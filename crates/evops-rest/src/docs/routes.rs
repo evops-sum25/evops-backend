@@ -23,6 +23,7 @@ pub fn router() -> ApiRouter {
                 .axum_route()
         })
         .route("/swagger/", get(async || Redirect::permanent("/swagger")))
+        .route("/", get(async || Redirect::permanent("/swagger")))
 }
 
 fn inspect_openapi_errors() {
