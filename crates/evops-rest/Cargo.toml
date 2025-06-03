@@ -1,0 +1,17 @@
+[package]
+name = "evops-rest"
+edition = "2024"
+
+[dependencies]
+evops-core = { workspace = true }
+
+aide = { workspace = true, features = ["axum-json", "swagger"] }
+axum = { workspace = true }
+schemars = { workspace = true }
+serde = { workspace = true, features = ["rc"] }
+strum = { workspace = true, features = ["derive"] }
+tokio = { workspace = true }
+tracing = { workspace = true }
+
+[lints]
+workspace = true
