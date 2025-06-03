@@ -8,7 +8,7 @@ default-members = ["crates/evops"]
 evops-core = { path = "crates/evops-core/" }
 evops-db = { path = "crates/evops-db/" }
 evops-grpc = { path = "crates/evops-grpc/" }
-evops-markdown = { path = "markdown/" }
+evops-markdown = { path = "client-ext/evops-markdown/" }
 evops-rest = { path = "crates/evops-rest/" }
 
 aide = "0.14.2"
