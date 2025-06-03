@@ -1,4 +1,6 @@
 *Dockerfile
 .env.example
 .gitignore
+/.gitmodules
 /target/
+README.md
