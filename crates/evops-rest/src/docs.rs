@@ -1,6 +1,6 @@
 use aide::transform::TransformOpenApi;
 use schemars::SchemaGenerator;
-use schemars::r#gen::SchemaSettings;
+use schemars::generate::SchemaSettings;
 use strum::{Display, EnumMessage, IntoStaticStr, VariantArray};
 
 pub use self::routes::router;
