@@ -1,14 +1,14 @@
 [workspace]
 resolver = "3"
 members = ["crates/*/"]
-exclude = ["markdown/"]
-default-members = ["crates/evops"]
+exclude = ["client-ext/crate/"]
+default-members = ["crates/evops/"]
 
 [workspace.dependencies]
+evops-client-ext = { path = "client-ext/crate/" }
 evops-core = { path = "crates/evops-core/" }
 evops-db = { path = "crates/evops-db/" }
 evops-grpc = { path = "crates/evops-grpc/" }
-evops-markdown = { path = "client-ext/evops-markdown/" }
 evops-rest = { path = "crates/evops-rest/" }
 
 aide = "0.15.0"
