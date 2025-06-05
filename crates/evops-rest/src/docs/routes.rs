@@ -4,6 +4,7 @@ use aide::NoApi;
 use aide::axum::routing::get;
 use aide::axum::{ApiRouter, IntoApiResponse};
 use aide::openapi::OpenApi;
+use aide::scalar::Scalar;
 use aide::swagger::Swagger;
 use axum::response::IntoResponse as _;
 use axum::{Extension, Json, response::Redirect};
@@ -16,14 +17,20 @@ pub fn router() -> ApiRouter {
 
     ApiRouter::new()
         // .route("/favicon.ico", get(async || Redirect::temporary(todo!())))
+        .route("/", get(async || Redirect::permanent("/swagger")))
         .route("/api.json", get(self::serve))
+        .route("/scalar", {
+            Scalar::new("/api.json")
+                .with_title("evops.api - Scalar")
+                .axum_route()
+        })
+        .route("/scalar/", get(async || Redirect::permanent("/scalar")))
         .route("/swagger", {
             Swagger::new("/api.json")
                 .with_title("evops.api - Swagger UI")
                 .axum_route()
         })
         .route("/swagger/", get(async || Redirect::permanent("/swagger")))
-        .route("/", get(async || Redirect::permanent("/swagger")))
 }
 
 fn inspect_openapi_errors() {
