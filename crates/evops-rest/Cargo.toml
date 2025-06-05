@@ -5,7 +5,7 @@ edition = "2024"
 [dependencies]
 evops-core = { workspace = true }
 
-aide = { workspace = true, features = ["axum-json", "swagger"] }
+aide = { workspace = true, features = ["axum-json", "scalar", "swagger"] }
 axum = { workspace = true }
 schemars = { workspace = true }
 serde = { workspace = true, features = ["rc"] }
