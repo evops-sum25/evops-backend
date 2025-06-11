@@ -1,8 +1,8 @@
-FROM rust:1.87.0-alpine3.22 AS builder
-RUN apk update && apk add --no-cache musl-dev protoc
+FROM rust:1.87.0-bookworm AS builder
+RUN apt-get update && apt-get install --assume-yes protobuf-compiler
 COPY ./ ./
 RUN cargo install --path=crates/evops/
 
-FROM alpine:3.22
+FROM debian:bookworm-slim
 COPY --from=builder /usr/local/cargo/bin/evops /usr/local/bin/
 ENTRYPOINT ["evops"]
