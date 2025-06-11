@@ -4,6 +4,5 @@ COPY ./ ./
 RUN cargo install --path=crates/evops/
 
 FROM debian:bookworm-slim
-COPY .env ./
 COPY --from=builder /usr/local/cargo/bin/evops /usr/local/bin/
 ENTRYPOINT ["evops"]
