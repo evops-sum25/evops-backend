@@ -1,17 +1,12 @@
-use crate::types::{EventServiceCreateRequest, EventServiceCreateResponse};
+use evops_types::{CreateEventRequest, CreateEventResponse};
 
-#[must_use]
-pub async fn create(
-    state: &crate::AppState,
-    mut request: EventServiceCreateRequest,
-) -> EventServiceCreateResponse {
-    {
-        _ = state.db.lock().await;
-    }
+impl crate::AppState {
+    #[must_use]
+    pub async fn create_event(&self, mut request: CreateEventRequest) -> CreateEventResponse {
+        {
+            _ = self.shared_state.db.lock().await;
+        }
 
-    request.name.make_ascii_uppercase();
-    EventServiceCreateResponse {
-        name: request.name,
-        description: request.description.repeat(2),
+        todo!();
     }
 }

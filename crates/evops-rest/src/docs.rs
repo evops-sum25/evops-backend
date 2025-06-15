@@ -11,6 +11,8 @@ mod routes;
 pub enum Tag {
     /// CRUD operations on events
     EventService,
+    /// CRUD operations on users
+    UserService,
 }
 
 pub fn use_openapi3_schemas() {

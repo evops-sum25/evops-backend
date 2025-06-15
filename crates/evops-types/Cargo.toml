@@ -1,0 +1,12 @@
+[package]
+name = "evops-types"
+edition = "2024"
+
+[dependencies]
+nutype = { workspace = true, features = ["new_unchecked", "regex"] }
+regex = { workspace = true }
+url = { workspace = true }
+uuid = { workspace = true }
+
+[lints]
+workspace = true

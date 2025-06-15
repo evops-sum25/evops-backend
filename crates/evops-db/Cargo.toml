@@ -3,11 +3,13 @@ name = "evops-db"
 edition = "2024"
 
 [dependencies]
-diesel = { workspace = true, features = ["chrono"] }
+evops-types = { workspace = true }
+
+diesel = { workspace = true, features = ["chrono", "uuid"] }
 diesel-async = { workspace = true, features = ["postgres"] }
-diesel-derive-newtype = { workspace = true }
 chrono = { workspace = true }
 url = { workspace = true }
+uuid = { workspace = true }
 
 [lints]
 workspace = true

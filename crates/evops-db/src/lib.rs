@@ -2,7 +2,7 @@ use diesel::ConnectionResult;
 use diesel_async::{AsyncConnection as _, AsyncPgConnection};
 use url::Url;
 
-pub mod models;
+mod models;
 mod schema;
 
 pub struct Database {
@@ -16,3 +16,7 @@ impl Database {
         })
     }
 }
+
+// impl Database {
+//     pub fn create_event() -> evops_types::EventServiceCreateResponse {}
+// }

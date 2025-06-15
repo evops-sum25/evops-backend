@@ -19,27 +19,22 @@ impl EventService for self::Service {
         request: Request<crate::pb::EventServiceCreateRequest>,
     ) -> Result<Response<crate::pb::EventServiceCreateResponse>, Status> {
         Ok(Response::new({
-            evops_core::services::event::create(&self.state, request.into_inner().into())
+            self.state
+                .create_event(request.into_inner().into())
                 .await
                 .into()
         }))
     }
 }
 
-impl From<crate::pb::EventServiceCreateRequest> for evops_core::types::EventServiceCreateRequest {
+impl From<crate::pb::EventServiceCreateRequest> for evops_types::CreateEventRequest {
     fn from(value: crate::pb::EventServiceCreateRequest) -> Self {
-        Self {
-            name: value.name,
-            description: value.description,
-        }
+        todo!();
     }
 }
 
-impl From<evops_core::types::EventServiceCreateResponse> for crate::pb::EventServiceCreateResponse {
-    fn from(value: evops_core::types::EventServiceCreateResponse) -> Self {
-        Self {
-            name: value.name,
-            description: value.description,
-        }
+impl From<evops_types::CreateEventResponse> for crate::pb::EventServiceCreateResponse {
+    fn from(value: evops_types::CreateEventResponse) -> Self {
+        todo!();
     }
 }
