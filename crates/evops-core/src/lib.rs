@@ -3,6 +3,7 @@ use std::sync::Arc;
 use eyre::Context as _;
 use url::Url;
 
+pub mod errors;
 pub mod services;
 
 // This private struct only exists to be part of `self::AppState`.

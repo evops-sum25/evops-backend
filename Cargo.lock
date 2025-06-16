@@ -32,6 +32,7 @@ version = "0.15.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4d34f0f6ce85b460bf2f9e7eea6612f217ba700ae14e9e476805d2413480f64b"
 dependencies = [
+ "aide-macros",
  "axum",
  "bytes",
  "cfg-if",
@@ -45,6 +46,18 @@ dependencies = [
  "tower-layer",
  "tower-service",
  "tracing",
+]
+
+[[package]]
+name = "aide-macros"
+version = "0.15.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9f2a08f14808f3c46f3e3004b727bace64af44c3c5996d0480a14d3852b1b25a"
+dependencies = [
+ "darling",
+ "proc-macro2",
+ "quote",
+ "syn",
 ]
 
 [[package]]
@@ -239,6 +252,7 @@ dependencies = [
  "iana-time-zone",
  "js-sys",
  "num-traits",
+ "serde",
  "wasm-bindgen",
  "windows-link",
 ]
@@ -506,6 +520,7 @@ dependencies = [
  "evops-db",
  "evops-types",
  "eyre",
+ "thiserror",
  "tokio",
  "url",
 ]
@@ -518,6 +533,7 @@ dependencies = [
  "diesel",
  "diesel-async",
  "evops-types",
+ "thiserror",
  "url",
  "uuid",
 ]
@@ -545,12 +561,15 @@ version = "0.0.0"
 dependencies = [
  "aide",
  "axum",
+ "chrono",
  "evops-core",
  "evops-types",
  "eyre",
+ "http",
  "schemars",
  "serde",
  "strum",
+ "thiserror",
  "tokio",
  "tracing",
  "url",
@@ -561,6 +580,7 @@ dependencies = [
 name = "evops-types"
 version = "0.0.0"
 dependencies = [
+ "chrono",
  "nutype",
  "regex",
  "url",
@@ -1611,6 +1631,7 @@ version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4cd191f9397d57d581cddd31014772520aa448f65ef991055d7f61582c65165f"
 dependencies = [
+ "chrono",
  "dyn-clone",
  "indexmap",
  "ref-cast",

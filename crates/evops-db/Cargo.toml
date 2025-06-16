@@ -5,11 +5,12 @@ edition = "2024"
 [dependencies]
 evops-types = { workspace = true }
 
+chrono = { workspace = true }
 diesel = { workspace = true, features = ["chrono", "uuid"] }
 diesel-async = { workspace = true, features = ["postgres"] }
-chrono = { workspace = true }
+thiserror = { workspace = true }
 url = { workspace = true }
-uuid = { workspace = true }
+uuid = { workspace = true, features = ["v7"] }
 
 [lints]
 workspace = true

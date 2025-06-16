@@ -11,6 +11,8 @@ mod routes;
 pub enum Tag {
     /// CRUD operations on events
     EventService,
+    /// CRUD operations on event tags
+    TagService,
     /// CRUD operations on users
     UserService,
 }

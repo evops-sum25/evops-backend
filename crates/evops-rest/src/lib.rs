@@ -7,6 +7,7 @@ use axum::Extension;
 use evops_core::AppState;
 
 mod docs;
+mod error;
 mod routes;
 mod types;
 

@@ -6,12 +6,20 @@ edition = "2024"
 evops-core = { workspace = true }
 evops-types = { workspace = true }
 
-aide = { workspace = true, features = ["axum-json", "scalar", "swagger"] }
+aide = { workspace = true, features = [
+  "axum-json",
+  "macros",
+  "scalar",
+  "swagger",
+] }
 axum = { workspace = true }
+chrono = { workspace = true, features = ["serde"] }
 eyre = { workspace = true }
-schemars = { workspace = true, features = ["url2", "uuid1"] }
+http = { workspace = true }
+schemars = { workspace = true, features = ["chrono04", "url2", "uuid1"] }
 serde = { workspace = true, features = ["rc"] }
 strum = { workspace = true, features = ["derive"] }
+thiserror = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
 url = { workspace = true, features = ["serde"] }

@@ -3,6 +3,7 @@ name = "evops-types"
 edition = "2024"
 
 [dependencies]
+chrono = { workspace = true }
 nutype = { workspace = true, features = ["new_unchecked", "regex"] }
 regex = { workspace = true }
 url = { workspace = true }
