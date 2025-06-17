@@ -7,7 +7,6 @@ evops-db = { workspace = true }
 evops-types = { workspace = true }
 
 eyre = { workspace = true }
-thiserror = { workspace = true }
 tokio = { workspace = true, features = ["sync"] }
 url = { workspace = true }
 

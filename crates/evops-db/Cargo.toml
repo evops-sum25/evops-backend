@@ -8,7 +8,6 @@ evops-types = { workspace = true }
 chrono = { workspace = true }
 diesel = { workspace = true, features = ["chrono", "uuid"] }
 diesel-async = { workspace = true, features = ["postgres"] }
-thiserror = { workspace = true }
 url = { workspace = true }
 uuid = { workspace = true, features = ["v7"] }
 
