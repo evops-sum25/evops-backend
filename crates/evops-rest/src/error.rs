@@ -1,7 +1,6 @@
 use aide::OperationIo;
 use aide::transform::TransformOperation;
 use axum::response::{IntoResponse, Response};
-use http::StatusCode;
 use thiserror::Error;
 
 pub use self::bad_request::BadRequestError;

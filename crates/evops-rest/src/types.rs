@@ -171,7 +171,10 @@ impl From<evops_types::EventDescription> for self::EventDescription {
 }
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
-struct UserName(#[schemars(length(min = 1, max = evops_types::USER_NAME_MAX_LEN))] String);
+struct UserName(
+    #[schemars(length(min = evops_types::USER_NAME_MIN_LEN, max = evops_types::USER_NAME_MAX_LEN))]
+    String,
+);
 impl TryFrom<self::UserName> for evops_types::UserName {
     type Error = crate::error::UnprocessableEntityError;
 
@@ -214,7 +217,7 @@ impl From<evops_types::TagId> for self::TagId {
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 struct TagName(
     #[schemars(
-        length(min = 1, max = evops_types::TAG_NAME_MAX_LEN),
+        length(min = evops_types::TAG_NAME_MIN_LEN, max = evops_types::TAG_NAME_MAX_LEN),
         regex(pattern = evops_types::TAG_NAME_REGEX),
         example = &"tag-like-on-github",
     )]
@@ -236,7 +239,7 @@ impl From<evops_types::TagName> for self::TagName {
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 struct TagAlias(
     #[schemars(
-        length(min = 1, max = evops_types::TAG_ALIAS_MAX_LEN),
+        length(min = evops_types::TAG_ALIAS_MIN_LEN, max = evops_types::TAG_ALIAS_MAX_LEN),
         example = &"alias-for-better-search-ux",
     )]
     String,
