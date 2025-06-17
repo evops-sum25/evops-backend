@@ -27,5 +27,5 @@ async fn post(
     State(state): State<crate::AppState>,
     Json(request): Json<crate::types::EventServiceCreateRequest>,
 ) -> crate::Result<Json<crate::types::EventServiceCreateResponse>> {
-    Ok(Json(state.create_event(request.try_into()?).await.into()))
+    Ok(Json(state.create_event(request.try_into()?).await?.into()))
 }

@@ -9,7 +9,7 @@ use evops_types::{CreateTagError, Tag, TagForm};
 #[diesel(table_name = crate::schema::tags)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 struct NewTag<'a> {
-    id: &'a Uuid,
+    id: Uuid,
     name: &'a str,
 }
 
@@ -17,24 +17,25 @@ struct NewTag<'a> {
 #[diesel(table_name = crate::schema::tag_aliases)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 struct NewTagAlias<'a> {
-    tag_id: &'a Uuid,
+    tag_id: Uuid,
     alias: &'a str,
 }
 
 impl crate::Database {
-    pub async fn create_tag(&mut self, request: TagForm) -> Result<Tag, CreateTagError> {
+    pub async fn create_tag(&mut self, form: TagForm) -> Result<Tag, CreateTagError> {
         let tag_id = Uuid::now_v7();
 
-        let insert_result = diesel::insert_into(crate::schema::tags::table)
-            .values(NewTag {
-                id: &tag_id,
-                name: request.name.as_ref(),
-            })
-            .execute(&mut self.conn)
-            .await;
-
+        let insert_tag_result = {
+            diesel::insert_into(crate::schema::tags::table)
+                .values(NewTag {
+                    id: tag_id,
+                    name: form.name.as_ref(),
+                })
+                .execute(&mut self.conn)
+                .await
+        };
         if let Err(diesel::result::Error::DatabaseError(DatabaseErrorKind::UniqueViolation, info)) =
-            insert_result
+            insert_tag_result
         {
             return Err(CreateTagError::Duplicate({
                 info.details().map_or_else(
@@ -44,14 +45,13 @@ impl crate::Database {
             }));
         }
 
-        let aliases = request.aliases.unwrap_or_default();
-
+        let aliases = form.aliases.unwrap_or_default();
         diesel::insert_into(crate::schema::tag_aliases::table)
             .values({
                 aliases
                     .iter()
                     .map(|a| NewTagAlias {
-                        tag_id: &tag_id,
+                        tag_id: tag_id,
                         alias: a.as_ref(),
                     })
                     .collect::<Vec<_>>()
@@ -62,7 +62,7 @@ impl crate::Database {
 
         Ok(Tag {
             id: evops_types::TagId::new(tag_id),
-            name: request.name,
+            name: form.name,
             aliases,
         })
     }
