@@ -3,7 +3,6 @@ use aide::axum::routing::post_with;
 use aide::transform::{TransformOperation, TransformPathItem};
 use axum::Json;
 use axum::extract::State;
-use axum::http::StatusCode;
 
 use crate::error::AddResponse as _;
 
@@ -27,11 +26,6 @@ fn post_docs(o: TransformOperation) -> TransformOperation {
 async fn post(
     State(state): State<crate::AppState>,
     Json(request): Json<crate::types::EventServiceCreateRequest>,
-) -> Result<Json<crate::types::EventServiceCreateResponse>, StatusCode> {
-    Ok(Json({
-        state
-            .create_event(request.try_into().map_err(|_| StatusCode::BAD_REQUEST)?)
-            .await
-            .into()
-    }))
+) -> crate::Result<Json<crate::types::EventServiceCreateResponse>> {
+    Ok(Json(state.create_event(request.try_into()?).await.into()))
 }

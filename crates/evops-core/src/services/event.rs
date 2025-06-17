@@ -1,7 +1,10 @@
-use evops_types::{CreateEventRequest, CreateEventResponse};
+use evops_types::{EventServiceCreateRequest, EventServiceCreateResponse};
 
 impl crate::AppState {
-    pub async fn create_event(&self, request: CreateEventRequest) -> CreateEventResponse {
+    pub async fn create_event(
+        &self,
+        request: EventServiceCreateRequest,
+    ) -> EventServiceCreateResponse {
         {
             _ = self.shared_state.db.lock().await;
         }

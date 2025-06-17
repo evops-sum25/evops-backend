@@ -1,12 +1,14 @@
-use evops_types::{CreateTagError, CreateTagRequest, CreateTagResponse};
+use evops_types::{CreateTagError, TagServiceCreateRequest, TagServiceCreateResponse};
 
 impl crate::AppState {
     pub async fn create_tag(
         &self,
-        request: CreateTagRequest,
-    ) -> Result<CreateTagResponse, CreateTagError> {
+        request: TagServiceCreateRequest,
+    ) -> Result<TagServiceCreateResponse, CreateTagError> {
         let mut db = self.shared_state.db.lock().await;
 
-        db.create_tag(request).await
+        Ok(TagServiceCreateResponse {
+            tag: db.create_tag(request.form).await?,
+        })
     }
 }

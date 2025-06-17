@@ -1,6 +1,6 @@
 use diesel::{Insertable, SelectableHelper as _};
 use diesel_async::RunQueryDsl as _;
-use evops_types::{CreateUserError, CreateUserRequest, CreateUserResponse};
+use evops_types::{CreateUserError, User, UserForm};
 use url::Url;
 use uuid::Uuid;
 
@@ -14,10 +14,7 @@ struct NewUser<'a> {
 }
 
 impl crate::Database {
-    pub async fn create_user(
-        &mut self,
-        request: CreateUserRequest,
-    ) -> Result<CreateUserResponse, CreateUserError> {
+    pub async fn create_user(&mut self, request: UserForm) -> Result<User, CreateUserError> {
         let id = Uuid::now_v7();
 
         diesel::insert_into(crate::schema::users::table)
@@ -31,7 +28,7 @@ impl crate::Database {
             .await
             .map_err(|e| CreateUserError::Db(e.into()))?;
 
-        Ok(CreateUserResponse {
+        Ok(User {
             id: evops_types::UserId::new(id),
             name: request.name,
             profile_picture_url: request.profile_picture_url,

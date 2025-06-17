@@ -16,11 +16,6 @@ impl EventService for self::Service {
         &self,
         request: Request<crate::pb::EventServiceCreateRequest>,
     ) -> Result<Response<crate::pb::EventServiceCreateResponse>, Status> {
-        Ok(Response::new({
-            self.state
-                .create_event(request.into_inner().into())
-                .await
-                .into()
-        }))
+        todo!();
     }
 }

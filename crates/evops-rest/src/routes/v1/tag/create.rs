@@ -28,10 +28,5 @@ async fn post(
     State(state): State<crate::AppState>,
     Json(request): Json<crate::types::TagServiceCreateRequest>,
 ) -> crate::Result<Json<crate::types::TagServiceCreateResponse>> {
-    Ok(Json({
-        state
-            .create_tag(evops_types::CreateTagRequest::try_from(request)?)
-            .await?
-            .into()
-    }))
+    Ok(Json(state.create_tag(request.try_into()?).await?.into()))
 }

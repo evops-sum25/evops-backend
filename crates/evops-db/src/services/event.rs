@@ -1,10 +1,7 @@
-use evops_types::{CreateEventError, CreateEventRequest, CreateEventResponse};
+use evops_types::{CreateEventError, Event, EventForm};
 
 impl crate::Database {
-    pub async fn create_event(
-        &mut self,
-        request: CreateEventRequest,
-    ) -> Result<CreateEventResponse, CreateEventError> {
+    pub async fn create_event(&mut self, request: EventForm) -> Result<Event, CreateEventError> {
         todo!();
     }
 }

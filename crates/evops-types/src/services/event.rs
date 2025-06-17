@@ -5,7 +5,17 @@ use url::Url;
 use uuid::Uuid;
 
 #[derive(Debug)]
-pub struct CreateEventRequest {
+pub struct EventServiceCreateRequest {
+    pub form: crate::EventForm,
+}
+
+#[derive(Debug)]
+pub struct EventServiceCreateResponse {
+    pub event: crate::Event,
+}
+
+#[derive(Debug)]
+pub struct EventForm {
     pub author_id: crate::UserId,
     pub image_urls: Option<Vec<Url>>,
     pub title: crate::EventTitle,
@@ -15,13 +25,13 @@ pub struct CreateEventRequest {
 }
 
 #[derive(Debug)]
-pub struct CreateEventResponse {
+pub struct Event {
     pub id: crate::EventId,
-    pub author: crate::CreateUserResponse,
+    pub author: crate::User,
     pub image_urls: Vec<Url>,
     pub title: crate::EventTitle,
     pub description: crate::EventDescription,
-    pub tags: Vec<crate::CreateTagResponse>,
+    pub tags: Vec<crate::Tag>,
     pub with_attendance: bool,
     pub created_at: DateTime<Utc>,
     pub modified_at: DateTime<Utc>,
@@ -36,8 +46,23 @@ pub enum CreateEventError {
 #[nutype(derive(Debug, PartialEq, Eq, Hash))]
 pub struct EventId(Uuid);
 
-#[nutype(new_unchecked, derive(Debug, PartialEq, Eq, AsRef, Hash))]
+pub const EVENT_TITLE_MIN_LEN: usize = 1;
+pub const EVENT_TITLE_MAX_LEN: usize = 64;
+#[nutype(
+    new_unchecked,
+    validate(len_char_min = crate::EVENT_TITLE_MIN_LEN, len_char_max = crate::EVENT_TITLE_MAX_LEN),
+    derive(Debug, PartialEq, Eq, AsRef, Hash),
+)]
 pub struct EventTitle(String);
 
-#[nutype(new_unchecked, derive(Debug, PartialEq, Eq, AsRef, Hash))]
+pub const EVENT_DESCRIPTION_MIN_LEN: usize = 1;
+pub const EVENT_DESCRIPTION_MAX_LEN: usize = 5000;
+#[nutype(
+    new_unchecked,
+    validate(
+        len_char_min = crate::EVENT_DESCRIPTION_MIN_LEN,
+        len_char_max = crate::EVENT_DESCRIPTION_MAX_LEN,
+    ),
+    derive(Debug, PartialEq, Eq, AsRef, Hash)
+)]
 pub struct EventDescription(String);

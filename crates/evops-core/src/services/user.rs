@@ -1,12 +1,14 @@
-use evops_types::{CreateUserError, CreateUserRequest, CreateUserResponse};
+use evops_types::{CreateUserError, UserServiceCreateRequest, UserServiceCreateResponse};
 
 impl crate::AppState {
     pub async fn create_user(
         &self,
-        request: CreateUserRequest,
-    ) -> Result<CreateUserResponse, CreateUserError> {
+        request: UserServiceCreateRequest,
+    ) -> Result<UserServiceCreateResponse, CreateUserError> {
         let mut db = self.shared_state.db.lock().await;
 
-        db.create_user(request).await
+        Ok(UserServiceCreateResponse {
+            user: db.create_user(request.form).await?,
+        })
     }
 }

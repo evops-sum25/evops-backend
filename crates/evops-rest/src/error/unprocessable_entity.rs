@@ -20,6 +20,18 @@ impl From<String> for self::UnprocessableEntityError {
     }
 }
 
+impl From<evops_types::EventDescriptionError> for self::UnprocessableEntityError {
+    fn from(value: evops_types::EventDescriptionError) -> Self {
+        value.to_string().into()
+    }
+}
+
+impl From<evops_types::EventTitleError> for self::UnprocessableEntityError {
+    fn from(value: evops_types::EventTitleError) -> Self {
+        value.to_string().into()
+    }
+}
+
 impl From<evops_types::TagNameError> for self::UnprocessableEntityError {
     fn from(value: evops_types::TagNameError) -> Self {
         value.to_string().into()

@@ -3,7 +3,7 @@ use diesel::result::DatabaseErrorKind;
 use diesel_async::RunQueryDsl as _;
 use uuid::Uuid;
 
-use evops_types::{CreateTagError, CreateTagRequest, CreateTagResponse};
+use evops_types::{CreateTagError, Tag, TagForm};
 
 #[derive(Insertable)]
 #[diesel(table_name = crate::schema::tags)]
@@ -22,10 +22,7 @@ struct NewTagAlias<'a> {
 }
 
 impl crate::Database {
-    pub async fn create_tag(
-        &mut self,
-        request: CreateTagRequest,
-    ) -> Result<CreateTagResponse, CreateTagError> {
+    pub async fn create_tag(&mut self, request: TagForm) -> Result<Tag, CreateTagError> {
         let tag_id = Uuid::now_v7();
 
         let insert_result = diesel::insert_into(crate::schema::tags::table)
@@ -63,7 +60,7 @@ impl crate::Database {
             .await
             .map_err(|e| CreateTagError::Db(e.into()))?;
 
-        Ok(CreateTagResponse {
+        Ok(Tag {
             id: evops_types::TagId::new(tag_id),
             name: request.name,
             aliases,

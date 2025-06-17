@@ -6,13 +6,23 @@ use thiserror::Error;
 use uuid::Uuid;
 
 #[derive(Debug)]
-pub struct CreateTagRequest {
+pub struct TagServiceCreateRequest {
+    pub form: crate::TagForm,
+}
+
+#[derive(Debug)]
+pub struct TagServiceCreateResponse {
+    pub tag: crate::Tag,
+}
+
+#[derive(Debug)]
+pub struct TagForm {
     pub name: crate::TagName,
     pub aliases: Option<Vec<crate::TagAlias>>,
 }
 
 #[derive(Debug)]
-pub struct CreateTagResponse {
+pub struct Tag {
     pub id: crate::TagId,
     pub name: crate::TagName,
     pub aliases: Vec<crate::TagAlias>,
