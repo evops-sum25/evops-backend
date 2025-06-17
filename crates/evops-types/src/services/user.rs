@@ -29,7 +29,7 @@ pub struct User {
 #[derive(Error, Debug)]
 pub enum CreateUserError {
     #[error(transparent)]
-    Db(eyre::Error),
+    Db(#[from] diesel::result::Error),
 }
 
 #[derive(Error, Debug)]
@@ -37,7 +37,7 @@ pub enum FindUserError {
     #[error("User with ID {0} was not found.")]
     NotFound(UserId),
     #[error(transparent)]
-    Db(eyre::Error),
+    Db(#[from] diesel::result::Error),
 }
 
 #[nutype(derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Display))]

@@ -563,8 +563,6 @@ dependencies = [
  "chrono",
  "evops-core",
  "evops-types",
- "eyre",
- "http",
  "schemars",
  "serde",
  "strum",
@@ -580,6 +578,7 @@ name = "evops-types"
 version = "0.0.0"
 dependencies = [
  "chrono",
+ "diesel",
  "eyre",
  "nutype",
  "regex",

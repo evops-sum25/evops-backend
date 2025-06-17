@@ -4,6 +4,7 @@ edition = "2024"
 
 [dependencies]
 chrono = { workspace = true }
+diesel = { workspace = true }
 eyre = { workspace = true }
 nutype = { workspace = true, features = ["new_unchecked", "regex"] }
 regex = { workspace = true }

@@ -1,5 +1,6 @@
 use diesel::{Insertable, QueryDsl as _, SelectableHelper as _};
-use diesel_async::RunQueryDsl as _;
+use diesel_async::scoped_futures::ScopedFutureExt as _;
+use diesel_async::{AsyncConnection as _, RunQueryDsl as _};
 use url::Url;
 use uuid::Uuid;
 
@@ -18,46 +19,61 @@ impl crate::Database {
         &mut self,
         id: evops_types::UserId,
     ) -> Result<evops_types::User, evops_types::FindUserError> {
-        let user: crate::models::User = {
-            crate::schema::users::table
-                .find(id.into_inner())
-                .select(crate::models::User::as_select())
-                .get_result(&mut self.conn)
-                .await
-                .map_err(|e| match e {
-                    diesel::result::Error::NotFound => evops_types::FindUserError::NotFound(id),
-                    _ => evops_types::FindUserError::Db(e.into()),
-                })?
-        };
+        self.conn
+            .transaction(|conn| {
+                async move {
+                    let user: crate::models::User = {
+                        crate::schema::users::table
+                            .find(id.into_inner())
+                            .select(crate::models::User::as_select())
+                            .get_result(conn)
+                            .await
+                            .map_err(|e| match e {
+                                diesel::result::Error::NotFound => {
+                                    evops_types::FindUserError::NotFound(id)
+                                }
+                                _ => e.into(),
+                            })?
+                    };
 
-        Ok(evops_types::User {
-            id,
-            name: unsafe { evops_types::UserName::new_unchecked(user.name) },
-            profile_picture_url: user.profile_picture_url.map(|s| s.parse().unwrap()),
-        })
+                    Ok(evops_types::User {
+                        id,
+                        name: unsafe { evops_types::UserName::new_unchecked(user.name) },
+                        profile_picture_url: user.profile_picture_url.map(|s| s.parse().unwrap()),
+                    })
+                }
+                .scope_boxed()
+            })
+            .await
     }
 
     pub async fn create_user(
         &mut self,
         form: evops_types::NewUserForm,
     ) -> Result<evops_types::User, evops_types::CreateUserError> {
-        let user_id = Uuid::now_v7();
+        self.conn
+            .transaction(|conn| {
+                async move {
+                    let user_id = Uuid::now_v7();
 
-        diesel::insert_into(crate::schema::users::table)
-            .values(NewUser {
-                id: user_id,
-                name: form.name.as_ref(),
-                profile_picture_url: form.profile_picture_url.as_ref().map(Url::as_str),
+                    diesel::insert_into(crate::schema::users::table)
+                        .values(NewUser {
+                            id: user_id,
+                            name: form.name.as_ref(),
+                            profile_picture_url: form.profile_picture_url.as_ref().map(Url::as_str),
+                        })
+                        .returning(crate::models::User::as_returning())
+                        .execute(conn)
+                        .await?;
+
+                    Ok(evops_types::User {
+                        id: evops_types::UserId::new(user_id),
+                        name: form.name,
+                        profile_picture_url: form.profile_picture_url,
+                    })
+                }
+                .scope_boxed()
             })
-            .returning(crate::models::User::as_returning())
-            .execute(&mut self.conn)
             .await
-            .map_err(|e| evops_types::CreateUserError::Db(e.into()))?;
-
-        Ok(evops_types::User {
-            id: evops_types::UserId::new(user_id),
-            name: form.name,
-            profile_picture_url: form.profile_picture_url,
-        })
     }
 }

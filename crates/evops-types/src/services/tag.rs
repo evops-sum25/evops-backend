@@ -33,7 +33,7 @@ pub enum CreateTagError {
     #[error("{0}")]
     AlreadyExists(String),
     #[error(transparent)]
-    Db(#[from] eyre::Error),
+    Db(#[from] diesel::result::Error),
 }
 
 #[derive(Error, Debug)]
@@ -41,7 +41,7 @@ pub enum FindTagError {
     #[error("Tag with ID {0} was not found.")]
     NotFound(crate::TagId),
     #[error(transparent)]
-    Db(#[from] eyre::Error),
+    Db(#[from] diesel::result::Error),
 }
 
 #[nutype(derive(Debug, Clone, Copy, Debug, PartialEq, Eq, Hash, Display))]

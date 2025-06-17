@@ -19,9 +19,3 @@ impl From<String> for self::InternalServerError {
         Self(value)
     }
 }
-
-impl From<eyre::Error> for self::InternalServerError {
-    fn from(value: eyre::Error) -> Self {
-        value.to_string().into()
-    }
-}

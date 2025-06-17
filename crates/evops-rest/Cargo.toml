@@ -14,8 +14,6 @@ aide = { workspace = true, features = [
 ] }
 axum = { workspace = true }
 chrono = { workspace = true, features = ["serde"] }
-eyre = { workspace = true }
-http = { workspace = true }
 schemars = { workspace = true, features = ["chrono04", "url2", "uuid1"] }
 serde = { workspace = true, features = ["rc"] }
 strum = { workspace = true, features = ["derive"] }

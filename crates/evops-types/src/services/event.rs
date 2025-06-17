@@ -44,7 +44,7 @@ pub enum CreateEventError {
     #[error("Tag with ID {0} was not found.")]
     TagNotFound(crate::TagId),
     #[error(transparent)]
-    Db(#[from] eyre::Error),
+    Db(#[from] diesel::result::Error),
 }
 
 #[nutype(derive(Debug, PartialEq, Eq, Hash, Display))]
