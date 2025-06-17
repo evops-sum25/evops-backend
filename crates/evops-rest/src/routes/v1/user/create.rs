@@ -26,13 +26,6 @@ fn post_docs(o: TransformOperation) -> TransformOperation {
 async fn post(
     State(state): State<crate::AppState>,
     Json(request): Json<crate::types::UserServiceCreateRequest>,
-) -> Result<Json<crate::types::UserServiceCreateResponse>, String> {
-    Ok(Json({
-        state
-            .create_user(request.try_into().map_err(|e: eyre::Error| e.to_string())?)
-            .await
-            // .map_err(|e| eyre!("{e}"))?
-            .map_err(|e| e.to_string())?
-            .into()
-    }))
+) -> crate::Result<Json<crate::types::UserServiceCreateResponse>> {
+    Ok(Json(state.create_user(request.try_into()?).await?.into()))
 }

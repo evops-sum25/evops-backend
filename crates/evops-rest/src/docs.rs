@@ -8,6 +8,7 @@ pub use self::routes::router;
 mod routes;
 
 #[derive(Display, IntoStaticStr, EnumMessage, VariantArray)]
+#[allow(clippy::enum_variant_names)]
 pub enum Tag {
     /// CRUD operations on events
     EventService,

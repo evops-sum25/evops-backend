@@ -1,37 +1,33 @@
 use aide::OperationIo;
 use aide::transform::TransformOperation;
+use axum::response::{IntoResponse, Response};
 use http::StatusCode;
-use schemars::JsonSchema;
-use serde::Serialize;
 use thiserror::Error;
 
-#[derive(Error, Debug, Serialize, JsonSchema)]
-#[error("{0}")]
-pub struct Error(pub String);
+pub use self::bad_request::BadRequestError;
+pub use self::conflict::ConflictError;
+pub use self::internal_server_error::InternalServerError;
+pub use self::unprocessable_entity::UnprocessableEntityError;
 
-#[derive(Error, Debug, OperationIo, Serialize, JsonSchema)]
-#[aide(output_with = "String")]
-#[error(transparent)]
-pub struct BadRequest(#[from] pub Error);
+mod bad_request;
+mod conflict;
+mod conversions;
+mod internal_server_error;
+mod unprocessable_entity;
 
-#[derive(Error, Debug, OperationIo, Serialize, JsonSchema)]
-#[aide(output_with = "String")]
+#[derive(Error, Debug, OperationIo)]
 #[error(transparent)]
-pub struct Conflict(#[from] pub Error);
-
-#[derive(Error, Debug, OperationIo, Serialize, JsonSchema)]
 #[aide(output_with = "String")]
-#[error(transparent)]
-pub struct UnprocessableEntity(#[from] pub Error);
-
-#[derive(Error, Debug, OperationIo, Serialize, JsonSchema)]
-#[aide(output_with = "String")]
-#[error(transparent)]
-pub struct InternalServerError(#[from] pub Error);
-impl From<eyre::Error> for InternalServerError {
-    fn from(value: eyre::Error) -> Self {
-        Self(Error(value.to_string()))
-    }
+pub enum Error {
+    /// 400
+    BadRequest(#[from] self::BadRequestError),
+    /// 409
+    Conflict(#[from] self::ConflictError),
+    /// 422
+    UnprocessableEntity(#[from] self::UnprocessableEntityError),
+    /// 500
+    #[allow(clippy::enum_variant_names)]
+    InternalServerError(#[from] self::InternalServerError),
 }
 
 pub trait AddResponse {
@@ -48,32 +44,39 @@ pub trait AddResponse {
     fn response_internal_server_error(self) -> Self;
 }
 
+impl IntoResponse for self::Error {
+    fn into_response(self) -> Response {
+        match self {
+            Self::BadRequest(e) => e.into_response(),
+            Self::Conflict(e) => e.into_response(),
+            Self::UnprocessableEntity(e) => e.into_response(),
+            Self::InternalServerError(e) => e.into_response(),
+        }
+    }
+}
+
 impl AddResponse for TransformOperation<'_> {
     fn response_bad_request(self) -> Self {
-        self.response_with::<400, self::BadRequest, _>(|r| {
-            r.description(StatusCode::BAD_REQUEST.canonical_reason().unwrap())
+        self.response_with::<400, self::BadRequestError, _>(|r| {
+            r.description("Bad Request (e.g. invalid JSON syntax)")
         })
     }
 
     fn response_conflict(self) -> Self {
-        self.response_with::<409, self::Conflict, _>(|r| {
-            r.description(StatusCode::CONFLICT.canonical_reason().unwrap())
+        self.response_with::<409, self::ConflictError, _>(|r| {
+            r.description("Conflict (e.g. the entity exists in the database)")
         })
     }
 
     fn response_unprocessable_entity(self) -> Self {
-        self.response_with::<422, self::UnprocessableEntity, _>(|r| {
-            r.description(StatusCode::UNPROCESSABLE_ENTITY.canonical_reason().unwrap())
+        self.response_with::<422, self::UnprocessableEntityError, _>(|r| {
+            r.description("Unprocessable Entity (e.g. wrong data types)")
         })
     }
 
     fn response_internal_server_error(self) -> Self {
         self.response_with::<500, self::InternalServerError, _>(|r| {
-            r.description({
-                StatusCode::INTERNAL_SERVER_ERROR
-                    .canonical_reason()
-                    .unwrap()
-            })
+            r.description("Internal Server Error (sorry)")
         })
     }
 }

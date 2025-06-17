@@ -1,9 +1,9 @@
-use std::collections::HashSet;
 use std::sync::LazyLock;
 
 use chrono::{DateTime, Utc};
 use nutype::nutype;
 use regex::Regex;
+use thiserror::Error;
 use url::Url;
 use uuid::Uuid;
 
@@ -20,14 +20,20 @@ pub struct CreateUserResponse {
     pub profile_picture_url: Option<Url>,
 }
 
+#[derive(Error, Debug)]
+#[error(transparent)]
+pub enum CreateUserError {
+    Db(eyre::Error),
+}
+
 #[derive(Debug)]
 pub struct CreateEventResponse {
     pub id: EventId,
     pub author: CreateUserResponse,
-    pub images: HashSet<Url>,
+    pub image_urls: Vec<Url>,
     pub title: EventTitle,
     pub description: EventDescription,
-    pub tags: HashSet<CreateTagResponse>,
+    pub tags: Vec<CreateTagResponse>,
     pub with_attendance: bool,
     pub created_at: DateTime<Utc>,
     pub modified_at: DateTime<Utc>,
@@ -45,11 +51,17 @@ pub struct EventDescription(String);
 #[derive(Debug)]
 pub struct CreateEventRequest {
     pub author_id: UserId,
-    pub images: Option<HashSet<Url>>,
+    pub image_urls: Option<Vec<Url>>,
     pub title: EventTitle,
     pub description: EventDescription,
-    pub tags: Option<HashSet<TagId>>,
+    pub tag_ids: Option<Vec<TagId>>,
     pub with_attendance: bool,
+}
+
+#[derive(Error, Debug)]
+#[error(transparent)]
+pub enum CreateEventError {
+    Db(#[from] eyre::Error),
 }
 
 #[nutype(derive(Debug, PartialEq, Eq, Hash))]
@@ -66,14 +78,23 @@ pub struct UserName(String);
 #[derive(Debug)]
 pub struct CreateTagRequest {
     pub name: TagName,
-    pub aliases: Option<HashSet<TagAlias>>,
+    pub aliases: Option<Vec<TagAlias>>,
 }
 
 #[derive(Debug)]
 pub struct CreateTagResponse {
     pub id: TagId,
     pub name: TagName,
-    pub aliases: HashSet<TagAlias>,
+    pub aliases: Vec<TagAlias>,
+}
+
+#[derive(Error, Debug)]
+#[error(transparent)]
+pub enum CreateTagError {
+    #[error("{0}")]
+    Duplicate(String),
+    #[error(transparent)]
+    Db(#[from] eyre::Error),
 }
 
 #[nutype(derive(Debug, PartialEq, Eq, Hash))]

@@ -2,7 +2,6 @@ use diesel::ConnectionResult;
 use diesel_async::{AsyncConnection as _, AsyncPgConnection};
 use url::Url;
 
-pub mod errors;
 mod models;
 mod schema;
 mod services;

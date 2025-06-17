@@ -3,8 +3,7 @@ use std::sync::Arc;
 use eyre::Context as _;
 use url::Url;
 
-pub mod errors;
-pub mod services;
+mod services;
 
 // This private struct only exists to be part of `self::AppState`.
 // The reason for its existence is to only wrap the state in an `Arc` once
@@ -39,6 +38,7 @@ impl AppState {
     /// Does the same thing as `self.clone()`,
     /// but the method name explicitly tells that the new object
     /// will point to the same memory location.
+    #[must_use]
     pub fn arc_clone(&self) -> Self {
         Self {
             shared_state: Arc::clone(&self.shared_state),
