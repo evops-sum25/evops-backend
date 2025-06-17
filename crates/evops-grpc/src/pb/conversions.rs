@@ -1,4 +1,4 @@
-impl From<crate::pb::EventServiceCreateRequest> for evops_types::EventForm {
+impl From<crate::pb::EventServiceCreateRequest> for evops_types::NewEventForm {
     fn from(value: crate::pb::EventServiceCreateRequest) -> Self {
         todo!();
     }

@@ -7,7 +7,7 @@ use uuid::Uuid;
 
 #[derive(Debug)]
 pub struct TagServiceCreateRequest {
-    pub form: crate::TagForm,
+    pub form: crate::NewTagForm,
 }
 
 #[derive(Debug)]
@@ -16,7 +16,7 @@ pub struct TagServiceCreateResponse {
 }
 
 #[derive(Debug)]
-pub struct TagForm {
+pub struct NewTagForm {
     pub name: crate::TagName,
     pub aliases: Option<Vec<crate::TagAlias>>,
 }
@@ -29,7 +29,6 @@ pub struct Tag {
 }
 
 #[derive(Error, Debug)]
-#[error(transparent)]
 pub enum CreateTagError {
     #[error("{0}")]
     Duplicate(String),
@@ -37,7 +36,15 @@ pub enum CreateTagError {
     Db(#[from] eyre::Error),
 }
 
-#[nutype(derive(Debug, PartialEq, Eq, Hash))]
+#[derive(Error, Debug)]
+pub enum FindTagError {
+    #[error("Tag with ID {0} was not found")]
+    NotFound(crate::TagId),
+    #[error(transparent)]
+    Db(#[from] eyre::Error),
+}
+
+#[nutype(derive(Debug, Clone, Copy, Debug, PartialEq, Eq, Hash, Display))]
 pub struct TagId(Uuid);
 
 pub static TAG_NAME_REGEX: LazyLock<Regex> =

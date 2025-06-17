@@ -1,7 +1,6 @@
 use chrono::{DateTime, Utc};
 use diesel::Insertable;
-use diesel_async::RunQueryDsl;
-use evops_types::{CreateEventError, Event, EventForm};
+use diesel_async::RunQueryDsl as _;
 use uuid::Uuid;
 
 #[derive(Insertable)]
@@ -44,7 +43,47 @@ struct NewEventTag {
 }
 
 impl crate::Database {
-    pub async fn create_event(&mut self, form: EventForm) -> Result<Event, CreateEventError> {
+    pub async fn create_event(
+        &mut self,
+        form: evops_types::NewEventForm,
+    ) -> Result<evops_types::Event, evops_types::CreateEventError> {
+        let author = match self.find_user(form.author_id).await {
+            Ok(author) => author,
+            Err(e) => {
+                return Err(match e {
+                    evops_types::FindUserError::NotFound(e) => {
+                        evops_types::CreateEventError::AuthorNotFound(e)
+                    }
+                    evops_types::FindUserError::Db(e) => evops_types::CreateEventError::Db(e),
+                });
+            }
+        };
+
+        let tags = {
+            let tag_ids = form.tag_ids.unwrap_or_default();
+            let mut buffer = Vec::with_capacity(tag_ids.len());
+
+            for id in tag_ids {
+                match self.find_tag(id).await {
+                    Ok(tag) => {
+                        buffer.push(tag);
+                    }
+                    Err(e) => {
+                        return Err(match e {
+                            evops_types::FindTagError::NotFound(e) => {
+                                evops_types::CreateEventError::TagNotFound(e)
+                            }
+                            evops_types::FindTagError::Db(e) => {
+                                evops_types::CreateEventError::Db(e)
+                            }
+                        });
+                    }
+                }
+            }
+
+            buffer
+        };
+
         let now = Utc::now();
         let event_id = Uuid::now_v7();
 
@@ -60,7 +99,7 @@ impl crate::Database {
             })
             .execute(&mut self.conn)
             .await
-            .map_err(|e| CreateEventError::Db(e.into()))?;
+            .map_err(|e| evops_types::CreateEventError::Db(e.into()))?;
 
         let image_urls = form.image_urls.unwrap_or_default();
         let new_images = {
@@ -77,7 +116,7 @@ impl crate::Database {
             .values(&new_images)
             .execute(&mut self.conn)
             .await
-            .map_err(|e| CreateEventError::Db(e.into()))?;
+            .map_err(|e| evops_types::CreateEventError::Db(e.into()))?;
 
         diesel::insert_into(crate::schema::event_images::table)
             .values(
@@ -91,10 +130,31 @@ impl crate::Database {
             )
             .execute(&mut self.conn)
             .await
-            .map_err(|e| CreateEventError::Db(e.into()))?;
+            .map_err(|e| evops_types::CreateEventError::Db(e.into()))?;
 
-        let tag_ids = form.tag_ids.unwrap_or_default();
+        diesel::insert_into(crate::schema::event_tags::table)
+            .values({
+                tags.iter()
+                    .map(|t| NewEventTag {
+                        event_id,
+                        tag_id: t.id.into_inner(),
+                    })
+                    .collect::<Vec<_>>()
+            })
+            .execute(&mut self.conn)
+            .await
+            .map_err(|e| evops_types::CreateEventError::Db(e.into()))?;
 
-        todo!();
+        Ok(evops_types::Event {
+            id: evops_types::EventId::new(event_id),
+            author,
+            image_urls,
+            title: form.title,
+            description: form.description,
+            tags,
+            with_attendance: form.with_attendance,
+            created_at: now,
+            modified_at: now,
+        })
     }
 }

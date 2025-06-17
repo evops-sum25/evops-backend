@@ -1,6 +1,5 @@
-use diesel::{Insertable, SelectableHelper as _};
+use diesel::{Insertable, QueryDsl as _, SelectableHelper as _};
 use diesel_async::RunQueryDsl as _;
-use evops_types::{CreateUserError, User, UserForm};
 use url::Url;
 use uuid::Uuid;
 
@@ -14,7 +13,33 @@ struct NewUser<'a> {
 }
 
 impl crate::Database {
-    pub async fn create_user(&mut self, form: UserForm) -> Result<User, CreateUserError> {
+    pub async fn find_user(
+        &mut self,
+        id: evops_types::UserId,
+    ) -> Result<evops_types::User, evops_types::FindUserError> {
+        let user: crate::models::User = {
+            crate::schema::users::table
+                .find(id.into_inner())
+                .select(crate::models::User::as_select())
+                .get_result(&mut self.conn)
+                .await
+                .map_err(|e| match e {
+                    diesel::result::Error::NotFound => evops_types::FindUserError::NotFound(id),
+                    e => evops_types::FindUserError::Db(e.into()),
+                })?
+        };
+
+        Ok(evops_types::User {
+            id,
+            name: unsafe { evops_types::UserName::new_unchecked(user.name) },
+            profile_picture_url: user.profile_picture_url.map(|s| s.parse().unwrap()),
+        })
+    }
+
+    pub async fn create_user(
+        &mut self,
+        form: evops_types::NewUserForm,
+    ) -> Result<evops_types::User, evops_types::CreateUserError> {
         let user_id = Uuid::now_v7();
 
         diesel::insert_into(crate::schema::users::table)
@@ -26,9 +51,9 @@ impl crate::Database {
             .returning(crate::models::User::as_returning())
             .execute(&mut self.conn)
             .await
-            .map_err(|e| CreateUserError::Db(e.into()))?;
+            .map_err(|e| evops_types::CreateUserError::Db(e.into()))?;
 
-        Ok(User {
+        Ok(evops_types::User {
             id: evops_types::UserId::new(user_id),
             name: form.name,
             profile_picture_url: form.profile_picture_url,

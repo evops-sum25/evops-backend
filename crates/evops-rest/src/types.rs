@@ -8,7 +8,7 @@ mod conversions;
 
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct EventServiceCreateRequest {
-    form: crate::types::EventForm,
+    form: crate::types::NewEventForm,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
@@ -18,7 +18,7 @@ pub struct EventServiceCreateResponse {
 
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct TagServiceCreateRequest {
-    form: crate::types::TagForm,
+    form: crate::types::NewTagForm,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
@@ -28,7 +28,7 @@ pub struct TagServiceCreateResponse {
 
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct UserServiceCreateRequest {
-    form: crate::types::UserForm,
+    form: crate::types::NewUserForm,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
@@ -37,7 +37,7 @@ pub struct UserServiceCreateResponse {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-struct EventForm {
+struct NewEventForm {
     author_id: crate::types::UserId,
     image_urls: Option<Vec<Url>>,
     title: crate::types::EventTitle,
@@ -60,7 +60,7 @@ struct Event {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-struct TagForm {
+struct NewTagForm {
     name: crate::types::TagName,
     aliases: Option<Vec<crate::types::TagAlias>>,
 }
@@ -73,7 +73,7 @@ struct Tag {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-struct UserForm {
+struct NewUserForm {
     name: crate::types::UserName,
     profile_picture_url: Option<Url>,
 }

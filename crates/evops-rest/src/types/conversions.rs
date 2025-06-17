@@ -52,10 +52,10 @@ impl From<evops_types::UserServiceCreateResponse> for crate::types::UserServiceC
     }
 }
 
-impl TryFrom<crate::types::EventForm> for evops_types::EventForm {
+impl TryFrom<crate::types::NewEventForm> for evops_types::NewEventForm {
     type Error = crate::error::UnprocessableEntityError;
 
-    fn try_from(value: crate::types::EventForm) -> Result<Self, Self::Error> {
+    fn try_from(value: crate::types::NewEventForm) -> Result<Self, Self::Error> {
         Ok(Self {
             author_id: value.author_id.into(),
             image_urls: value.image_urls,
@@ -87,10 +87,10 @@ impl From<evops_types::Event> for crate::types::Event {
     }
 }
 
-impl TryFrom<crate::types::TagForm> for evops_types::TagForm {
+impl TryFrom<crate::types::NewTagForm> for evops_types::NewTagForm {
     type Error = crate::error::UnprocessableEntityError;
 
-    fn try_from(value: crate::types::TagForm) -> Result<Self, Self::Error> {
+    fn try_from(value: crate::types::NewTagForm) -> Result<Self, Self::Error> {
         Ok(Self {
             name: value.name.try_into()?,
             aliases: match value.aliases {
@@ -115,10 +115,10 @@ impl From<evops_types::Tag> for crate::types::Tag {
     }
 }
 
-impl TryFrom<crate::types::UserForm> for evops_types::UserForm {
+impl TryFrom<crate::types::NewUserForm> for evops_types::NewUserForm {
     type Error = crate::error::UnprocessableEntityError;
 
-    fn try_from(value: crate::types::UserForm) -> Result<Self, Self::Error> {
+    fn try_from(value: crate::types::NewUserForm) -> Result<Self, Self::Error> {
         Ok(Self {
             name: value.name.try_into()?,
             profile_picture_url: value.profile_picture_url,

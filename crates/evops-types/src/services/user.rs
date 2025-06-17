@@ -5,7 +5,7 @@ use uuid::Uuid;
 
 #[derive(Debug)]
 pub struct UserServiceCreateRequest {
-    pub form: crate::UserForm,
+    pub form: crate::NewUserForm,
 }
 
 #[derive(Debug)]
@@ -14,7 +14,7 @@ pub struct UserServiceCreateResponse {
 }
 
 #[derive(Debug)]
-pub struct UserForm {
+pub struct NewUserForm {
     pub name: crate::UserName,
     pub profile_picture_url: Option<Url>,
 }
@@ -27,12 +27,20 @@ pub struct User {
 }
 
 #[derive(Error, Debug)]
-#[error(transparent)]
 pub enum CreateUserError {
+    #[error(transparent)]
     Db(eyre::Error),
 }
 
-#[nutype(derive(Debug, PartialEq, Eq, Hash))]
+#[derive(Error, Debug)]
+pub enum FindUserError {
+    #[error("User with ID {0} was not found")]
+    NotFound(UserId),
+    #[error(transparent)]
+    Db(eyre::Error),
+}
+
+#[nutype(derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Display))]
 pub struct UserId(Uuid);
 
 pub const USER_NAME_MIN_LEN: usize = 1;

@@ -6,7 +6,7 @@ use uuid::Uuid;
 
 #[derive(Debug)]
 pub struct EventServiceCreateRequest {
-    pub form: crate::EventForm,
+    pub form: crate::NewEventForm,
 }
 
 #[derive(Debug)]
@@ -15,7 +15,7 @@ pub struct EventServiceCreateResponse {
 }
 
 #[derive(Debug)]
-pub struct EventForm {
+pub struct NewEventForm {
     pub author_id: crate::UserId,
     pub image_urls: Option<Vec<Url>>,
     pub title: crate::EventTitle,
@@ -38,8 +38,12 @@ pub struct Event {
 }
 
 #[derive(Error, Debug)]
-#[error(transparent)]
 pub enum CreateEventError {
+    #[error("User with ID {0} was not found")]
+    AuthorNotFound(crate::UserId),
+    #[error("Tag with ID {0} was not found")]
+    TagNotFound(crate::TagId),
+    #[error(transparent)]
     Db(#[from] eyre::Error),
 }
 
