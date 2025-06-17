@@ -16,6 +16,17 @@ impl UserService for self::Service {
         &self,
         request: Request<crate::pb::UserServiceCreateRequest>,
     ) -> Result<Response<crate::pb::UserServiceCreateResponse>, Status> {
-        todo!();
+        Ok(Response::new({
+            self.state
+                .create_user(request.into_inner().try_into()?)
+                .await
+                .map_err(|e| {
+                    use evops_types::CreateUserError as E;
+                    match e {
+                        E::Db(e) => Status::internal(e.to_string()),
+                    }
+                })?
+                .into()
+        }))
     }
 }

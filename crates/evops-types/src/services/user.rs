@@ -34,7 +34,7 @@ pub enum CreateUserError {
 
 #[derive(Error, Debug)]
 pub enum FindUserError {
-    #[error("User with ID {0} was not found")]
+    #[error("User with ID {0} was not found.")]
     NotFound(UserId),
     #[error(transparent)]
     Db(eyre::Error),
@@ -47,7 +47,7 @@ pub const USER_NAME_MIN_LEN: usize = 1;
 pub const USER_NAME_MAX_LEN: usize = 64;
 #[nutype(
     new_unchecked,
-    validate(len_char_min = crate::USER_NAME_MIN_LEN, len_char_max = crate::USER_NAME_MAX_LEN),
+    validate(len_char_max = crate::USER_NAME_MAX_LEN, not_empty),
     derive(Debug, PartialEq, Eq, AsRef, Hash),
 )]
 pub struct UserName(String);

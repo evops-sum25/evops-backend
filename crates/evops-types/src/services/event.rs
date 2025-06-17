@@ -39,22 +39,22 @@ pub struct Event {
 
 #[derive(Error, Debug)]
 pub enum CreateEventError {
-    #[error("User with ID {0} was not found")]
+    #[error("User with ID {0} was not found.")]
     AuthorNotFound(crate::UserId),
-    #[error("Tag with ID {0} was not found")]
+    #[error("Tag with ID {0} was not found.")]
     TagNotFound(crate::TagId),
     #[error(transparent)]
     Db(#[from] eyre::Error),
 }
 
-#[nutype(derive(Debug, PartialEq, Eq, Hash))]
+#[nutype(derive(Debug, PartialEq, Eq, Hash, Display))]
 pub struct EventId(Uuid);
 
 pub const EVENT_TITLE_MIN_LEN: usize = 1;
 pub const EVENT_TITLE_MAX_LEN: usize = 64;
 #[nutype(
     new_unchecked,
-    validate(len_char_min = crate::EVENT_TITLE_MIN_LEN, len_char_max = crate::EVENT_TITLE_MAX_LEN),
+    validate(len_char_max = crate::EVENT_TITLE_MAX_LEN, not_empty),
     derive(Debug, PartialEq, Eq, AsRef, Hash),
 )]
 pub struct EventTitle(String);
@@ -63,10 +63,7 @@ pub const EVENT_DESCRIPTION_MIN_LEN: usize = 1;
 pub const EVENT_DESCRIPTION_MAX_LEN: usize = 5000;
 #[nutype(
     new_unchecked,
-    validate(
-        len_char_min = crate::EVENT_DESCRIPTION_MIN_LEN,
-        len_char_max = crate::EVENT_DESCRIPTION_MAX_LEN,
-    ),
+    validate(len_char_max = crate::EVENT_DESCRIPTION_MAX_LEN, not_empty),
     derive(Debug, PartialEq, Eq, AsRef, Hash)
 )]
 pub struct EventDescription(String);

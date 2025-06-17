@@ -16,6 +16,20 @@ impl EventService for self::Service {
         &self,
         request: Request<crate::pb::EventServiceCreateRequest>,
     ) -> Result<Response<crate::pb::EventServiceCreateResponse>, Status> {
-        todo!();
+        Ok(Response::new({
+            self.state
+                .create_event(request.into_inner().try_into()?)
+                .await
+                .map_err(|e| {
+                    use evops_types::CreateEventError as E;
+                    match e {
+                        E::AuthorNotFound(_) | E::TagNotFound(_) => {
+                            Status::not_found(e.to_string())
+                        }
+                        E::Db(_) => Status::internal(e.to_string()),
+                    }
+                })?
+                .into()
+        }))
     }
 }

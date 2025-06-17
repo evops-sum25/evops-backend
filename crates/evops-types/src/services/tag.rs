@@ -31,14 +31,14 @@ pub struct Tag {
 #[derive(Error, Debug)]
 pub enum CreateTagError {
     #[error("{0}")]
-    Duplicate(String),
+    AlreadyExists(String),
     #[error(transparent)]
     Db(#[from] eyre::Error),
 }
 
 #[derive(Error, Debug)]
 pub enum FindTagError {
-    #[error("Tag with ID {0} was not found")]
+    #[error("Tag with ID {0} was not found.")]
     NotFound(crate::TagId),
     #[error(transparent)]
     Db(#[from] eyre::Error),
@@ -53,12 +53,8 @@ pub const TAG_NAME_MIN_LEN: usize = 1;
 pub const TAG_NAME_MAX_LEN: usize = 32;
 #[nutype(
     new_unchecked,
-    validate(
-        len_char_min = TAG_NAME_MIN_LEN,
-        len_char_max = TAG_NAME_MAX_LEN,
-        regex = TAG_NAME_REGEX,
-    ),
-    derive(Debug, PartialEq, Eq, AsRef, Hash),
+    validate(len_char_max = TAG_NAME_MAX_LEN, not_empty, regex = TAG_NAME_REGEX),
+    derive(Debug, PartialEq, Eq, AsRef, Hash, Display),
 )]
 pub struct TagName(String);
 
@@ -66,7 +62,7 @@ pub const TAG_ALIAS_MIN_LEN: usize = 1;
 pub const TAG_ALIAS_MAX_LEN: usize = TAG_NAME_MAX_LEN;
 #[nutype(
     new_unchecked,
-    validate(len_char_min = TAG_ALIAS_MIN_LEN, len_char_max = TAG_ALIAS_MAX_LEN),
-    derive(Debug, PartialEq, Eq, AsRef, Hash),
+    validate(len_char_max = TAG_ALIAS_MAX_LEN, not_empty),
+    derive(Debug, PartialEq, Eq, AsRef, Hash, Display),
 )]
 pub struct TagAlias(String);

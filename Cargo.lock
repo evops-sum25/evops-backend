@@ -546,6 +546,7 @@ dependencies = [
  "eyre",
  "http",
  "prost",
+ "prost-types",
  "tonic",
  "tonic-build",
  "tonic-reflection",

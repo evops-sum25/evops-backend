@@ -13,7 +13,7 @@ impl From<evops_types::CreateTagError> for crate::error::Error {
     fn from(value: evops_types::CreateTagError) -> Self {
         use evops_types::CreateTagError as E;
         match value {
-            E::Duplicate(e) => Self::Conflict(e.into()),
+            E::AlreadyExists(e) => Self::Conflict(e.into()),
             E::Db(e) => Self::InternalServerError(e.into()),
         }
     }

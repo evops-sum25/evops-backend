@@ -16,6 +16,18 @@ impl TagService for self::Service {
         &self,
         request: Request<crate::pb::TagServiceCreateRequest>,
     ) -> Result<Response<crate::pb::TagServiceCreateResponse>, Status> {
-        todo!();
+        Ok(Response::new({
+            self.state
+                .create_tag(request.into_inner().try_into()?)
+                .await
+                .map_err(|e| {
+                    use evops_types::CreateTagError as E;
+                    match e {
+                        E::AlreadyExists(_) => Status::already_exists(e.to_string()),
+                        E::Db(_) => Status::internal(e.to_string()),
+                    }
+                })?
+                .into()
+        }))
     }
 }

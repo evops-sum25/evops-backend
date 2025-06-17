@@ -10,6 +10,7 @@ axum = { workspace = true }
 # Needed by build.rs.
 http = { workspace = true }
 prost = { workspace = true }
+prost-types = { workspace = true }
 tonic = { workspace = true }
 tonic-reflection = { workspace = true }
 tonic-web = { workspace = true }

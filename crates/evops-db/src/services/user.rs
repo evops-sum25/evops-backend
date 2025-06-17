@@ -12,6 +12,7 @@ struct NewUser<'a> {
     profile_picture_url: Option<&'a str>,
 }
 
+#[allow(clippy::missing_panics_doc)]
 impl crate::Database {
     pub async fn find_user(
         &mut self,
@@ -25,7 +26,7 @@ impl crate::Database {
                 .await
                 .map_err(|e| match e {
                     diesel::result::Error::NotFound => evops_types::FindUserError::NotFound(id),
-                    e => evops_types::FindUserError::Db(e.into()),
+                    _ => evops_types::FindUserError::Db(e.into()),
                 })?
         };
 

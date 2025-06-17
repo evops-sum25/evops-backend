@@ -38,11 +38,8 @@ impl crate::Database {
         if let Err(diesel::result::Error::DatabaseError(DatabaseErrorKind::UniqueViolation, info)) =
             insert_tag_result
         {
-            return Err(evops_types::CreateTagError::Duplicate({
-                info.details().map_or_else(
-                    || info.message().to_owned(),
-                    |details| format!("{}\n\n{details}", info.message()),
-                )
+            return Err(evops_types::CreateTagError::AlreadyExists({
+                info.message().to_owned()
             }));
         }
 
@@ -52,7 +49,7 @@ impl crate::Database {
                 aliases
                     .iter()
                     .map(|a| NewTagAlias {
-                        tag_id: tag_id,
+                        tag_id,
                         alias: a.as_ref(),
                     })
                     .collect::<Vec<_>>()
@@ -101,7 +98,7 @@ impl crate::Database {
             Ok(tag) => Ok(evops_types::Tag {
                 id: evops_types::TagId::new(tag.id),
                 name: unsafe { evops_types::TagName::new_unchecked(tag.name) },
-                aliases: aliases,
+                aliases,
             }),
             Err(e) => Err(match e {
                 diesel::result::Error::NotFound => evops_types::FindTagError::NotFound(id),

@@ -43,6 +43,7 @@ struct NewEventTag {
 }
 
 impl crate::Database {
+    #[allow(clippy::too_many_lines)]
     pub async fn create_event(
         &mut self,
         form: evops_types::NewEventForm,
@@ -51,8 +52,8 @@ impl crate::Database {
             Ok(author) => author,
             Err(e) => {
                 return Err(match e {
-                    evops_types::FindUserError::NotFound(e) => {
-                        evops_types::CreateEventError::AuthorNotFound(e)
+                    evops_types::FindUserError::NotFound(id) => {
+                        evops_types::CreateEventError::AuthorNotFound(id)
                     }
                     evops_types::FindUserError::Db(e) => evops_types::CreateEventError::Db(e),
                 });
@@ -70,8 +71,8 @@ impl crate::Database {
                     }
                     Err(e) => {
                         return Err(match e {
-                            evops_types::FindTagError::NotFound(e) => {
-                                evops_types::CreateEventError::TagNotFound(e)
+                            evops_types::FindTagError::NotFound(id) => {
+                                evops_types::CreateEventError::TagNotFound(id)
                             }
                             evops_types::FindTagError::Db(e) => {
                                 evops_types::CreateEventError::Db(e)
