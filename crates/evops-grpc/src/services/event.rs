@@ -1,15 +1,13 @@
 use tonic::{Request, Response, Status};
 
-use evops_core::AppState;
-
 use crate::pb::event_service_server::{EventService, EventServiceServer};
 
-pub fn server(state: AppState) -> EventServiceServer<self::Service> {
+pub fn server(state: crate::AppState) -> EventServiceServer<self::Service> {
     EventServiceServer::new(self::Service { state })
 }
 
 pub struct Service {
-    state: AppState,
+    state: crate::AppState,
 }
 
 #[tonic::async_trait]
@@ -24,17 +22,5 @@ impl EventService for self::Service {
                 .await
                 .into()
         }))
-    }
-}
-
-impl From<crate::pb::EventServiceCreateRequest> for evops_types::CreateEventRequest {
-    fn from(value: crate::pb::EventServiceCreateRequest) -> Self {
-        todo!();
-    }
-}
-
-impl From<evops_types::CreateEventResponse> for crate::pb::EventServiceCreateResponse {
-    fn from(value: evops_types::CreateEventResponse) -> Self {
-        todo!();
     }
 }
