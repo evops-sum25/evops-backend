@@ -8,14 +8,22 @@ impl crate::AppState {
         &self,
         request: TagServiceFindRequest,
     ) -> Result<TagServiceFindResponse, FindTagError> {
-        todo!();
+        let mut db = self.shared_state.db.lock().await;
+
+        Ok(TagServiceFindResponse {
+            tag: db.find_tag(request.id).await?,
+        })
     }
 
     pub async fn list_tags(
         &self,
-        request: TagServiceListRequest,
+        _request: TagServiceListRequest,
     ) -> Result<TagServiceListResponse, ListTagsError> {
-        todo!();
+        let mut db = self.shared_state.db.lock().await;
+
+        Ok(TagServiceListResponse {
+            tags: db.list_tags().await?,
+        })
     }
 
     pub async fn create_tag(

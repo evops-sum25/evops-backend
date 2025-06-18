@@ -44,6 +44,33 @@ struct NewEventTag {
 }
 
 impl crate::Database {
+    pub async fn find_event(
+        &mut self,
+        form: evops_models::EventId,
+    ) -> Result<evops_models::Event, evops_models::FindEventError> {
+        self.conn
+            .transaction(|conn| {
+                async move {
+                    todo!();
+                }
+                .scope_boxed()
+            })
+            .await
+    }
+
+    pub async fn list_events(
+        &mut self,
+    ) -> Result<Vec<evops_models::Event>, evops_models::ListEventsError> {
+        self.conn
+            .transaction(|conn| {
+                async move {
+                    todo!();
+                }
+                .scope_boxed()
+            })
+            .await
+    }
+
     #[allow(clippy::missing_panics_doc, clippy::too_many_lines)]
     pub async fn create_event(
         &mut self,

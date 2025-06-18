@@ -9,7 +9,11 @@ impl crate::AppState {
         &self,
         request: UserServiceFindRequest,
     ) -> Result<UserServiceFindResponse, FindUserError> {
-        todo!();
+        let mut db = self.shared_state.db.lock().await;
+
+        Ok(UserServiceFindResponse {
+            user: db.find_user(request.id).await?,
+        })
     }
 
     pub async fn list_users(

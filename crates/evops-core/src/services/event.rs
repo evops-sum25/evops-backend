@@ -9,14 +9,22 @@ impl crate::AppState {
         &self,
         request: EventServiceFindRequest,
     ) -> Result<EventServiceFindResponse, FindEventError> {
-        todo!()
+        let mut db = self.shared_state.db.lock().await;
+
+        Ok(EventServiceFindResponse {
+            event: db.find_event(request.id).await?,
+        })
     }
 
     pub async fn list_events(
         &self,
-        request: EventServiceListRequest,
+        _request: EventServiceListRequest,
     ) -> Result<EventServiceListResponse, ListEventsError> {
-        todo!()
+        let mut db = self.shared_state.db.lock().await;
+
+        Ok(EventServiceListResponse {
+            events: db.list_events().await?,
+        })
     }
 
     pub async fn create_event(

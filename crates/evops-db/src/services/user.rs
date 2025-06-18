@@ -15,31 +15,6 @@ struct NewUser<'a> {
 
 #[allow(clippy::missing_panics_doc)]
 impl crate::Database {
-    pub async fn list_users(
-        &mut self,
-    ) -> Result<Vec<evops_models::User>, evops_models::ListUsersError> {
-        self.conn
-            .transaction(|conn| {
-                async move {
-                    let raw_results: Vec<crate::models::User> = crate::schema::users::table
-                        .select(crate::models::User::as_select())
-                        .get_results(conn)
-                        .await?;
-
-                    Ok(raw_results
-                        .into_iter()
-                        .map(|u| evops_models::User {
-                            id: evops_models::UserId::new(u.id),
-                            name: unsafe { evops_models::UserName::new_unchecked(u.name) },
-                            profile_picture_url: u.profile_picture_url.map(|s| s.parse().unwrap()),
-                        })
-                        .collect::<Vec<_>>())
-                }
-                .scope_boxed()
-            })
-            .await
-    }
-
     pub async fn find_user(
         &mut self,
         id: evops_models::UserId,
@@ -66,6 +41,31 @@ impl crate::Database {
                         name: unsafe { evops_models::UserName::new_unchecked(user.name) },
                         profile_picture_url: user.profile_picture_url.map(|s| s.parse().unwrap()),
                     })
+                }
+                .scope_boxed()
+            })
+            .await
+    }
+
+    pub async fn list_users(
+        &mut self,
+    ) -> Result<Vec<evops_models::User>, evops_models::ListUsersError> {
+        self.conn
+            .transaction(|conn| {
+                async move {
+                    let raw_results: Vec<crate::models::User> = crate::schema::users::table
+                        .select(crate::models::User::as_select())
+                        .get_results(conn)
+                        .await?;
+
+                    Ok(raw_results
+                        .into_iter()
+                        .map(|u| evops_models::User {
+                            id: evops_models::UserId::new(u.id),
+                            name: unsafe { evops_models::UserName::new_unchecked(u.name) },
+                            profile_picture_url: u.profile_picture_url.map(|s| s.parse().unwrap()),
+                        })
+                        .collect::<Vec<_>>())
                 }
                 .scope_boxed()
             })

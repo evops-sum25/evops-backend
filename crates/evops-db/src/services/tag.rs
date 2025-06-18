@@ -21,6 +21,70 @@ struct NewTagAlias<'a> {
 }
 
 impl crate::Database {
+    pub async fn find_tag(
+        &mut self,
+        id: evops_models::TagId,
+    ) -> Result<evops_models::Tag, evops_models::FindTagError> {
+        self.conn
+            .transaction(|conn| {
+                async move {
+                    let find_tag_result: Result<crate::models::Tag, diesel::result::Error> = {
+                        crate::schema::tags::table
+                            .find(id.into_inner())
+                            .select(crate::models::Tag::as_select())
+                            .get_result(conn)
+                            .await
+                    };
+
+                    let aliases = {
+                        let find_result = {
+                            crate::schema::tag_aliases::table
+                                .filter(crate::schema::tag_aliases::tag_id.eq(id.into_inner()))
+                                .select(crate::models::TagAlias::as_select())
+                                .load(conn)
+                                .await
+                        };
+                        match find_result {
+                            Ok(aliases) => aliases
+                                .into_iter()
+                                .map(|a| unsafe { evops_models::TagAlias::new_unchecked(a.alias) })
+                                .collect(),
+                            Err(e) => return Err(e.into()),
+                        }
+                    };
+
+                    match find_tag_result {
+                        Ok(tag) => Ok(evops_models::Tag {
+                            id: evops_models::TagId::new(tag.id),
+                            name: unsafe { evops_models::TagName::new_unchecked(tag.name) },
+                            aliases,
+                        }),
+                        Err(e) => Err(match e {
+                            diesel::result::Error::NotFound => {
+                                evops_models::FindTagError::NotFound(id)
+                            }
+                            _ => e.into(),
+                        }),
+                    }
+                }
+                .scope_boxed()
+            })
+            .await
+    }
+
+    pub async fn list_tags(
+        &mut self,
+    ) -> Result<Vec<evops_models::Tag>, evops_models::ListTagsError> {
+        self.conn
+            .transaction(|conn| {
+                async move {
+                    todo!();
+                }
+                .scope_boxed()
+            })
+            .await
+    }
+
     pub async fn create_tag(
         &mut self,
         form: evops_models::NewTagForm,
@@ -68,57 +132,6 @@ impl crate::Database {
                         name: form.name,
                         aliases,
                     })
-                }
-                .scope_boxed()
-            })
-            .await
-    }
-
-    pub async fn find_tag(
-        &mut self,
-        id: evops_models::TagId,
-    ) -> Result<evops_models::Tag, evops_models::FindTagError> {
-        self.conn
-            .transaction(|conn| {
-                async move {
-                    let find_tag_result: Result<crate::models::Tag, diesel::result::Error> = {
-                        crate::schema::tags::table
-                            .find(id.into_inner())
-                            .select(crate::models::Tag::as_select())
-                            .get_result(conn)
-                            .await
-                    };
-
-                    let aliases = {
-                        let find_result = {
-                            crate::schema::tag_aliases::table
-                                .filter(crate::schema::tag_aliases::tag_id.eq(id.into_inner()))
-                                .select(crate::models::TagAlias::as_select())
-                                .load(conn)
-                                .await
-                        };
-                        match find_result {
-                            Ok(aliases) => aliases
-                                .into_iter()
-                                .map(|a| unsafe { evops_models::TagAlias::new_unchecked(a.alias) })
-                                .collect(),
-                            Err(e) => return Err(e.into()),
-                        }
-                    };
-
-                    match find_tag_result {
-                        Ok(tag) => Ok(evops_models::Tag {
-                            id: evops_models::TagId::new(tag.id),
-                            name: unsafe { evops_models::TagName::new_unchecked(tag.name) },
-                            aliases,
-                        }),
-                        Err(e) => Err(match e {
-                            diesel::result::Error::NotFound => {
-                                evops_models::FindTagError::NotFound(id)
-                            }
-                            _ => e.into(),
-                        }),
-                    }
                 }
                 .scope_boxed()
             })
