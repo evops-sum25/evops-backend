@@ -6,12 +6,14 @@ use thiserror::Error;
 pub use self::bad_request::BadRequestError;
 pub use self::conflict::ConflictError;
 pub use self::internal_server_error::InternalServerError;
+pub use self::not_found::NotFoundError;
 pub use self::unprocessable_entity::UnprocessableEntityError;
 
 mod bad_request;
 mod conflict;
 mod conversions;
 mod internal_server_error;
+mod not_found;
 mod unprocessable_entity;
 
 #[derive(Error, Debug, OperationIo)]
@@ -20,6 +22,8 @@ mod unprocessable_entity;
 pub enum Error {
     /// 400
     BadRequest(#[from] self::BadRequestError),
+    /// 404
+    NotFound(#[from] self::NotFoundError),
     /// 409
     Conflict(#[from] self::ConflictError),
     /// 422
@@ -32,6 +36,9 @@ pub enum Error {
 pub trait AddResponse {
     /// 400
     fn response_bad_request(self) -> Self;
+
+    /// 404
+    fn response_not_found(self) -> Self;
 
     /// 409
     fn response_conflict(self) -> Self;
@@ -47,6 +54,7 @@ impl IntoResponse for self::Error {
     fn into_response(self) -> Response {
         match self {
             Self::BadRequest(e) => e.into_response(),
+            Self::NotFound(e) => e.into_response(),
             Self::Conflict(e) => e.into_response(),
             Self::UnprocessableEntity(e) => e.into_response(),
             Self::InternalServerError(e) => e.into_response(),
@@ -58,6 +66,12 @@ impl AddResponse for TransformOperation<'_> {
     fn response_bad_request(self) -> Self {
         self.response_with::<400, self::BadRequestError, _>(|r| {
             r.description("Bad Request (e.g. invalid JSON syntax)")
+        })
+    }
+
+    fn response_not_found(self) -> Self {
+        self.response_with::<404, self::NotFoundError, _>(|r| {
+            r.description("Not Found (needs no introduction)")
         })
     }
 

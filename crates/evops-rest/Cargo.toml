@@ -8,6 +8,7 @@ evops-models = { workspace = true }
 
 aide = { workspace = true, features = [
   "axum-json",
+  "axum-query",
   "macros",
   "scalar",
   "swagger",

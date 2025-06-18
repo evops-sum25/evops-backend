@@ -1,13 +1,29 @@
-impl From<crate::types::UserServiceListRequest> for evops_models::UserServiceListRequest {
-    fn from(_value: crate::types::UserServiceListRequest) -> Self {
+impl From<crate::types::EventServiceFindRequest> for evops_models::EventServiceFindRequest {
+    fn from(value: crate::types::EventServiceFindRequest) -> Self {
+        Self {
+            id: value.id.into(),
+        }
+    }
+}
+
+impl From<evops_models::EventServiceFindResponse> for crate::types::EventServiceFindResponse {
+    fn from(value: evops_models::EventServiceFindResponse) -> Self {
+        Self {
+            event: value.event.into(),
+        }
+    }
+}
+
+impl From<crate::types::EventServiceListRequest> for evops_models::EventServiceListRequest {
+    fn from(_value: crate::types::EventServiceListRequest) -> Self {
         Self
     }
 }
 
-impl From<evops_models::UserServiceListResponse> for crate::types::UserServiceListResponse {
-    fn from(value: evops_models::UserServiceListResponse) -> Self {
+impl From<evops_models::EventServiceListResponse> for crate::types::EventServiceListResponse {
+    fn from(value: evops_models::EventServiceListResponse) -> Self {
         Self {
-            users: value.users.into_iter().map(Into::into).collect(),
+            events: value.events.into_iter().map(Into::into).collect(),
         }
     }
 }
@@ -30,6 +46,36 @@ impl From<evops_models::EventServiceCreateResponse> for crate::types::EventServi
     }
 }
 
+impl From<crate::types::TagServiceFindRequest> for evops_models::TagServiceFindRequest {
+    fn from(value: crate::types::TagServiceFindRequest) -> Self {
+        Self {
+            id: value.id.into(),
+        }
+    }
+}
+
+impl From<evops_models::TagServiceFindResponse> for crate::types::TagServiceFindResponse {
+    fn from(value: evops_models::TagServiceFindResponse) -> Self {
+        Self {
+            tag: value.tag.into(),
+        }
+    }
+}
+
+impl From<crate::types::TagServiceListRequest> for evops_models::TagServiceListRequest {
+    fn from(_value: crate::types::TagServiceListRequest) -> Self {
+        Self
+    }
+}
+
+impl From<evops_models::TagServiceListResponse> for crate::types::TagServiceListResponse {
+    fn from(value: evops_models::TagServiceListResponse) -> Self {
+        Self {
+            tags: value.tags.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
 impl TryFrom<crate::types::TagServiceCreateRequest> for evops_models::TagServiceCreateRequest {
     type Error = crate::error::UnprocessableEntityError;
 
@@ -44,6 +90,36 @@ impl From<evops_models::TagServiceCreateResponse> for crate::types::TagServiceCr
     fn from(value: evops_models::TagServiceCreateResponse) -> Self {
         Self {
             tag: value.tag.into(),
+        }
+    }
+}
+
+impl From<crate::types::UserServiceFindRequest> for evops_models::UserServiceFindRequest {
+    fn from(value: crate::types::UserServiceFindRequest) -> Self {
+        Self {
+            id: value.id.into(),
+        }
+    }
+}
+
+impl From<evops_models::UserServiceFindResponse> for crate::types::UserServiceFindResponse {
+    fn from(value: evops_models::UserServiceFindResponse) -> Self {
+        Self {
+            user: value.user.into(),
+        }
+    }
+}
+
+impl From<crate::types::UserServiceListRequest> for evops_models::UserServiceListRequest {
+    fn from(_value: crate::types::UserServiceListRequest) -> Self {
+        Self
+    }
+}
+
+impl From<evops_models::UserServiceListResponse> for crate::types::UserServiceListResponse {
+    fn from(value: evops_models::UserServiceListResponse) -> Self {
+        Self {
+            users: value.users.into_iter().map(Into::into).collect(),
         }
     }
 }

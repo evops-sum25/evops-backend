@@ -7,11 +7,21 @@ use uuid::Uuid;
 mod conversions;
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct UserServiceListRequest;
+pub struct EventServiceFindRequest {
+    id: crate::types::EventId,
+}
 
 #[derive(Debug, Serialize, JsonSchema)]
-pub struct UserServiceListResponse {
-    users: Vec<crate::types::User>,
+pub struct EventServiceFindResponse {
+    event: crate::types::Event,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct EventServiceListRequest;
+
+#[derive(Debug, Serialize, JsonSchema)]
+pub struct EventServiceListResponse {
+    events: Vec<crate::types::Event>,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
@@ -25,6 +35,24 @@ pub struct EventServiceCreateResponse {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
+pub struct TagServiceFindRequest {
+    id: crate::types::TagId,
+}
+
+#[derive(Debug, Serialize, JsonSchema)]
+pub struct TagServiceFindResponse {
+    tag: crate::types::Tag,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct TagServiceListRequest;
+
+#[derive(Debug, Serialize, JsonSchema)]
+pub struct TagServiceListResponse {
+    tags: Vec<crate::types::Tag>,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct TagServiceCreateRequest {
     form: crate::types::NewTagForm,
 }
@@ -32,6 +60,24 @@ pub struct TagServiceCreateRequest {
 #[derive(Debug, Serialize, JsonSchema)]
 pub struct TagServiceCreateResponse {
     tag: crate::types::Tag,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct UserServiceFindRequest {
+    id: crate::types::UserId,
+}
+
+#[derive(Debug, Serialize, JsonSchema)]
+pub struct UserServiceFindResponse {
+    user: crate::types::User,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct UserServiceListRequest;
+
+#[derive(Debug, Serialize, JsonSchema)]
+pub struct UserServiceListResponse {
+    users: Vec<crate::types::User>,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
