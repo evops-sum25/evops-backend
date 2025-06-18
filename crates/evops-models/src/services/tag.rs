@@ -6,6 +6,24 @@ use thiserror::Error;
 use uuid::Uuid;
 
 #[derive(Debug)]
+pub struct TagServiceFindRequest {
+    pub id: crate::TagId,
+}
+
+#[derive(Debug)]
+pub struct TagServiceFindResponse {
+    pub tag: crate::Tag,
+}
+
+#[derive(Debug)]
+pub struct TagServiceListRequest;
+
+#[derive(Debug)]
+pub struct TagServiceListResponse {
+    pub tags: Vec<crate::Tag>,
+}
+
+#[derive(Debug)]
 pub struct TagServiceCreateRequest {
     pub form: crate::NewTagForm,
 }
@@ -29,17 +47,23 @@ pub struct Tag {
 }
 
 #[derive(Error, Debug)]
-pub enum CreateTagError {
-    #[error("{0}")]
-    AlreadyExists(String),
+pub enum FindTagError {
+    #[error("Tag with ID {0} was not found.")]
+    NotFound(crate::TagId),
     #[error(transparent)]
     Db(#[from] diesel::result::Error),
 }
 
 #[derive(Error, Debug)]
-pub enum FindTagError {
-    #[error("Tag with ID {0} was not found.")]
-    NotFound(crate::TagId),
+pub enum ListTagsError {
+    #[error(transparent)]
+    Db(#[from] diesel::result::Error),
+}
+
+#[derive(Error, Debug)]
+pub enum CreateTagError {
+    #[error("{0}")]
+    AlreadyExists(String),
     #[error(transparent)]
     Db(#[from] diesel::result::Error),
 }

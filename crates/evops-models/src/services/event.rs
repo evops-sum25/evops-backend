@@ -5,6 +5,24 @@ use url::Url;
 use uuid::Uuid;
 
 #[derive(Debug)]
+pub struct EventServiceFindRequest {
+    pub id: crate::EventId,
+}
+
+#[derive(Debug)]
+pub struct EventServiceFindResponse {
+    pub event: crate::Event,
+}
+
+#[derive(Debug)]
+pub struct EventServiceListRequest;
+
+#[derive(Debug)]
+pub struct EventServiceListResponse {
+    pub events: Vec<crate::Event>,
+}
+
+#[derive(Debug)]
 pub struct EventServiceCreateRequest {
     pub form: crate::NewEventForm,
 }
@@ -35,6 +53,20 @@ pub struct Event {
     pub with_attendance: bool,
     pub created_at: DateTime<Utc>,
     pub modified_at: DateTime<Utc>,
+}
+
+#[derive(Error, Debug)]
+pub enum FindEventError {
+    #[error("Event with ID {0} was not found.")]
+    NotFound(crate::EventId),
+    #[error(transparent)]
+    Db(#[from] diesel::result::Error),
+}
+
+#[derive(Error, Debug)]
+pub enum ListEventsError {
+    #[error(transparent)]
+    Db(#[from] diesel::result::Error),
 }
 
 #[derive(Error, Debug)]

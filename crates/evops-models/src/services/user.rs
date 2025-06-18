@@ -4,6 +4,16 @@ use url::Url;
 use uuid::Uuid;
 
 #[derive(Debug)]
+pub struct UserServiceFindRequest {
+    pub id: crate::UserId,
+}
+
+#[derive(Debug)]
+pub struct UserServiceFindResponse {
+    pub user: crate::User,
+}
+
+#[derive(Debug)]
 pub struct UserServiceListRequest;
 
 #[derive(Debug)]
@@ -21,12 +31,6 @@ pub struct UserServiceCreateResponse {
     pub user: crate::User,
 }
 
-#[derive(Error, Debug)]
-pub enum ListUsersError {
-    #[error(transparent)]
-    Db(#[from] diesel::result::Error),
-}
-
 #[derive(Debug)]
 pub struct NewUserForm {
     pub name: crate::UserName,
@@ -41,15 +45,21 @@ pub struct User {
 }
 
 #[derive(Error, Debug)]
-pub enum CreateUserError {
+pub enum FindUserError {
+    #[error("User with ID {0} was not found.")]
+    NotFound(UserId),
     #[error(transparent)]
     Db(#[from] diesel::result::Error),
 }
 
 #[derive(Error, Debug)]
-pub enum FindUserError {
-    #[error("User with ID {0} was not found.")]
-    NotFound(UserId),
+pub enum ListUsersError {
+    #[error(transparent)]
+    Db(#[from] diesel::result::Error),
+}
+
+#[derive(Error, Debug)]
+pub enum CreateUserError {
     #[error(transparent)]
     Db(#[from] diesel::result::Error),
 }
