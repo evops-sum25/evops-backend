@@ -15,6 +15,31 @@ struct NewUser<'a> {
 
 #[allow(clippy::missing_panics_doc)]
 impl crate::Database {
+    pub async fn list_users(
+        &mut self,
+    ) -> Result<Vec<evops_types::User>, evops_types::ListUsersError> {
+        self.conn
+            .transaction(|conn| {
+                async move {
+                    let raw_results: Vec<crate::models::User> = crate::schema::users::table
+                        .select(crate::models::User::as_select())
+                        .get_results(conn)
+                        .await?;
+
+                    Ok(raw_results
+                        .into_iter()
+                        .map(|u| evops_types::User {
+                            id: evops_types::UserId::new(u.id),
+                            name: unsafe { evops_types::UserName::new_unchecked(u.name) },
+                            profile_picture_url: u.profile_picture_url.map(|s| s.parse().unwrap()),
+                        })
+                        .collect::<Vec<_>>())
+                }
+                .scope_boxed()
+            })
+            .await
+    }
+
     pub async fn find_user(
         &mut self,
         id: evops_types::UserId,

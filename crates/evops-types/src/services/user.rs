@@ -4,6 +4,14 @@ use url::Url;
 use uuid::Uuid;
 
 #[derive(Debug)]
+pub struct UserServiceListRequest;
+
+#[derive(Debug)]
+pub struct UserServiceListResponse {
+    pub users: Vec<crate::User>,
+}
+
+#[derive(Debug)]
 pub struct UserServiceCreateRequest {
     pub form: crate::NewUserForm,
 }
@@ -11,6 +19,12 @@ pub struct UserServiceCreateRequest {
 #[derive(Debug)]
 pub struct UserServiceCreateResponse {
     pub user: crate::User,
+}
+
+#[derive(Error, Debug)]
+pub enum ListUsersError {
+    #[error(transparent)]
+    Db(#[from] diesel::result::Error),
 }
 
 #[derive(Debug)]

@@ -7,6 +7,14 @@ use uuid::Uuid;
 mod conversions;
 
 #[derive(Debug, Deserialize, JsonSchema)]
+pub struct UserServiceListRequest;
+
+#[derive(Debug, Serialize, JsonSchema)]
+pub struct UserServiceListResponse {
+    users: Vec<crate::types::User>,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct EventServiceCreateRequest {
     form: crate::types::NewEventForm,
 }

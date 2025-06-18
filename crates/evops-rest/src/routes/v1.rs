@@ -1,12 +1,12 @@
 use aide::axum::ApiRouter;
 
-mod event;
-mod tag;
-mod user;
+mod events;
+mod tags;
+mod users;
 
 pub fn router() -> ApiRouter<crate::AppState> {
     ApiRouter::new()
-        .nest("/event", self::event::router())
-        .nest("/tag", self::tag::router())
-        .nest("/user", self::user::router())
+        .nest("/events", self::events::router())
+        .nest("/tags", self::tags::router())
+        .nest("/users", self::users::router())
 }

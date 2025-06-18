@@ -1,3 +1,17 @@
+impl From<crate::types::UserServiceListRequest> for evops_types::UserServiceListRequest {
+    fn from(_value: crate::types::UserServiceListRequest) -> Self {
+        Self
+    }
+}
+
+impl From<evops_types::UserServiceListResponse> for crate::types::UserServiceListResponse {
+    fn from(value: evops_types::UserServiceListResponse) -> Self {
+        Self {
+            users: value.users.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
 impl TryFrom<crate::types::EventServiceCreateRequest> for evops_types::EventServiceCreateRequest {
     type Error = crate::error::UnprocessableEntityError;
 
