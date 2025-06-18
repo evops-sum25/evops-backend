@@ -12,6 +12,31 @@ pub struct Service {
 
 #[tonic::async_trait]
 impl UserService for self::Service {
+    async fn find(
+        &self,
+        request: Request<crate::pb::UserServiceFindRequest>,
+    ) -> Result<Response<crate::pb::UserServiceFindResponse>, Status> {
+        todo!();
+    }
+
+    async fn list(
+        &self,
+        request: Request<crate::pb::UserServiceListRequest>,
+    ) -> Result<Response<crate::pb::UserServiceListResponse>, Status> {
+        Ok(Response::new({
+            self.state
+                .list_users(request.into_inner().into())
+                .await
+                .map_err(|e| {
+                    use evops_types::ListUsersError as E;
+                    match e {
+                        E::Db(e) => Status::internal(e.to_string()),
+                    }
+                })?
+                .into()
+        }))
+    }
+
     async fn create(
         &self,
         request: Request<crate::pb::UserServiceCreateRequest>,

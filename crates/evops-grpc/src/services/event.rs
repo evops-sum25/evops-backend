@@ -12,6 +12,20 @@ pub struct Service {
 
 #[tonic::async_trait]
 impl EventService for self::Service {
+    async fn find(
+        &self,
+        request: Request<crate::pb::EventServiceFindRequest>,
+    ) -> Result<Response<crate::pb::EventServiceFindResponse>, Status> {
+        todo!();
+    }
+
+    async fn list(
+        &self,
+        request: Request<crate::pb::EventServiceListRequest>,
+    ) -> Result<Response<crate::pb::EventServiceListResponse>, Status> {
+        todo!();
+    }
+
     async fn create(
         &self,
         request: Request<crate::pb::EventServiceCreateRequest>,

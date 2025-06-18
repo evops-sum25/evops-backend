@@ -4,6 +4,20 @@ fn invalid_argument(message: impl ToString) -> tonic::Status {
     tonic::Status::invalid_argument(message.to_string())
 }
 
+impl From<crate::pb::UserServiceListRequest> for evops_types::UserServiceListRequest {
+    fn from(_value: crate::pb::UserServiceListRequest) -> Self {
+        Self
+    }
+}
+
+impl From<evops_types::UserServiceListResponse> for crate::pb::UserServiceListResponse {
+    fn from(value: evops_types::UserServiceListResponse) -> Self {
+        Self {
+            users: value.users.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
 impl TryFrom<crate::pb::EventServiceCreateRequest> for evops_types::EventServiceCreateRequest {
     type Error = tonic::Status;
 

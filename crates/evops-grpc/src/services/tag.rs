@@ -12,6 +12,20 @@ pub struct Service {
 
 #[tonic::async_trait]
 impl TagService for self::Service {
+    async fn find(
+        &self,
+        request: Request<crate::pb::TagServiceFindRequest>,
+    ) -> Result<Response<crate::pb::TagServiceFindResponse>, Status> {
+        todo!();
+    }
+
+    async fn list(
+        &self,
+        request: Request<crate::pb::TagServiceListRequest>,
+    ) -> Result<Response<crate::pb::TagServiceListResponse>, Status> {
+        todo!();
+    }
+
     async fn create(
         &self,
         request: Request<crate::pb::TagServiceCreateRequest>,
