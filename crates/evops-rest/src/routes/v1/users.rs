@@ -32,7 +32,7 @@ async fn get(
             .list_users(request.into())
             .await
             .map_err(|e| {
-                use evops_types::ListUsersError as E;
+                use evops_models::ListUsersError as E;
                 match e {
                     E::Db(e) => crate::error::InternalServerError::from(e.to_string()),
                 }

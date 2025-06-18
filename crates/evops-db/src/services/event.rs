@@ -47,8 +47,8 @@ impl crate::Database {
     #[allow(clippy::missing_panics_doc, clippy::too_many_lines)]
     pub async fn create_event(
         &mut self,
-        form: evops_types::NewEventForm,
-    ) -> Result<evops_types::Event, evops_types::CreateEventError> {
+        form: evops_models::NewEventForm,
+    ) -> Result<evops_models::Event, evops_models::CreateEventError> {
         self.conn
             .transaction(|conn| {
                 async move {
@@ -61,7 +61,7 @@ impl crate::Database {
                                 .await
                                 .map_err(|e| match e {
                                     diesel::result::Error::NotFound => {
-                                        evops_types::CreateEventError::AuthorNotFound({
+                                        evops_models::CreateEventError::AuthorNotFound({
                                             form.author_id
                                         })
                                     }
@@ -69,9 +69,9 @@ impl crate::Database {
                                 })?
                         };
 
-                        evops_types::User {
+                        evops_models::User {
                             id: form.author_id,
-                            name: unsafe { evops_types::UserName::new_unchecked(user.name) },
+                            name: unsafe { evops_models::UserName::new_unchecked(user.name) },
                             profile_picture_url: user
                                 .profile_picture_url
                                 .map(|s| s.parse().unwrap()),
@@ -109,7 +109,7 @@ impl crate::Database {
                                     Ok(aliases) => aliases
                                         .into_iter()
                                         .map(|a| unsafe {
-                                            evops_types::TagAlias::new_unchecked(a.alias)
+                                            evops_models::TagAlias::new_unchecked(a.alias)
                                         })
                                         .collect(),
                                     Err(e) => return Err(e.into()),
@@ -117,16 +117,16 @@ impl crate::Database {
                             };
 
                             match find_tag_result {
-                                Ok(tag) => buffer.push(evops_types::Tag {
-                                    id: evops_types::TagId::new(tag.id),
+                                Ok(tag) => buffer.push(evops_models::Tag {
+                                    id: evops_models::TagId::new(tag.id),
                                     name: unsafe {
-                                        evops_types::TagName::new_unchecked(tag.name)
+                                        evops_models::TagName::new_unchecked(tag.name)
                                     },
                                     aliases,
                                 }),
                                 Err(e) => return Err(match e {
                                     diesel::result::Error::NotFound => {
-                                        evops_types::CreateEventError::TagNotFound(id)
+                                        evops_models::CreateEventError::TagNotFound(id)
                                     }
                                     _ => e.into(),
                                 }),
@@ -193,8 +193,8 @@ impl crate::Database {
                         .execute(conn)
                         .await?;
 
-                    Ok(evops_types::Event {
-                        id: evops_types::EventId::new(event_id),
+                    Ok(evops_models::Event {
+                        id: evops_models::EventId::new(event_id),
                         author,
                         image_urls,
                         title: form.title,

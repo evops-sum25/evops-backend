@@ -9,8 +9,8 @@ evops-client-ext = { path = "client-ext/crate/" }
 evops-core = { path = "crates/evops-core/" }
 evops-db = { path = "crates/evops-db/" }
 evops-grpc = { path = "crates/evops-grpc/" }
+evops-models = { path = "crates/evops-models/" }
 evops-rest = { path = "crates/evops-rest/" }
-evops-types = { path = "crates/evops-types/" }
 
 aide = "0.15.0"
 axum = "0.8.4"

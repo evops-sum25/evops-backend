@@ -1,4 +1,4 @@
-use evops_types::{CreateEventError, EventServiceCreateRequest, EventServiceCreateResponse};
+use evops_models::{CreateEventError, EventServiceCreateRequest, EventServiceCreateResponse};
 
 impl crate::AppState {
     pub async fn create_event(

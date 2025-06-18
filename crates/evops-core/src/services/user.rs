@@ -1,4 +1,4 @@
-use evops_types::{
+use evops_models::{
     CreateUserError, ListUsersError, UserServiceCreateRequest, UserServiceCreateResponse,
     UserServiceListRequest, UserServiceListResponse,
 };

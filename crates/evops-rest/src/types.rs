@@ -99,7 +99,7 @@ struct EventId(Uuid);
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 struct EventTitle(
     #[schemars(
-        length(min = evops_types::EVENT_TITLE_MIN_LEN, max = evops_types::EVENT_TITLE_MAX_LEN),
+        length(min = evops_models::EVENT_TITLE_MIN_LEN, max = evops_models::EVENT_TITLE_MAX_LEN),
     )]
     String,
 );
@@ -108,8 +108,8 @@ struct EventTitle(
 struct EventDescription(
     #[schemars(
         length(
-            min = evops_types::EVENT_DESCRIPTION_MIN_LEN,
-            max = evops_types::EVENT_DESCRIPTION_MAX_LEN,
+            min = evops_models::EVENT_DESCRIPTION_MIN_LEN,
+            max = evops_models::EVENT_DESCRIPTION_MAX_LEN,
         ),
     )]
     String,
@@ -117,8 +117,8 @@ struct EventDescription(
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 struct UserName(
-    #[schemars(length(min = evops_types::USER_NAME_MIN_LEN, max = evops_types::USER_NAME_MAX_LEN))]
-    String,
+    #[schemars(length(min = evops_models::USER_NAME_MIN_LEN, max = evops_models::USER_NAME_MAX_LEN))]
+     String,
 );
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
@@ -130,8 +130,8 @@ struct TagId(Uuid);
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 struct TagName(
     #[schemars(
-        length(min = evops_types::TAG_NAME_MIN_LEN, max = evops_types::TAG_NAME_MAX_LEN),
-        regex(pattern = evops_types::TAG_NAME_REGEX),
+        length(min = evops_models::TAG_NAME_MIN_LEN, max = evops_models::TAG_NAME_MAX_LEN),
+        regex(pattern = evops_models::TAG_NAME_REGEX),
         example = &"tag-like-on-github",
     )]
     String,
@@ -140,7 +140,7 @@ struct TagName(
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 struct TagAlias(
     #[schemars(
-        length(min = evops_types::TAG_ALIAS_MIN_LEN, max = evops_types::TAG_ALIAS_MAX_LEN),
+        length(min = evops_models::TAG_ALIAS_MIN_LEN, max = evops_models::TAG_ALIAS_MAX_LEN),
         example = &"alias-for-better-search-ux",
     )]
     String,

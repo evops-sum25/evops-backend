@@ -4,7 +4,7 @@ edition = "2024"
 
 [dependencies]
 evops-db = { workspace = true }
-evops-types = { workspace = true }
+evops-models = { workspace = true }
 
 eyre = { workspace = true }
 tokio = { workspace = true, features = ["sync"] }

@@ -35,7 +35,7 @@ impl EventService for self::Service {
                 .create_event(request.into_inner().try_into()?)
                 .await
                 .map_err(|e| {
-                    use evops_types::CreateEventError as E;
+                    use evops_models::CreateEventError as E;
                     match e {
                         E::AuthorNotFound(_) | E::TagNotFound(_) => {
                             Status::not_found(e.to_string())

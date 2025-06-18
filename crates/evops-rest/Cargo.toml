@@ -4,7 +4,7 @@ edition = "2024"
 
 [dependencies]
 evops-core = { workspace = true }
-evops-types = { workspace = true }
+evops-models = { workspace = true }
 
 aide = { workspace = true, features = [
   "axum-json",

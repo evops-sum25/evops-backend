@@ -1,5 +1,5 @@
 [package]
-name = "evops-types"
+name = "evops-models"
 edition = "2024"
 
 [dependencies]

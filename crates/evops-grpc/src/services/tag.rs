@@ -35,7 +35,7 @@ impl TagService for self::Service {
                 .create_tag(request.into_inner().try_into()?)
                 .await
                 .map_err(|e| {
-                    use evops_types::CreateTagError as E;
+                    use evops_models::CreateTagError as E;
                     match e {
                         E::AlreadyExists(_) => Status::already_exists(e.to_string()),
                         E::Db(_) => Status::internal(e.to_string()),

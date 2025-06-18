@@ -28,7 +28,7 @@ impl UserService for self::Service {
                 .list_users(request.into_inner().into())
                 .await
                 .map_err(|e| {
-                    use evops_types::ListUsersError as E;
+                    use evops_models::ListUsersError as E;
                     match e {
                         E::Db(e) => Status::internal(e.to_string()),
                     }
@@ -46,7 +46,7 @@ impl UserService for self::Service {
                 .create_user(request.into_inner().try_into()?)
                 .await
                 .map_err(|e| {
-                    use evops_types::CreateUserError as E;
+                    use evops_models::CreateUserError as E;
                     match e {
                         E::Db(e) => Status::internal(e.to_string()),
                     }

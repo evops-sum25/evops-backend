@@ -1,18 +1,18 @@
-impl From<crate::types::UserServiceListRequest> for evops_types::UserServiceListRequest {
+impl From<crate::types::UserServiceListRequest> for evops_models::UserServiceListRequest {
     fn from(_value: crate::types::UserServiceListRequest) -> Self {
         Self
     }
 }
 
-impl From<evops_types::UserServiceListResponse> for crate::types::UserServiceListResponse {
-    fn from(value: evops_types::UserServiceListResponse) -> Self {
+impl From<evops_models::UserServiceListResponse> for crate::types::UserServiceListResponse {
+    fn from(value: evops_models::UserServiceListResponse) -> Self {
         Self {
             users: value.users.into_iter().map(Into::into).collect(),
         }
     }
 }
 
-impl TryFrom<crate::types::EventServiceCreateRequest> for evops_types::EventServiceCreateRequest {
+impl TryFrom<crate::types::EventServiceCreateRequest> for evops_models::EventServiceCreateRequest {
     type Error = crate::error::UnprocessableEntityError;
 
     fn try_from(value: crate::types::EventServiceCreateRequest) -> Result<Self, Self::Error> {
@@ -22,15 +22,15 @@ impl TryFrom<crate::types::EventServiceCreateRequest> for evops_types::EventServ
     }
 }
 
-impl From<evops_types::EventServiceCreateResponse> for crate::types::EventServiceCreateResponse {
-    fn from(value: evops_types::EventServiceCreateResponse) -> Self {
+impl From<evops_models::EventServiceCreateResponse> for crate::types::EventServiceCreateResponse {
+    fn from(value: evops_models::EventServiceCreateResponse) -> Self {
         Self {
             event: value.event.into(),
         }
     }
 }
 
-impl TryFrom<crate::types::TagServiceCreateRequest> for evops_types::TagServiceCreateRequest {
+impl TryFrom<crate::types::TagServiceCreateRequest> for evops_models::TagServiceCreateRequest {
     type Error = crate::error::UnprocessableEntityError;
 
     fn try_from(value: crate::types::TagServiceCreateRequest) -> Result<Self, Self::Error> {
@@ -40,15 +40,15 @@ impl TryFrom<crate::types::TagServiceCreateRequest> for evops_types::TagServiceC
     }
 }
 
-impl From<evops_types::TagServiceCreateResponse> for crate::types::TagServiceCreateResponse {
-    fn from(value: evops_types::TagServiceCreateResponse) -> Self {
+impl From<evops_models::TagServiceCreateResponse> for crate::types::TagServiceCreateResponse {
+    fn from(value: evops_models::TagServiceCreateResponse) -> Self {
         Self {
             tag: value.tag.into(),
         }
     }
 }
 
-impl TryFrom<crate::types::UserServiceCreateRequest> for evops_types::UserServiceCreateRequest {
+impl TryFrom<crate::types::UserServiceCreateRequest> for evops_models::UserServiceCreateRequest {
     type Error = crate::error::UnprocessableEntityError;
 
     fn try_from(value: crate::types::UserServiceCreateRequest) -> Result<Self, Self::Error> {
@@ -58,15 +58,15 @@ impl TryFrom<crate::types::UserServiceCreateRequest> for evops_types::UserServic
     }
 }
 
-impl From<evops_types::UserServiceCreateResponse> for crate::types::UserServiceCreateResponse {
-    fn from(value: evops_types::UserServiceCreateResponse) -> Self {
+impl From<evops_models::UserServiceCreateResponse> for crate::types::UserServiceCreateResponse {
+    fn from(value: evops_models::UserServiceCreateResponse) -> Self {
         Self {
             user: value.user.into(),
         }
     }
 }
 
-impl TryFrom<crate::types::NewEventForm> for evops_types::NewEventForm {
+impl TryFrom<crate::types::NewEventForm> for evops_models::NewEventForm {
     type Error = crate::error::UnprocessableEntityError;
 
     fn try_from(value: crate::types::NewEventForm) -> Result<Self, Self::Error> {
@@ -85,8 +85,8 @@ impl TryFrom<crate::types::NewEventForm> for evops_types::NewEventForm {
     }
 }
 
-impl From<evops_types::Event> for crate::types::Event {
-    fn from(value: evops_types::Event) -> Self {
+impl From<evops_models::Event> for crate::types::Event {
+    fn from(value: evops_models::Event) -> Self {
         Self {
             id: value.id.into(),
             author: value.author.into(),
@@ -101,7 +101,7 @@ impl From<evops_types::Event> for crate::types::Event {
     }
 }
 
-impl TryFrom<crate::types::NewTagForm> for evops_types::NewTagForm {
+impl TryFrom<crate::types::NewTagForm> for evops_models::NewTagForm {
     type Error = crate::error::UnprocessableEntityError;
 
     fn try_from(value: crate::types::NewTagForm) -> Result<Self, Self::Error> {
@@ -119,8 +119,8 @@ impl TryFrom<crate::types::NewTagForm> for evops_types::NewTagForm {
     }
 }
 
-impl From<evops_types::Tag> for crate::types::Tag {
-    fn from(value: evops_types::Tag) -> Self {
+impl From<evops_models::Tag> for crate::types::Tag {
+    fn from(value: evops_models::Tag) -> Self {
         Self {
             id: value.id.into(),
             name: value.name.into(),
@@ -129,7 +129,7 @@ impl From<evops_types::Tag> for crate::types::Tag {
     }
 }
 
-impl TryFrom<crate::types::NewUserForm> for evops_types::NewUserForm {
+impl TryFrom<crate::types::NewUserForm> for evops_models::NewUserForm {
     type Error = crate::error::UnprocessableEntityError;
 
     fn try_from(value: crate::types::NewUserForm) -> Result<Self, Self::Error> {
@@ -140,8 +140,8 @@ impl TryFrom<crate::types::NewUserForm> for evops_types::NewUserForm {
     }
 }
 
-impl From<evops_types::User> for crate::types::User {
-    fn from(value: evops_types::User) -> Self {
+impl From<evops_models::User> for crate::types::User {
+    fn from(value: evops_models::User) -> Self {
         Self {
             id: value.id.into(),
             name: value.name.into(),
@@ -150,19 +150,19 @@ impl From<evops_types::User> for crate::types::User {
     }
 }
 
-impl From<evops_types::EventId> for crate::types::EventId {
-    fn from(value: evops_types::EventId) -> Self {
+impl From<evops_models::EventId> for crate::types::EventId {
+    fn from(value: evops_models::EventId) -> Self {
         Self(value.into_inner())
     }
 }
 
-impl From<crate::types::EventId> for evops_types::EventId {
+impl From<crate::types::EventId> for evops_models::EventId {
     fn from(value: crate::types::EventId) -> Self {
         Self::new(value.0)
     }
 }
 
-impl TryFrom<crate::types::EventTitle> for evops_types::EventTitle {
+impl TryFrom<crate::types::EventTitle> for evops_models::EventTitle {
     type Error = crate::error::UnprocessableEntityError;
 
     fn try_from(value: crate::types::EventTitle) -> Result<Self, Self::Error> {
@@ -170,13 +170,13 @@ impl TryFrom<crate::types::EventTitle> for evops_types::EventTitle {
     }
 }
 
-impl From<evops_types::EventTitle> for crate::types::EventTitle {
-    fn from(value: evops_types::EventTitle) -> Self {
+impl From<evops_models::EventTitle> for crate::types::EventTitle {
+    fn from(value: evops_models::EventTitle) -> Self {
         Self(value.into_inner())
     }
 }
 
-impl TryFrom<crate::types::EventDescription> for evops_types::EventDescription {
+impl TryFrom<crate::types::EventDescription> for evops_models::EventDescription {
     type Error = crate::error::UnprocessableEntityError;
 
     fn try_from(value: crate::types::EventDescription) -> Result<Self, Self::Error> {
@@ -184,13 +184,13 @@ impl TryFrom<crate::types::EventDescription> for evops_types::EventDescription {
     }
 }
 
-impl From<evops_types::EventDescription> for crate::types::EventDescription {
-    fn from(value: evops_types::EventDescription) -> Self {
+impl From<evops_models::EventDescription> for crate::types::EventDescription {
+    fn from(value: evops_models::EventDescription) -> Self {
         Self(value.into_inner())
     }
 }
 
-impl TryFrom<crate::types::UserName> for evops_types::UserName {
+impl TryFrom<crate::types::UserName> for evops_models::UserName {
     type Error = crate::error::UnprocessableEntityError;
 
     fn try_from(value: crate::types::UserName) -> Result<Self, Self::Error> {
@@ -198,37 +198,37 @@ impl TryFrom<crate::types::UserName> for evops_types::UserName {
     }
 }
 
-impl From<evops_types::UserName> for crate::types::UserName {
-    fn from(value: evops_types::UserName) -> Self {
+impl From<evops_models::UserName> for crate::types::UserName {
+    fn from(value: evops_models::UserName) -> Self {
         Self(value.into_inner())
     }
 }
 
-impl From<crate::types::UserId> for evops_types::UserId {
+impl From<crate::types::UserId> for evops_models::UserId {
     fn from(value: crate::types::UserId) -> Self {
         Self::new(value.0)
     }
 }
 
-impl From<evops_types::UserId> for crate::types::UserId {
-    fn from(value: evops_types::UserId) -> Self {
+impl From<evops_models::UserId> for crate::types::UserId {
+    fn from(value: evops_models::UserId) -> Self {
         Self(value.into_inner())
     }
 }
 
-impl From<crate::types::TagId> for evops_types::TagId {
+impl From<crate::types::TagId> for evops_models::TagId {
     fn from(value: crate::types::TagId) -> Self {
         Self::new(value.0)
     }
 }
 
-impl From<evops_types::TagId> for crate::types::TagId {
-    fn from(value: evops_types::TagId) -> Self {
+impl From<evops_models::TagId> for crate::types::TagId {
+    fn from(value: evops_models::TagId) -> Self {
         Self(value.into_inner())
     }
 }
 
-impl TryFrom<crate::types::TagName> for evops_types::TagName {
+impl TryFrom<crate::types::TagName> for evops_models::TagName {
     type Error = crate::error::UnprocessableEntityError;
 
     fn try_from(value: crate::types::TagName) -> Result<Self, Self::Error> {
@@ -236,13 +236,13 @@ impl TryFrom<crate::types::TagName> for evops_types::TagName {
     }
 }
 
-impl From<evops_types::TagName> for crate::types::TagName {
-    fn from(value: evops_types::TagName) -> Self {
+impl From<evops_models::TagName> for crate::types::TagName {
+    fn from(value: evops_models::TagName) -> Self {
         Self(value.into_inner())
     }
 }
 
-impl TryFrom<crate::types::TagAlias> for evops_types::TagAlias {
+impl TryFrom<crate::types::TagAlias> for evops_models::TagAlias {
     type Error = crate::error::UnprocessableEntityError;
 
     fn try_from(value: crate::types::TagAlias) -> Result<Self, Self::Error> {
@@ -250,8 +250,8 @@ impl TryFrom<crate::types::TagAlias> for evops_types::TagAlias {
     }
 }
 
-impl From<evops_types::TagAlias> for crate::types::TagAlias {
-    fn from(value: evops_types::TagAlias) -> Self {
+impl From<evops_models::TagAlias> for crate::types::TagAlias {
+    fn from(value: evops_models::TagAlias) -> Self {
         Self(value.into_inner())
     }
 }

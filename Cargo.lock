@@ -518,7 +518,7 @@ name = "evops-core"
 version = "0.0.0"
 dependencies = [
  "evops-db",
- "evops-types",
+ "evops-models",
  "eyre",
  "tokio",
  "url",
@@ -531,7 +531,7 @@ dependencies = [
  "chrono",
  "diesel",
  "diesel-async",
- "evops-types",
+ "evops-models",
  "url",
  "uuid",
 ]
@@ -542,7 +542,7 @@ version = "0.0.0"
 dependencies = [
  "axum",
  "evops-core",
- "evops-types",
+ "evops-models",
  "eyre",
  "http",
  "prost",
@@ -555,26 +555,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "evops-rest"
-version = "0.0.0"
-dependencies = [
- "aide",
- "axum",
- "chrono",
- "evops-core",
- "evops-types",
- "schemars",
- "serde",
- "strum",
- "thiserror",
- "tokio",
- "tracing",
- "url",
- "uuid",
-]
-
-[[package]]
-name = "evops-types"
+name = "evops-models"
 version = "0.0.0"
 dependencies = [
  "chrono",
@@ -583,6 +564,25 @@ dependencies = [
  "nutype",
  "regex",
  "thiserror",
+ "url",
+ "uuid",
+]
+
+[[package]]
+name = "evops-rest"
+version = "0.0.0"
+dependencies = [
+ "aide",
+ "axum",
+ "chrono",
+ "evops-core",
+ "evops-models",
+ "schemars",
+ "serde",
+ "strum",
+ "thiserror",
+ "tokio",
+ "tracing",
  "url",
  "uuid",
 ]

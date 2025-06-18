@@ -1,4 +1,4 @@
-use evops_types::{CreateTagError, TagServiceCreateRequest, TagServiceCreateResponse};
+use evops_models::{CreateTagError, TagServiceCreateRequest, TagServiceCreateResponse};
 
 impl crate::AppState {
     pub async fn create_tag(
