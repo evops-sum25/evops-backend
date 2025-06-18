@@ -1,15 +1,19 @@
 use aide::axum::ApiRouter;
 use aide::axum::routing::get_with;
-use aide::transform::TransformOperation;
-use axum::{Json, extract::State};
+use aide::transform::{TransformOperation, TransformPathItem};
+use axum::Json;
+use axum::extract::State;
 
 use crate::error::AddResponse as _;
 
 mod create;
 
+fn route_docs(r: TransformPathItem) -> TransformPathItem {
+    r.tag(crate::docs::Tag::UserService.into())
+}
 pub fn router() -> ApiRouter<crate::AppState> {
     ApiRouter::new()
-        .api_route("/", get_with(self::get, self::get_docs))
+        .api_route_with("/", get_with(self::get, self::get_docs), self::route_docs)
         .nest("/create", self::create::router())
 }
 
