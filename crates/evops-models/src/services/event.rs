@@ -79,7 +79,7 @@ pub enum CreateEventError {
     Db(#[from] diesel::result::Error),
 }
 
-#[nutype(derive(Debug, PartialEq, Eq, Hash, Display))]
+#[nutype(derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Display))]
 pub struct EventId(Uuid);
 
 pub const EVENT_TITLE_MIN_LEN: usize = 1;

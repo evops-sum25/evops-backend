@@ -1,9 +1,11 @@
 use chrono::{DateTime, Utc};
-use diesel::{Identifiable, Queryable, Selectable};
+use diesel::{Associations, Identifiable, Queryable, Selectable};
 use uuid::Uuid;
 
+use crate::schema;
+
 #[derive(Queryable, Selectable, Identifiable)]
-#[diesel(table_name = crate::schema::users)]
+#[diesel(table_name = schema::users)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct User {
     pub id: Uuid,
@@ -12,23 +14,16 @@ pub struct User {
 }
 
 #[derive(Queryable, Selectable, Identifiable)]
-#[diesel(table_name = crate::schema::images)]
-#[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct Image {
-    pub id: Uuid,
-    pub url: String,
-}
-
-#[derive(Queryable, Selectable, Identifiable)]
-#[diesel(table_name = crate::schema::tags)]
+#[diesel(table_name = schema::tags)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Tag {
     pub id: Uuid,
     pub name: String,
 }
 
-#[derive(Queryable, Selectable, Identifiable)]
-#[diesel(table_name = crate::schema::tag_aliases)]
+#[derive(Queryable, Selectable, Identifiable, Associations)]
+#[diesel(table_name = schema::tags_aliases)]
+#[diesel(belongs_to(Tag))]
 #[diesel(primary_key(tag_id, alias))]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct TagAlias {
@@ -37,7 +32,7 @@ pub struct TagAlias {
 }
 
 #[derive(Queryable, Selectable, Identifiable)]
-#[diesel(table_name = crate::schema::events)]
+#[diesel(table_name = schema::events)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct Event {
     pub id: Uuid,
@@ -49,17 +44,20 @@ pub struct Event {
     pub modified_at: DateTime<Utc>,
 }
 
-#[derive(Queryable, Selectable, Identifiable)]
-#[diesel(table_name = crate::schema::event_images)]
-#[diesel(primary_key(event_id, image_id))]
+#[derive(Queryable, Selectable, Identifiable, Associations)]
+#[diesel(table_name = schema::images)]
+#[diesel(belongs_to(Event))]
 #[diesel(check_for_backend(diesel::pg::Pg))]
-pub struct EventImage {
+pub struct Image {
+    pub id: Uuid,
+    pub url: String,
     pub event_id: Uuid,
-    pub image_id: Uuid,
 }
 
-#[derive(Queryable, Selectable, Identifiable)]
-#[diesel(table_name = crate::schema::event_tags)]
+#[derive(Queryable, Selectable, Identifiable, Associations)]
+#[diesel(table_name = schema::events_tags)]
+#[diesel(belongs_to(Event))]
+#[diesel(belongs_to(Tag))]
 #[diesel(primary_key(event_id, tag_id))]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 pub struct EventTag {

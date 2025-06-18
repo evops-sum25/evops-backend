@@ -1,19 +1,28 @@
+use std::collections::HashMap;
+
 use chrono::{DateTime, Utc};
-use diesel::{ExpressionMethods as _, Insertable, QueryDsl as _, SelectableHelper as _};
+use diesel::{
+    BelongingToDsl as _, ExpressionMethods as _, GroupedBy as _, Insertable, QueryDsl as _,
+    SelectableHelper as _,
+};
 use diesel_async::scoped_futures::ScopedFutureExt as _;
 use diesel_async::{AsyncConnection as _, RunQueryDsl as _};
 use uuid::Uuid;
 
+use crate::models;
+use crate::schema;
+
 #[derive(Insertable)]
-#[diesel(table_name = crate::schema::images)]
+#[diesel(table_name = schema::images)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 struct NewImage<'a> {
     id: Uuid,
     url: &'a str,
+    event_id: Uuid,
 }
 
 #[derive(Insertable)]
-#[diesel(table_name = crate::schema::events)]
+#[diesel(table_name = schema::events)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 struct NewEvent<'a> {
     id: Uuid,
@@ -26,16 +35,7 @@ struct NewEvent<'a> {
 }
 
 #[derive(Insertable)]
-#[diesel(table_name = crate::schema::event_images)]
-#[diesel(primary_key(event_id, image_id))]
-#[diesel(check_for_backend(diesel::pg::Pg))]
-struct NewEventImage {
-    event_id: Uuid,
-    image_id: Uuid,
-}
-
-#[derive(Insertable)]
-#[diesel(table_name = crate::schema::event_tags)]
+#[diesel(table_name = schema::events_tags)]
 #[diesel(primary_key(event_id, tag_id))]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 struct NewEventTag {
@@ -44,27 +44,239 @@ struct NewEventTag {
 }
 
 impl crate::Database {
+    #[allow(clippy::missing_panics_doc)]
     pub async fn find_event(
         &mut self,
-        form: evops_models::EventId,
+        id: evops_models::EventId,
     ) -> Result<evops_models::Event, evops_models::FindEventError> {
         self.conn
             .transaction(|conn| {
                 async move {
-                    todo!();
+                    let event: models::Event = {
+                        schema::events::table
+                            .find(id.into_inner())
+                            .select(models::Event::as_select())
+                            .get_result(conn)
+                            .await
+                            .map_err(|e| match e {
+                                diesel::result::Error::NotFound => {
+                                    evops_models::FindEventError::NotFound(id)
+                                }
+                                e => e.into(),
+                            })?
+                    };
+
+                    let author: models::User = {
+                        schema::users::table
+                            .find(event.id)
+                            .select(models::User::as_select())
+                            .get_result(conn)
+                            .await?
+                    };
+
+                    let images: Vec<models::Image> =
+                        models::Image::belonging_to(&event).load(conn).await?;
+
+                    let tags: Vec<models::Tag> = {
+                        models::EventTag::belonging_to(&event)
+                            .inner_join(schema::tags::table)
+                            .select(models::Tag::as_select())
+                            .load(conn)
+                            .await?
+                    };
+
+                    let aliases: Vec<models::TagAlias> = {
+                        models::TagAlias::belonging_to(&tags)
+                            .select(models::TagAlias::as_select())
+                            .load(conn)
+                            .await?
+                    };
+
+                    let tags_with_aliases: Vec<(models::Tag, Vec<models::TagAlias>)> = {
+                        aliases
+                            .grouped_by(&tags)
+                            .into_iter()
+                            .zip(tags)
+                            .map(|(a, t)| (t, a))
+                            .collect()
+                    };
+
+                    Ok(evops_models::Event {
+                        id,
+                        author: evops_models::User {
+                            id: evops_models::UserId::new(author.id),
+                            name: unsafe { evops_models::UserName::new_unchecked(author.name) },
+                            profile_picture_url: {
+                                author.profile_picture_url.map(|s| s.parse().unwrap())
+                            },
+                        },
+                        image_urls: {
+                            images
+                                .into_iter()
+                                .map(|img| img.url.parse().unwrap())
+                                .collect()
+                        },
+                        title: unsafe { evops_models::EventTitle::new_unchecked(event.title) },
+                        description: unsafe {
+                            evops_models::EventDescription::new_unchecked(event.description)
+                        },
+                        tags: {
+                            tags_with_aliases
+                                .into_iter()
+                                .map(|(tag, aliases)| evops_models::Tag {
+                                    id: evops_models::TagId::new(tag.id),
+                                    name: unsafe { evops_models::TagName::new_unchecked(tag.name) },
+                                    aliases: {
+                                        aliases
+                                            .into_iter()
+                                            .map(|a| unsafe {
+                                                evops_models::TagAlias::new_unchecked(a.alias)
+                                            })
+                                            .collect()
+                                    },
+                                })
+                                .collect()
+                        },
+                        with_attendance: event.with_attendance,
+                        created_at: event.created_at,
+                        modified_at: event.modified_at,
+                    })
                 }
                 .scope_boxed()
             })
             .await
     }
 
+    #[allow(clippy::missing_panics_doc, clippy::too_many_lines)]
     pub async fn list_events(
         &mut self,
     ) -> Result<Vec<evops_models::Event>, evops_models::ListEventsError> {
         self.conn
             .transaction(|conn| {
                 async move {
-                    todo!();
+                    let events_with_authors: Vec<(models::Event, models::User)> = {
+                        schema::events::table
+                            .inner_join(schema::users::table)
+                            .select((models::Event::as_select(), models::User::as_select()))
+                            .load(conn)
+                            .await?
+                    };
+
+                    let images: Vec<models::Image> = {
+                        schema::images::table
+                            .select(models::Image::as_select())
+                            .load(conn)
+                            .await?
+                    };
+
+                    let events: Vec<models::Event> = {
+                        schema::events::table
+                            .select(models::Event::as_select())
+                            .load(conn)
+                            .await?
+                    };
+
+                    let mut images_per_event: HashMap<Uuid, Vec<models::Image>> = {
+                        images
+                            .grouped_by(&events)
+                            .into_iter()
+                            .zip(&events)
+                            .map(|(im, ev)| (ev.id, im))
+                            .collect()
+                    };
+
+                    let tag_ids_per_event: Vec<(Uuid, Vec<Uuid>)> = {
+                        let ets = schema::events_tags::table
+                            .inner_join(schema::events::table)
+                            .select(models::EventTag::as_select())
+                            .load(conn)
+                            .await?;
+
+                        ets.grouped_by(&events)
+                            .into_iter()
+                            .zip(events)
+                            .map(|(et, ev)| {
+                                (ev.id, et.into_iter().map(|t| t.tag_id).collect::<Vec<_>>())
+                            })
+                            .collect()
+                    };
+
+                    let mut tags_with_aliases_per_event =
+                        HashMap::<Uuid, Vec<(models::Tag, Vec<models::TagAlias>)>>::new();
+
+                    for (event_id, tag_ids) in tag_ids_per_event {
+                        let event_bucket = tags_with_aliases_per_event.entry(event_id).or_default();
+
+                        for tag_id in tag_ids {
+                            let tag: models::Tag = {
+                                schema::tags::table
+                                    .find(tag_id)
+                                    .select(models::Tag::as_select())
+                                    .get_result(conn)
+                                    .await?
+                            };
+
+                            let aliases: Vec<models::TagAlias> = {
+                                schema::tags_aliases::table
+                                    .filter(schema::tags_aliases::tag_id.eq(tag_id))
+                                    .select(models::TagAlias::as_select())
+                                    .load(conn)
+                                    .await?
+                            };
+
+                            event_bucket.push((tag, aliases));
+                        }
+                    }
+
+                    Ok(events_with_authors
+                        .into_iter()
+                        .map(|(event, author)| evops_models::Event {
+                            id: evops_models::EventId::new(event.id),
+                            author: evops_models::User {
+                                id: evops_models::UserId::new(author.id),
+                                name: unsafe { evops_models::UserName::new_unchecked(author.name) },
+                                profile_picture_url: author
+                                    .profile_picture_url
+                                    .map(|s| s.parse().unwrap()),
+                            },
+                            image_urls: {
+                                images_per_event
+                                    .remove(&event.id)
+                                    .unwrap_or_default()
+                                    .into_iter()
+                                    .map(|im| im.url.parse().unwrap())
+                                    .collect()
+                            },
+                            title: unsafe { evops_models::EventTitle::new_unchecked(event.title) },
+                            description: unsafe {
+                                evops_models::EventDescription::new_unchecked(event.description)
+                            },
+                            tags: {
+                                tags_with_aliases_per_event
+                                    .remove(&event.id)
+                                    .unwrap_or_default()
+                                    .into_iter()
+                                    .map(|(tag, aliases)| evops_models::Tag {
+                                        id: evops_models::TagId::new(tag.id),
+                                        name: unsafe {
+                                            evops_models::TagName::new_unchecked(tag.name)
+                                        },
+                                        aliases: {
+                                            aliases
+                                                .into_iter()
+                                                .map(|a| unsafe {
+                                                    evops_models::TagAlias::new_unchecked(a.alias)
+                                                })
+                                                .collect()
+                                        },
+                                    })
+                                    .collect()
+                            },
+                            with_attendance: event.with_attendance,
+                            created_at: event.created_at,
+                            modified_at: event.modified_at,
+                        })
+                        .collect())
                 }
                 .scope_boxed()
             })
@@ -80,10 +292,10 @@ impl crate::Database {
             .transaction(|conn| {
                 async move {
                     let author = {
-                        let user: crate::models::User = {
-                            crate::schema::users::table
+                        let user: models::User = {
+                            schema::users::table
                                 .find(form.author_id.into_inner())
-                                .select(crate::models::User::as_select())
+                                .select(models::User::as_select())
                                 .get_result(conn)
                                 .await
                                 .map_err(|e| match e {
@@ -110,25 +322,19 @@ impl crate::Database {
                         let mut buffer = Vec::with_capacity(tag_ids.len());
 
                         for id in tag_ids {
-                            let find_tag_result: Result<
-                                crate::models::Tag,
-                                diesel::result::Error,
-                            > = {
-                                crate::schema::tags::table
+                            let find_tag_result: Result<models::Tag, diesel::result::Error> = {
+                                schema::tags::table
                                     .find(id.into_inner())
-                                    .select(crate::models::Tag::as_select())
+                                    .select(models::Tag::as_select())
                                     .get_result(conn)
                                     .await
                             };
 
                             let aliases = {
                                 let find_result = {
-                                    crate::schema::tag_aliases::table
-                                        .filter(
-                                            crate::schema::tag_aliases::tag_id
-                                                .eq(id.into_inner()),
-                                        )
-                                        .select(crate::models::TagAlias::as_select())
+                                    schema::tags_aliases::table
+                                        .filter(schema::tags_aliases::tag_id.eq(id.into_inner()))
+                                        .select(models::TagAlias::as_select())
                                         .load(conn)
                                         .await
                                 };
@@ -146,17 +352,17 @@ impl crate::Database {
                             match find_tag_result {
                                 Ok(tag) => buffer.push(evops_models::Tag {
                                     id: evops_models::TagId::new(tag.id),
-                                    name: unsafe {
-                                        evops_models::TagName::new_unchecked(tag.name)
-                                    },
+                                    name: unsafe { evops_models::TagName::new_unchecked(tag.name) },
                                     aliases,
                                 }),
-                                Err(e) => return Err(match e {
-                                    diesel::result::Error::NotFound => {
-                                        evops_models::CreateEventError::TagNotFound(id)
-                                    }
-                                    _ => e.into(),
-                                }),
+                                Err(e) => {
+                                    return Err(match e {
+                                        diesel::result::Error::NotFound => {
+                                            evops_models::CreateEventError::TagNotFound(id)
+                                        }
+                                        _ => e.into(),
+                                    });
+                                }
                             }
                         }
 
@@ -166,7 +372,7 @@ impl crate::Database {
                     let now = Utc::now();
                     let event_id = Uuid::now_v7();
 
-                    diesel::insert_into(crate::schema::events::table)
+                    diesel::insert_into(schema::events::table)
                         .values(NewEvent {
                             id: event_id,
                             title: form.title.as_ref(),
@@ -186,29 +392,17 @@ impl crate::Database {
                             .map(|u| NewImage {
                                 id: Uuid::now_v7(),
                                 url: u.as_str(),
+                                event_id,
                             })
                             .collect::<Vec<_>>()
                     };
 
-                    diesel::insert_into(crate::schema::images::table)
+                    diesel::insert_into(schema::images::table)
                         .values(&new_images)
                         .execute(conn)
                         .await?;
 
-                    diesel::insert_into(crate::schema::event_images::table)
-                        .values(
-                            new_images
-                                .iter()
-                                .map(|im| NewEventImage {
-                                    event_id,
-                                    image_id: im.id,
-                                })
-                                .collect::<Vec<_>>(),
-                        )
-                        .execute(conn)
-                        .await?;
-
-                    diesel::insert_into(crate::schema::event_tags::table)
+                    diesel::insert_into(schema::events_tags::table)
                         .values({
                             tags.iter()
                                 .map(|t| NewEventTag {

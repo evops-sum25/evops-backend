@@ -4,17 +4,12 @@ CREATE TABLE users (
     profile_picture_url text
 );
 
-CREATE TABLE images (
-    id uuid PRIMARY KEY,
-    url text NOT NULL
-);
-
 CREATE TABLE tags (
     id uuid PRIMARY KEY,
     name text UNIQUE NOT NULL
 );
 
-CREATE TABLE tag_aliases (
+CREATE TABLE tags_aliases (
     tag_id uuid REFERENCES tags (id),
     alias text,
     PRIMARY KEY (tag_id, alias)
@@ -30,13 +25,13 @@ CREATE TABLE events (
     modified_at timestamptz NOT NULL
 );
 
-CREATE TABLE event_images (
-    event_id uuid REFERENCES events (id),
-    image_id uuid REFERENCES images (id),
-    PRIMARY KEY (event_id, image_id)
+CREATE TABLE images (
+    id uuid PRIMARY KEY,
+    url text NOT NULL,
+    event_id uuid NOT NULL REFERENCES events (id)
 );
 
-CREATE TABLE event_tags (
+CREATE TABLE events_tags (
     event_id uuid REFERENCES events (id),
     tag_id uuid REFERENCES tags (id),
     PRIMARY KEY (event_id, tag_id)

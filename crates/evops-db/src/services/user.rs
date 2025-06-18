@@ -4,8 +4,11 @@ use diesel_async::{AsyncConnection as _, RunQueryDsl as _};
 use url::Url;
 use uuid::Uuid;
 
+use crate::models;
+use crate::schema;
+
 #[derive(Insertable)]
-#[diesel(table_name = crate::schema::users)]
+#[diesel(table_name = schema::users)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
 struct NewUser<'a> {
     id: Uuid,
@@ -22,10 +25,10 @@ impl crate::Database {
         self.conn
             .transaction(|conn| {
                 async move {
-                    let user: crate::models::User = {
-                        crate::schema::users::table
+                    let user: models::User = {
+                        schema::users::table
                             .find(id.into_inner())
-                            .select(crate::models::User::as_select())
+                            .select(models::User::as_select())
                             .get_result(conn)
                             .await
                             .map_err(|e| match e {
@@ -53,8 +56,8 @@ impl crate::Database {
         self.conn
             .transaction(|conn| {
                 async move {
-                    let raw_results: Vec<crate::models::User> = crate::schema::users::table
-                        .select(crate::models::User::as_select())
+                    let raw_results: Vec<models::User> = schema::users::table
+                        .select(models::User::as_select())
                         .get_results(conn)
                         .await?;
 
@@ -81,13 +84,13 @@ impl crate::Database {
                 async move {
                     let user_id = Uuid::now_v7();
 
-                    diesel::insert_into(crate::schema::users::table)
+                    diesel::insert_into(schema::users::table)
                         .values(NewUser {
                             id: user_id,
                             name: form.name.as_ref(),
                             profile_picture_url: form.profile_picture_url.as_ref().map(Url::as_str),
                         })
-                        .returning(crate::models::User::as_returning())
+                        .returning(models::User::as_returning())
                         .execute(conn)
                         .await?;
 
