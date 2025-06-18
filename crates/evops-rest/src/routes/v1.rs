@@ -1,9 +1,12 @@
 use aide::axum::ApiRouter;
 
-use evops_core::AppState;
+mod events;
+mod tags;
+mod users;
 
-mod event;
-
-pub fn router() -> ApiRouter<AppState> {
-    ApiRouter::new().nest("/event", self::event::router())
+pub fn router() -> ApiRouter<crate::AppState> {
+    ApiRouter::new()
+        .nest("/events", self::events::router())
+        .nest("/tags", self::tags::router())
+        .nest("/users", self::users::router())
 }

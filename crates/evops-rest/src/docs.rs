@@ -8,9 +8,14 @@ pub use self::routes::router;
 mod routes;
 
 #[derive(Display, IntoStaticStr, EnumMessage, VariantArray)]
+#[allow(clippy::enum_variant_names)]
 pub enum Tag {
     /// CRUD operations on events
     EventService,
+    /// CRUD operations on event tags
+    TagService,
+    /// CRUD operations on users
+    UserService,
 }
 
 pub fn use_openapi3_schemas() {

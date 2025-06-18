@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use http::Method;
 use http::header::CONTENT_TYPE;
 use tonic_reflection::server::v1::{ServerReflection, ServerReflectionServer};
@@ -15,7 +13,9 @@ mod services;
 pub fn router(state: &AppState) -> axum::Router {
     tonic::service::Routes::new(self::grpc_reflection_service())
         // server logic
-        .add_service(crate::services::event::server(Arc::clone(state)))
+        .add_service(crate::services::event::server(state.arc_clone()))
+        .add_service(crate::services::tag::server(state.arc_clone()))
+        .add_service(crate::services::user::server(state.arc_clone()))
         // auxiliary layers
         .into_axum_router()
         .layer(GrpcWebLayer::new())

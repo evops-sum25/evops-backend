@@ -6,8 +6,12 @@ use axum::Extension;
 
 use evops_core::AppState;
 
-pub(crate) mod docs;
+type Result<T> = std::result::Result<T, self::error::Error>;
+
+mod docs;
+mod error;
 mod routes;
+mod types;
 
 pub fn router(state: AppState) -> axum::Router {
     self::docs::use_openapi3_schemas();

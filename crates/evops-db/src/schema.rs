@@ -1,53 +1,65 @@
 // @generated automatically by Diesel CLI.
 
 diesel::table! {
-    event_tags (event_id, tag_id) {
-        event_id -> Int8,
-        tag_id -> Int8,
-    }
-}
-
-diesel::table! {
     events (id) {
-        id -> Int8,
+        id -> Uuid,
         title -> Text,
         description -> Text,
-        author -> Int8,
-        location_id -> Nullable<Int8>,
+        author_id -> Uuid,
+        with_attendance -> Bool,
         created_at -> Timestamptz,
+        modified_at -> Timestamptz,
     }
 }
 
 diesel::table! {
-    locations (id) {
-        id -> Int8,
-        name -> Text,
+    events_tags (event_id, tag_id) {
+        event_id -> Uuid,
+        tag_id -> Uuid,
+    }
+}
+
+diesel::table! {
+    images (id) {
+        id -> Uuid,
+        url -> Text,
+        event_id -> Uuid,
     }
 }
 
 diesel::table! {
     tags (id) {
-        id -> Int8,
+        id -> Uuid,
         name -> Text,
     }
 }
 
 diesel::table! {
-    users (id) {
-        id -> Int8,
-        email_address -> Text,
+    tags_aliases (tag_id, alias) {
+        tag_id -> Uuid,
+        alias -> Text,
     }
 }
 
-diesel::joinable!(event_tags -> events (event_id));
-diesel::joinable!(event_tags -> tags (tag_id));
-diesel::joinable!(events -> locations (location_id));
-diesel::joinable!(events -> users (author));
+diesel::table! {
+    users (id) {
+        id -> Uuid,
+        name -> Text,
+        profile_picture_url -> Nullable<Text>,
+    }
+}
+
+diesel::joinable!(events -> users (author_id));
+diesel::joinable!(events_tags -> events (event_id));
+diesel::joinable!(events_tags -> tags (tag_id));
+diesel::joinable!(images -> events (event_id));
+diesel::joinable!(tags_aliases -> tags (tag_id));
 
 diesel::allow_tables_to_appear_in_same_query!(
-    event_tags,
     events,
-    locations,
+    events_tags,
+    images,
     tags,
+    tags_aliases,
     users,
 );
