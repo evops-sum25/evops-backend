@@ -28,7 +28,12 @@ fn get_docs(o: TransformOperation) -> TransformOperation {
 
 async fn get(
     State(state): State<crate::AppState>,
-    Json(request): Json<crate::types::UserServiceListRequest>,
+    // Query(request): Query<crate::types::UserServiceListRequest>,
 ) -> crate::Result<Json<crate::types::UserServiceListResponse>> {
-    Ok(Json(state.list_users(request.into()).await?.into()))
+    Ok(Json({
+        state
+            .list_users(crate::types::UserServiceListRequest.into())
+            .await?
+            .into()
+    }))
 }

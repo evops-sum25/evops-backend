@@ -68,7 +68,7 @@ impl crate::Database {
 
                     let author: models::User = {
                         schema::users::table
-                            .find(event.id)
+                            .find(event.author_id)
                             .select(models::User::as_select())
                             .get_result(conn)
                             .await?
