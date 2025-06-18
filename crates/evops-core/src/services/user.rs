@@ -1,9 +1,17 @@
 use evops_models::{
-    CreateUserError, ListUsersError, UserServiceCreateRequest, UserServiceCreateResponse,
+    CreateUserError, FindUserError, ListUsersError, UserServiceCreateRequest,
+    UserServiceCreateResponse, UserServiceFindRequest, UserServiceFindResponse,
     UserServiceListRequest, UserServiceListResponse,
 };
 
 impl crate::AppState {
+    pub async fn find_user(
+        &self,
+        request: UserServiceFindRequest,
+    ) -> Result<UserServiceFindResponse, FindUserError> {
+        todo!();
+    }
+
     pub async fn list_users(
         &self,
         _request: UserServiceListRequest,
