@@ -4,16 +4,34 @@ fn invalid_argument(message: impl ToString) -> tonic::Status {
     tonic::Status::invalid_argument(message.to_string())
 }
 
-impl From<crate::pb::UserServiceListRequest> for evops_models::UserServiceListRequest {
-    fn from(_value: crate::pb::UserServiceListRequest) -> Self {
+impl TryFrom<crate::pb::EventServiceFindRequest> for evops_models::EventServiceFindRequest {
+    type Error = tonic::Status;
+
+    fn try_from(value: crate::pb::EventServiceFindRequest) -> Result<Self, Self::Error> {
+        Ok(Self {
+            id: evops_models::EventId::new(value.id.parse().map_err(self::invalid_argument)?),
+        })
+    }
+}
+
+impl From<evops_models::EventServiceFindResponse> for crate::pb::EventServiceFindResponse {
+    fn from(value: evops_models::EventServiceFindResponse) -> Self {
+        Self {
+            event: Some(value.event.into()),
+        }
+    }
+}
+
+impl From<crate::pb::EventServiceListRequest> for evops_models::EventServiceListRequest {
+    fn from(_value: crate::pb::EventServiceListRequest) -> Self {
         Self
     }
 }
 
-impl From<evops_models::UserServiceListResponse> for crate::pb::UserServiceListResponse {
-    fn from(value: evops_models::UserServiceListResponse) -> Self {
+impl From<evops_models::EventServiceListResponse> for crate::pb::EventServiceListResponse {
+    fn from(value: evops_models::EventServiceListResponse) -> Self {
         Self {
-            users: value.users.into_iter().map(Into::into).collect(),
+            events: value.events.into_iter().map(Into::into).collect(),
         }
     }
 }
@@ -43,6 +61,38 @@ impl From<evops_models::EventServiceCreateResponse> for crate::pb::EventServiceC
     }
 }
 
+impl TryFrom<crate::pb::TagServiceFindRequest> for evops_models::TagServiceFindRequest {
+    type Error = tonic::Status;
+
+    fn try_from(value: crate::pb::TagServiceFindRequest) -> Result<Self, Self::Error> {
+        Ok(Self {
+            id: evops_models::TagId::new(value.id.parse().map_err(self::invalid_argument)?),
+        })
+    }
+}
+
+impl From<evops_models::TagServiceFindResponse> for crate::pb::TagServiceFindResponse {
+    fn from(value: evops_models::TagServiceFindResponse) -> Self {
+        Self {
+            tag: Some(value.tag.into()),
+        }
+    }
+}
+
+impl From<crate::pb::TagServiceListRequest> for evops_models::TagServiceListRequest {
+    fn from(_value: crate::pb::TagServiceListRequest) -> Self {
+        Self
+    }
+}
+
+impl From<evops_models::TagServiceListResponse> for crate::pb::TagServiceListResponse {
+    fn from(value: evops_models::TagServiceListResponse) -> Self {
+        Self {
+            tags: value.tags.into_iter().map(Into::into).collect(),
+        }
+    }
+}
+
 impl TryFrom<crate::pb::TagServiceCreateRequest> for evops_models::TagServiceCreateRequest {
     type Error = tonic::Status;
 
@@ -64,6 +114,38 @@ impl From<evops_models::TagServiceCreateResponse> for crate::pb::TagServiceCreat
     fn from(value: evops_models::TagServiceCreateResponse) -> Self {
         Self {
             tag: Some(value.tag.into()),
+        }
+    }
+}
+
+impl TryFrom<crate::pb::UserServiceFindRequest> for evops_models::UserServiceFindRequest {
+    type Error = tonic::Status;
+
+    fn try_from(value: crate::pb::UserServiceFindRequest) -> Result<Self, Self::Error> {
+        Ok(Self {
+            id: evops_models::UserId::new(value.id.parse().map_err(self::invalid_argument)?),
+        })
+    }
+}
+
+impl From<evops_models::UserServiceFindResponse> for crate::pb::UserServiceFindResponse {
+    fn from(value: evops_models::UserServiceFindResponse) -> Self {
+        Self {
+            user: Some(value.user.into()),
+        }
+    }
+}
+
+impl From<crate::pb::UserServiceListRequest> for evops_models::UserServiceListRequest {
+    fn from(_value: crate::pb::UserServiceListRequest) -> Self {
+        Self
+    }
+}
+
+impl From<evops_models::UserServiceListResponse> for crate::pb::UserServiceListResponse {
+    fn from(value: evops_models::UserServiceListResponse) -> Self {
+        Self {
+            users: value.users.into_iter().map(Into::into).collect(),
         }
     }
 }

@@ -16,7 +16,19 @@ impl UserService for self::Service {
         &self,
         request: Request<crate::pb::UserServiceFindRequest>,
     ) -> Result<Response<crate::pb::UserServiceFindResponse>, Status> {
-        todo!();
+        Ok(Response::new({
+            self.state
+                .find_user(request.into_inner().try_into()?)
+                .await
+                .map_err(|e| {
+                    use evops_models::FindUserError as E;
+                    match e {
+                        E::NotFound(_) => Status::not_found(e.to_string()),
+                        E::Db(_) => Status::internal(e.to_string()),
+                    }
+                })?
+                .into()
+        }))
     }
 
     async fn list(
