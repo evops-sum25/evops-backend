@@ -7,8 +7,8 @@ evops-core = { workspace = true }
 evops-models = { workspace = true }
 
 axum = { workspace = true }
-# Needed by build.rs.
 http = { workspace = true }
+# Needed by build.rs for the `crate::pb` module.
 prost = { workspace = true }
 prost-types = { workspace = true }
 tonic = { workspace = true }
