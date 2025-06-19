@@ -1,7 +1,7 @@
 [workspace]
 resolver = "3"
 members = ["crates/*/"]
-exclude = ["client-ext/crate/"]
+exclude = ["client-ext/crate/", "server-ext/crate/"]
 default-members = ["crates/evops/"]
 
 [workspace.dependencies]
@@ -11,6 +11,7 @@ evops-db = { path = "crates/evops-db/" }
 evops-grpc = { path = "crates/evops-grpc/" }
 evops-models = { path = "crates/evops-models/" }
 evops-rest = { path = "crates/evops-rest/" }
+evops-server-ext = { path = "server-ext/crate/" }
 
 aide = "0.15.0"
 axum = "0.8.4"
