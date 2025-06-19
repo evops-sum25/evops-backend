@@ -10,11 +10,11 @@ mod routes;
 #[derive(Display, IntoStaticStr, EnumMessage, VariantArray)]
 #[allow(clippy::enum_variant_names)]
 pub enum Tag {
-    /// CRUD operations on events
+    /// Manages event-related operations
     EventService,
-    /// CRUD operations on event tags
+    /// Manages event tags
     TagService,
-    /// CRUD operations on users
+    /// Manages user accounts
     UserService,
 }
 

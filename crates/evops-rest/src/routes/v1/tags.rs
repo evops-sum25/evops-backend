@@ -23,7 +23,8 @@ pub fn router() -> ApiRouter<crate::AppState> {
 
 fn get_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.TagService.List")
-        .response_bad_request() // TODO:
+        .description("Lists all tags.")
+        .response_bad_request()
         .response_unprocessable_entity()
         .response_internal_server_error()
 }
@@ -42,6 +43,7 @@ async fn get(
 
 fn post_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.TagService.Create")
+        .description("Creates a new tag.")
         .response_bad_request()
         .response_conflict()
         .response_unprocessable_entity()

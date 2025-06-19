@@ -23,8 +23,8 @@ pub fn router() -> ApiRouter<crate::AppState> {
 
 fn get_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.EventService.List")
-        .response_bad_request() // TODO:
-        .response_unprocessable_entity()
+        .description("Lists all events.")
+        .response_bad_request()
         .response_internal_server_error()
 }
 
@@ -42,6 +42,7 @@ async fn get(
 
 fn post_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.EventService.Create")
+        .description("Creates a new event.")
         .response_bad_request()
         .response_unprocessable_entity()
         .response_internal_server_error()
