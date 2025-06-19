@@ -7,20 +7,22 @@ use axum::extract::State;
 use crate::error::AddResponse as _;
 
 mod _id;
-mod create;
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::TagService.into())
 }
 pub fn router() -> ApiRouter<crate::AppState> {
     ApiRouter::new()
-        .api_route_with("/", get_with(self::get, self::get_docs), self::route_docs)
+        .api_route_with(
+            "/",
+            get_with(self::get, self::get_docs).post_with(self::post, self::post_docs),
+            self::route_docs,
+        )
         .nest("/{id}", self::_id::router())
-        .nest("/create", self::create::router())
 }
 
 fn get_docs(o: TransformOperation) -> TransformOperation {
-    o.summary("evops.api.v1.TagService/List")
+    o.summary("evops.api.v1.TagService.List")
         .response_bad_request() // TODO:
         .response_unprocessable_entity()
         .response_internal_server_error()
@@ -36,4 +38,18 @@ async fn get(
             .await?
             .into()
     }))
+}
+
+fn post_docs(o: TransformOperation) -> TransformOperation {
+    o.summary("evops.api.v1.TagService.Create")
+        .response_bad_request()
+        .response_conflict()
+        .response_unprocessable_entity()
+        .response_internal_server_error()
+}
+async fn post(
+    State(state): State<crate::AppState>,
+    Json(request): Json<crate::types::TagServiceCreateRequest>,
+) -> crate::Result<Json<crate::types::TagServiceCreateResponse>> {
+    Ok(Json(state.create_tag(request.try_into()?).await?.into()))
 }

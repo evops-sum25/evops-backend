@@ -14,7 +14,7 @@ pub fn router() -> ApiRouter<crate::AppState> {
 }
 
 fn get_docs(o: TransformOperation) -> TransformOperation {
-    o.summary("evops.api.v1.EventService/Find")
+    o.summary("evops.api.v1.EventService.Find")
         .response_bad_request() // TODO:
         .response_not_found()
         .response_unprocessable_entity() // TODO:
