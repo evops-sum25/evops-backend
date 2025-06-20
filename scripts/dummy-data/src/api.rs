@@ -18,12 +18,10 @@ impl Api {
     {
         let endpoint = Endpoint::new(dst)?;
 
-        Ok({
-            Self {
-                event_service: EventServiceClient::connect(endpoint.clone()).await?,
-                tag_service: TagServiceClient::connect(endpoint.clone()).await?,
-                user_service: UserServiceClient::connect(endpoint).await?,
-            }
+        Ok(Self {
+            event_service: EventServiceClient::connect(endpoint.clone()).await?,
+            tag_service: TagServiceClient::connect(endpoint.clone()).await?,
+            user_service: UserServiceClient::connect(endpoint).await?,
         })
     }
 }

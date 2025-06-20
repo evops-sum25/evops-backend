@@ -8,7 +8,8 @@ mod api;
 async fn main() -> eyre::Result<()> {
     color_eyre::install()?;
 
-    let mut api = Api::try_connect("http://0.0.0.0:8080").await?;
+    let server_addr = "http://0.0.0.0:8080";
+    let mut api = Api::try_connect(server_addr).await?;
 
     let _events = {
         api.event_service
