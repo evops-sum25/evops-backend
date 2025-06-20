@@ -14,10 +14,11 @@ pub fn router() -> ApiRouter<crate::AppState> {
 }
 
 fn get_docs(o: TransformOperation) -> TransformOperation {
-    o.summary("evops.api.v1.UserService/Find")
-        .response_bad_request() // TODO:
+    o.summary("evops.api.v1.UserService.Find")
+        .description("Retrieves a user by ID.")
+        .response_bad_request()
         .response_not_found()
-        .response_unprocessable_entity() // TODO:
+        .response_unprocessable_entity()
         .response_internal_server_error()
 }
 async fn get(
