@@ -1,0 +1,15 @@
+[package]
+name = "evops-pb"
+edition = "2024"
+
+[dependencies]
+evops-models = { workspace = true }
+
+# Needed by build.rs for the `crate::pb` module.
+prost = { workspace = true }
+prost-types = { workspace = true }
+tonic = { workspace = true }
+
+[build-dependencies]
+eyre = { workspace = true }
+tonic-build = { workspace = true }

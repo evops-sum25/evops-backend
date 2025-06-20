@@ -558,12 +558,9 @@ dependencies = [
  "axum",
  "evops-core",
  "evops-models",
- "eyre",
+ "evops-pb",
  "http",
- "prost",
- "prost-types",
  "tonic",
- "tonic-build",
  "tonic-reflection",
  "tonic-web",
  "tower-http",
@@ -584,6 +581,18 @@ dependencies = [
  "tonic",
  "url",
  "uuid",
+]
+
+[[package]]
+name = "evops-pb"
+version = "0.0.0"
+dependencies = [
+ "evops-models",
+ "eyre",
+ "prost",
+ "prost-types",
+ "tonic",
+ "tonic-build",
 ]
 
 [[package]]
@@ -1716,6 +1725,17 @@ name = "scopeguard"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
+
+[[package]]
+name = "script-dummy-data"
+version = "0.0.0"
+dependencies = [
+ "color-eyre",
+ "evops-pb",
+ "eyre",
+ "tokio",
+ "tonic",
+]
 
 [[package]]
 name = "semver"

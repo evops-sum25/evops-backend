@@ -7,7 +7,6 @@ use tower_http::cors::{Any, CorsLayer};
 use evops_core::AppState;
 
 mod headers;
-pub mod pb;
 mod services;
 
 pub fn router(state: &AppState) -> axum::Router {
@@ -24,7 +23,7 @@ pub fn router(state: &AppState) -> axum::Router {
 
 fn grpc_reflection_service() -> ServerReflectionServer<impl ServerReflection> {
     tonic_reflection::server::Builder::configure()
-        .register_encoded_file_descriptor_set(crate::pb::FILE_DESCRIPTOR_SET)
+        .register_encoded_file_descriptor_set(evops_pb::api::FILE_DESCRIPTOR_SET)
         .build_v1()
         .expect("reflection service should construct successfully")
 }

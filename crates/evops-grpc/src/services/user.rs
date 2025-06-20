@@ -1,6 +1,6 @@
 use tonic::{Request, Response, Status};
 
-use crate::pb::user_service_server::{UserService, UserServiceServer};
+use evops_pb::api::user_service_server::{UserService, UserServiceServer};
 
 pub fn server(state: crate::AppState) -> UserServiceServer<self::Service> {
     UserServiceServer::new(self::Service { state })
@@ -14,8 +14,8 @@ pub struct Service {
 impl UserService for self::Service {
     async fn find(
         &self,
-        request: Request<crate::pb::UserServiceFindRequest>,
-    ) -> Result<Response<crate::pb::UserServiceFindResponse>, Status> {
+        request: Request<evops_pb::api::UserServiceFindRequest>,
+    ) -> Result<Response<evops_pb::api::UserServiceFindResponse>, Status> {
         Ok(Response::new({
             self.state
                 .find_user(request.into_inner().try_into()?)
@@ -26,8 +26,8 @@ impl UserService for self::Service {
 
     async fn list(
         &self,
-        request: Request<crate::pb::UserServiceListRequest>,
-    ) -> Result<Response<crate::pb::UserServiceListResponse>, Status> {
+        request: Request<evops_pb::api::UserServiceListRequest>,
+    ) -> Result<Response<evops_pb::api::UserServiceListResponse>, Status> {
         Ok(Response::new({
             self.state
                 .list_users(request.into_inner().into())
@@ -38,8 +38,8 @@ impl UserService for self::Service {
 
     async fn create(
         &self,
-        request: Request<crate::pb::UserServiceCreateRequest>,
-    ) -> Result<Response<crate::pb::UserServiceCreateResponse>, Status> {
+        request: Request<evops_pb::api::UserServiceCreateRequest>,
+    ) -> Result<Response<evops_pb::api::UserServiceCreateResponse>, Status> {
         Ok(Response::new({
             self.state
                 .create_user(request.into_inner().try_into()?)
