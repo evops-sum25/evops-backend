@@ -24,3 +24,11 @@
 
 3. Both the REST and gRPC servers should be available on http://0.0.0.0:8080 by
    default.
+
+## Additional Information
+
+To populate the DB with dummy data, run this command.
+
+```shell
+cargo run --package=script-dummy-data
+```
