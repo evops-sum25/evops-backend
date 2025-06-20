@@ -4,17 +4,17 @@ fn invalid_argument(message: impl ToString) -> tonic::Status {
     tonic::Status::invalid_argument(message.to_string())
 }
 
-impl TryFrom<crate::pb::EventServiceFindRequest> for evops_models::EventServiceFindRequest {
+impl TryFrom<crate::api::EventServiceFindRequest> for evops_models::EventServiceFindRequest {
     type Error = tonic::Status;
 
-    fn try_from(value: crate::pb::EventServiceFindRequest) -> Result<Self, Self::Error> {
+    fn try_from(value: crate::api::EventServiceFindRequest) -> Result<Self, Self::Error> {
         Ok(Self {
             id: evops_models::EventId::new(value.id.parse().map_err(self::invalid_argument)?),
         })
     }
 }
 
-impl From<evops_models::EventServiceFindResponse> for crate::pb::EventServiceFindResponse {
+impl From<evops_models::EventServiceFindResponse> for crate::api::EventServiceFindResponse {
     fn from(value: evops_models::EventServiceFindResponse) -> Self {
         Self {
             event: Some(value.event.into()),
@@ -22,13 +22,13 @@ impl From<evops_models::EventServiceFindResponse> for crate::pb::EventServiceFin
     }
 }
 
-impl From<crate::pb::EventServiceListRequest> for evops_models::EventServiceListRequest {
-    fn from(_value: crate::pb::EventServiceListRequest) -> Self {
+impl From<crate::api::EventServiceListRequest> for evops_models::EventServiceListRequest {
+    fn from(_value: crate::api::EventServiceListRequest) -> Self {
         Self
     }
 }
 
-impl From<evops_models::EventServiceListResponse> for crate::pb::EventServiceListResponse {
+impl From<evops_models::EventServiceListResponse> for crate::api::EventServiceListResponse {
     fn from(value: evops_models::EventServiceListResponse) -> Self {
         Self {
             events: value.events.into_iter().map(Into::into).collect(),
@@ -36,10 +36,10 @@ impl From<evops_models::EventServiceListResponse> for crate::pb::EventServiceLis
     }
 }
 
-impl TryFrom<crate::pb::EventServiceCreateRequest> for evops_models::EventServiceCreateRequest {
+impl TryFrom<crate::api::EventServiceCreateRequest> for evops_models::EventServiceCreateRequest {
     type Error = tonic::Status;
 
-    fn try_from(value: crate::pb::EventServiceCreateRequest) -> Result<Self, Self::Error> {
+    fn try_from(value: crate::api::EventServiceCreateRequest) -> Result<Self, Self::Error> {
         Ok(Self {
             form: {
                 value
@@ -53,7 +53,7 @@ impl TryFrom<crate::pb::EventServiceCreateRequest> for evops_models::EventServic
     }
 }
 
-impl From<evops_models::EventServiceCreateResponse> for crate::pb::EventServiceCreateResponse {
+impl From<evops_models::EventServiceCreateResponse> for crate::api::EventServiceCreateResponse {
     fn from(value: evops_models::EventServiceCreateResponse) -> Self {
         Self {
             event: Some(value.event.into()),
@@ -61,17 +61,17 @@ impl From<evops_models::EventServiceCreateResponse> for crate::pb::EventServiceC
     }
 }
 
-impl TryFrom<crate::pb::TagServiceFindRequest> for evops_models::TagServiceFindRequest {
+impl TryFrom<crate::api::TagServiceFindRequest> for evops_models::TagServiceFindRequest {
     type Error = tonic::Status;
 
-    fn try_from(value: crate::pb::TagServiceFindRequest) -> Result<Self, Self::Error> {
+    fn try_from(value: crate::api::TagServiceFindRequest) -> Result<Self, Self::Error> {
         Ok(Self {
             id: evops_models::TagId::new(value.id.parse().map_err(self::invalid_argument)?),
         })
     }
 }
 
-impl From<evops_models::TagServiceFindResponse> for crate::pb::TagServiceFindResponse {
+impl From<evops_models::TagServiceFindResponse> for crate::api::TagServiceFindResponse {
     fn from(value: evops_models::TagServiceFindResponse) -> Self {
         Self {
             tag: Some(value.tag.into()),
@@ -79,13 +79,13 @@ impl From<evops_models::TagServiceFindResponse> for crate::pb::TagServiceFindRes
     }
 }
 
-impl From<crate::pb::TagServiceListRequest> for evops_models::TagServiceListRequest {
-    fn from(_value: crate::pb::TagServiceListRequest) -> Self {
+impl From<crate::api::TagServiceListRequest> for evops_models::TagServiceListRequest {
+    fn from(_value: crate::api::TagServiceListRequest) -> Self {
         Self
     }
 }
 
-impl From<evops_models::TagServiceListResponse> for crate::pb::TagServiceListResponse {
+impl From<evops_models::TagServiceListResponse> for crate::api::TagServiceListResponse {
     fn from(value: evops_models::TagServiceListResponse) -> Self {
         Self {
             tags: value.tags.into_iter().map(Into::into).collect(),
@@ -93,10 +93,10 @@ impl From<evops_models::TagServiceListResponse> for crate::pb::TagServiceListRes
     }
 }
 
-impl TryFrom<crate::pb::TagServiceCreateRequest> for evops_models::TagServiceCreateRequest {
+impl TryFrom<crate::api::TagServiceCreateRequest> for evops_models::TagServiceCreateRequest {
     type Error = tonic::Status;
 
-    fn try_from(value: crate::pb::TagServiceCreateRequest) -> Result<Self, Self::Error> {
+    fn try_from(value: crate::api::TagServiceCreateRequest) -> Result<Self, Self::Error> {
         Ok(Self {
             form: {
                 value
@@ -110,7 +110,7 @@ impl TryFrom<crate::pb::TagServiceCreateRequest> for evops_models::TagServiceCre
     }
 }
 
-impl From<evops_models::TagServiceCreateResponse> for crate::pb::TagServiceCreateResponse {
+impl From<evops_models::TagServiceCreateResponse> for crate::api::TagServiceCreateResponse {
     fn from(value: evops_models::TagServiceCreateResponse) -> Self {
         Self {
             tag: Some(value.tag.into()),
@@ -118,17 +118,17 @@ impl From<evops_models::TagServiceCreateResponse> for crate::pb::TagServiceCreat
     }
 }
 
-impl TryFrom<crate::pb::UserServiceFindRequest> for evops_models::UserServiceFindRequest {
+impl TryFrom<crate::api::UserServiceFindRequest> for evops_models::UserServiceFindRequest {
     type Error = tonic::Status;
 
-    fn try_from(value: crate::pb::UserServiceFindRequest) -> Result<Self, Self::Error> {
+    fn try_from(value: crate::api::UserServiceFindRequest) -> Result<Self, Self::Error> {
         Ok(Self {
             id: evops_models::UserId::new(value.id.parse().map_err(self::invalid_argument)?),
         })
     }
 }
 
-impl From<evops_models::UserServiceFindResponse> for crate::pb::UserServiceFindResponse {
+impl From<evops_models::UserServiceFindResponse> for crate::api::UserServiceFindResponse {
     fn from(value: evops_models::UserServiceFindResponse) -> Self {
         Self {
             user: Some(value.user.into()),
@@ -136,13 +136,13 @@ impl From<evops_models::UserServiceFindResponse> for crate::pb::UserServiceFindR
     }
 }
 
-impl From<crate::pb::UserServiceListRequest> for evops_models::UserServiceListRequest {
-    fn from(_value: crate::pb::UserServiceListRequest) -> Self {
+impl From<crate::api::UserServiceListRequest> for evops_models::UserServiceListRequest {
+    fn from(_value: crate::api::UserServiceListRequest) -> Self {
         Self
     }
 }
 
-impl From<evops_models::UserServiceListResponse> for crate::pb::UserServiceListResponse {
+impl From<evops_models::UserServiceListResponse> for crate::api::UserServiceListResponse {
     fn from(value: evops_models::UserServiceListResponse) -> Self {
         Self {
             users: value.users.into_iter().map(Into::into).collect(),
@@ -150,10 +150,10 @@ impl From<evops_models::UserServiceListResponse> for crate::pb::UserServiceListR
     }
 }
 
-impl TryFrom<crate::pb::UserServiceCreateRequest> for evops_models::UserServiceCreateRequest {
+impl TryFrom<crate::api::UserServiceCreateRequest> for evops_models::UserServiceCreateRequest {
     type Error = tonic::Status;
 
-    fn try_from(value: crate::pb::UserServiceCreateRequest) -> Result<Self, Self::Error> {
+    fn try_from(value: crate::api::UserServiceCreateRequest) -> Result<Self, Self::Error> {
         Ok(Self {
             form: {
                 value
@@ -167,7 +167,7 @@ impl TryFrom<crate::pb::UserServiceCreateRequest> for evops_models::UserServiceC
     }
 }
 
-impl From<evops_models::UserServiceCreateResponse> for crate::pb::UserServiceCreateResponse {
+impl From<evops_models::UserServiceCreateResponse> for crate::api::UserServiceCreateResponse {
     fn from(value: evops_models::UserServiceCreateResponse) -> Self {
         Self {
             user: Some(value.user.into()),
@@ -175,10 +175,10 @@ impl From<evops_models::UserServiceCreateResponse> for crate::pb::UserServiceCre
     }
 }
 
-impl TryFrom<crate::pb::NewEventForm> for evops_models::NewEventForm {
+impl TryFrom<crate::api::NewEventForm> for evops_models::NewEventForm {
     type Error = tonic::Status;
 
-    fn try_from(value: crate::pb::NewEventForm) -> Result<Self, Self::Error> {
+    fn try_from(value: crate::api::NewEventForm) -> Result<Self, Self::Error> {
         Ok(Self {
             author_id: evops_models::UserId::new({
                 value.author_id.parse().map_err(self::invalid_argument)?
@@ -215,7 +215,7 @@ impl TryFrom<crate::pb::NewEventForm> for evops_models::NewEventForm {
     }
 }
 
-impl From<evops_models::Event> for crate::pb::Event {
+impl From<evops_models::Event> for crate::api::Event {
     fn from(value: evops_models::Event) -> Self {
         Self {
             id: value.id.to_string(),
@@ -231,10 +231,10 @@ impl From<evops_models::Event> for crate::pb::Event {
     }
 }
 
-impl TryFrom<crate::pb::NewTagForm> for evops_models::NewTagForm {
+impl TryFrom<crate::api::NewTagForm> for evops_models::NewTagForm {
     type Error = tonic::Status;
 
-    fn try_from(value: crate::pb::NewTagForm) -> Result<Self, Self::Error> {
+    fn try_from(value: crate::api::NewTagForm) -> Result<Self, Self::Error> {
         Ok(Self {
             name: evops_models::TagName::try_new(value.name).map_err(self::invalid_argument)?,
             aliases: Some({
@@ -252,7 +252,7 @@ impl TryFrom<crate::pb::NewTagForm> for evops_models::NewTagForm {
     }
 }
 
-impl From<evops_models::Tag> for crate::pb::Tag {
+impl From<evops_models::Tag> for crate::api::Tag {
     fn from(value: evops_models::Tag) -> Self {
         Self {
             id: value.id.to_string(),
@@ -262,10 +262,10 @@ impl From<evops_models::Tag> for crate::pb::Tag {
     }
 }
 
-impl TryFrom<crate::pb::NewUserForm> for evops_models::NewUserForm {
+impl TryFrom<crate::api::NewUserForm> for evops_models::NewUserForm {
     type Error = tonic::Status;
 
-    fn try_from(value: crate::pb::NewUserForm) -> Result<Self, Self::Error> {
+    fn try_from(value: crate::api::NewUserForm) -> Result<Self, Self::Error> {
         Ok(Self {
             name: evops_models::UserName::try_new(value.name).map_err(self::invalid_argument)?,
             profile_picture_url: match value.profile_picture_url {
@@ -276,7 +276,7 @@ impl TryFrom<crate::pb::NewUserForm> for evops_models::NewUserForm {
     }
 }
 
-impl From<evops_models::User> for crate::pb::User {
+impl From<evops_models::User> for crate::api::User {
     fn from(value: evops_models::User) -> Self {
         Self {
             id: value.id.to_string(),
