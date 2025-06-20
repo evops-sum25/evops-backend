@@ -10,18 +10,16 @@ pub struct Api {
     pub user_service: UserServiceClient<Channel>,
 }
 
-impl Api {
-    pub async fn try_connect<D>(dst: D) -> Result<Self, tonic::transport::Error>
-    where
-        D: TryInto<Endpoint>,
-        D::Error: Into<Box<dyn std::error::Error + Send + Sync + 'static>>,
-    {
-        let endpoint = Endpoint::new(dst)?;
+pub async fn try_connect<D>(dst: D) -> Result<self::Api, tonic::transport::Error>
+where
+    D: TryInto<Endpoint>,
+    D::Error: Into<Box<dyn std::error::Error + Send + Sync + 'static>>,
+{
+    let endpoint = Endpoint::new(dst)?;
 
-        Ok(Self {
-            event_service: EventServiceClient::connect(endpoint.clone()).await?,
-            tag_service: TagServiceClient::connect(endpoint.clone()).await?,
-            user_service: UserServiceClient::connect(endpoint).await?,
-        })
-    }
+    Ok(self::Api {
+        event_service: EventServiceClient::connect(endpoint.clone()).await?,
+        tag_service: TagServiceClient::connect(endpoint.clone()).await?,
+        user_service: UserServiceClient::connect(endpoint).await?,
+    })
 }

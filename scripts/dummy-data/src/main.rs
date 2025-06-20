@@ -1,7 +1,5 @@
 use tonic::Request;
 
-use self::api::Api;
-
 mod api;
 
 #[tokio::main]
@@ -9,7 +7,7 @@ async fn main() -> eyre::Result<()> {
     color_eyre::install()?;
 
     let server_addr = "http://0.0.0.0:8080";
-    let mut api = Api::try_connect(server_addr).await?;
+    let mut api = self::api::try_connect(server_addr).await?;
 
     let _events = {
         api.event_service
