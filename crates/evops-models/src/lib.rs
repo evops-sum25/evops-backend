@@ -1,3 +1,5 @@
+use thiserror::Error;
+
 pub use self::services::event::{
     CreateEventError, EVENT_DESCRIPTION_MAX_LEN, EVENT_DESCRIPTION_MIN_LEN, EVENT_TITLE_MAX_LEN,
     EVENT_TITLE_MIN_LEN, Event, EventDescription, EventDescriptionError, EventId,
@@ -19,3 +21,14 @@ pub use self::services::user::{
 };
 
 mod services;
+
+#[derive(Debug, Error)]
+#[error("{0}")]
+pub enum ApiError {
+    InvalidArgument(String),
+    NotFound(String),
+    AlreadyExists(String),
+    #[error(transparent)]
+    Db(#[from] diesel::result::Error),
+    Other(String),
+}
