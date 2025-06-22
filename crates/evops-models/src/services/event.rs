@@ -1,6 +1,5 @@
 use chrono::{DateTime, Utc};
 use nutype::nutype;
-use thiserror::Error;
 use url::Url;
 use uuid::Uuid;
 
@@ -53,30 +52,6 @@ pub struct Event {
     pub with_attendance: bool,
     pub created_at: DateTime<Utc>,
     pub modified_at: DateTime<Utc>,
-}
-
-#[derive(Error, Debug)]
-pub enum FindEventError {
-    #[error("Event with ID {0} was not found.")]
-    NotFound(crate::EventId),
-    #[error(transparent)]
-    Db(#[from] diesel::result::Error),
-}
-
-#[derive(Error, Debug)]
-pub enum ListEventsError {
-    #[error(transparent)]
-    Db(#[from] diesel::result::Error),
-}
-
-#[derive(Error, Debug)]
-pub enum CreateEventError {
-    #[error("User with ID {0} was not found.")]
-    AuthorNotFound(crate::UserId),
-    #[error("Tag with ID {0} was not found.")]
-    TagNotFound(crate::TagId),
-    #[error(transparent)]
-    Db(#[from] diesel::result::Error),
 }
 
 #[nutype(derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Display))]

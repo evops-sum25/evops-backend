@@ -1,3 +1,9 @@
+use evops_models::ApiError;
+
+fn invalid_argument(e: impl ToString) -> ApiError {
+    ApiError::InvalidArgument(e.to_string())
+}
+
 impl From<crate::types::EventServiceFindRequest> for evops_models::EventServiceFindRequest {
     fn from(value: crate::types::EventServiceFindRequest) -> Self {
         Self {
@@ -29,7 +35,7 @@ impl From<evops_models::EventServiceListResponse> for crate::types::EventService
 }
 
 impl TryFrom<crate::types::EventServiceCreateRequest> for evops_models::EventServiceCreateRequest {
-    type Error = crate::error::UnprocessableEntityError;
+    type Error = ApiError;
 
     fn try_from(value: crate::types::EventServiceCreateRequest) -> Result<Self, Self::Error> {
         Ok(Self {
@@ -77,7 +83,7 @@ impl From<evops_models::TagServiceListResponse> for crate::types::TagServiceList
 }
 
 impl TryFrom<crate::types::TagServiceCreateRequest> for evops_models::TagServiceCreateRequest {
-    type Error = crate::error::UnprocessableEntityError;
+    type Error = ApiError;
 
     fn try_from(value: crate::types::TagServiceCreateRequest) -> Result<Self, Self::Error> {
         Ok(Self {
@@ -125,7 +131,7 @@ impl From<evops_models::UserServiceListResponse> for crate::types::UserServiceLi
 }
 
 impl TryFrom<crate::types::UserServiceCreateRequest> for evops_models::UserServiceCreateRequest {
-    type Error = crate::error::UnprocessableEntityError;
+    type Error = ApiError;
 
     fn try_from(value: crate::types::UserServiceCreateRequest) -> Result<Self, Self::Error> {
         Ok(Self {
@@ -143,7 +149,7 @@ impl From<evops_models::UserServiceCreateResponse> for crate::types::UserService
 }
 
 impl TryFrom<crate::types::NewEventForm> for evops_models::NewEventForm {
-    type Error = crate::error::UnprocessableEntityError;
+    type Error = ApiError;
 
     fn try_from(value: crate::types::NewEventForm) -> Result<Self, Self::Error> {
         Ok(Self {
@@ -178,7 +184,7 @@ impl From<evops_models::Event> for crate::types::Event {
 }
 
 impl TryFrom<crate::types::NewTagForm> for evops_models::NewTagForm {
-    type Error = crate::error::UnprocessableEntityError;
+    type Error = ApiError;
 
     fn try_from(value: crate::types::NewTagForm) -> Result<Self, Self::Error> {
         Ok(Self {
@@ -206,7 +212,7 @@ impl From<evops_models::Tag> for crate::types::Tag {
 }
 
 impl TryFrom<crate::types::NewUserForm> for evops_models::NewUserForm {
-    type Error = crate::error::UnprocessableEntityError;
+    type Error = ApiError;
 
     fn try_from(value: crate::types::NewUserForm) -> Result<Self, Self::Error> {
         Ok(Self {
@@ -239,10 +245,10 @@ impl From<crate::types::EventId> for evops_models::EventId {
 }
 
 impl TryFrom<crate::types::EventTitle> for evops_models::EventTitle {
-    type Error = crate::error::UnprocessableEntityError;
+    type Error = ApiError;
 
     fn try_from(value: crate::types::EventTitle) -> Result<Self, Self::Error> {
-        Ok(Self::try_new(value.0)?)
+        Ok(Self::try_new(value.0).map_err(self::invalid_argument)?)
     }
 }
 
@@ -253,10 +259,10 @@ impl From<evops_models::EventTitle> for crate::types::EventTitle {
 }
 
 impl TryFrom<crate::types::EventDescription> for evops_models::EventDescription {
-    type Error = crate::error::UnprocessableEntityError;
+    type Error = ApiError;
 
     fn try_from(value: crate::types::EventDescription) -> Result<Self, Self::Error> {
-        Ok(Self::try_new(value.0)?)
+        Ok(Self::try_new(value.0).map_err(self::invalid_argument)?)
     }
 }
 
@@ -267,10 +273,10 @@ impl From<evops_models::EventDescription> for crate::types::EventDescription {
 }
 
 impl TryFrom<crate::types::UserName> for evops_models::UserName {
-    type Error = crate::error::UnprocessableEntityError;
+    type Error = ApiError;
 
     fn try_from(value: crate::types::UserName) -> Result<Self, Self::Error> {
-        Ok(Self::try_new(value.0)?)
+        Ok(Self::try_new(value.0).map_err(self::invalid_argument)?)
     }
 }
 
@@ -305,10 +311,10 @@ impl From<evops_models::TagId> for crate::types::TagId {
 }
 
 impl TryFrom<crate::types::TagName> for evops_models::TagName {
-    type Error = crate::error::UnprocessableEntityError;
+    type Error = ApiError;
 
     fn try_from(value: crate::types::TagName) -> Result<Self, Self::Error> {
-        Ok(Self::try_new(value.0)?)
+        Ok(Self::try_new(value.0).map_err(self::invalid_argument)?)
     }
 }
 
@@ -319,10 +325,10 @@ impl From<evops_models::TagName> for crate::types::TagName {
 }
 
 impl TryFrom<crate::types::TagAlias> for evops_models::TagAlias {
-    type Error = crate::error::UnprocessableEntityError;
+    type Error = ApiError;
 
     fn try_from(value: crate::types::TagAlias) -> Result<Self, Self::Error> {
-        Ok(Self::try_new(value.0)?)
+        Ok(Self::try_new(value.0).map_err(self::invalid_argument)?)
     }
 }
 

@@ -4,6 +4,8 @@ use aide::transform::{TransformOperation, TransformPathItem};
 use axum::Json;
 use axum::extract::State;
 
+use evops_models::ApiResult;
+
 use crate::error::AddResponse as _;
 
 mod _id;
@@ -32,7 +34,7 @@ fn get_docs(o: TransformOperation) -> TransformOperation {
 async fn get(
     State(state): State<crate::AppState>,
     // Query(request): Query<crate::types::UserServiceListRequest>,
-) -> crate::Result<Json<crate::types::UserServiceListResponse>> {
+) -> ApiResult<Json<crate::types::UserServiceListResponse>> {
     Ok(Json({
         state
             .list_users(crate::types::UserServiceListRequest.into())
@@ -51,6 +53,6 @@ fn post_docs(o: TransformOperation) -> TransformOperation {
 async fn post(
     State(state): State<crate::AppState>,
     Json(request): Json<crate::types::UserServiceCreateRequest>,
-) -> crate::Result<Json<crate::types::UserServiceCreateResponse>> {
+) -> ApiResult<Json<crate::types::UserServiceCreateResponse>> {
     Ok(Json(state.create_user(request.try_into()?).await?.into()))
 }

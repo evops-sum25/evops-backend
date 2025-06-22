@@ -1,14 +1,13 @@
 use evops_models::{
-    CreateUserError, FindUserError, ListUsersError, UserServiceCreateRequest,
-    UserServiceCreateResponse, UserServiceFindRequest, UserServiceFindResponse,
-    UserServiceListRequest, UserServiceListResponse,
+    ApiResult, UserServiceCreateRequest, UserServiceCreateResponse, UserServiceFindRequest,
+    UserServiceFindResponse, UserServiceListRequest, UserServiceListResponse,
 };
 
 impl crate::AppState {
     pub async fn find_user(
         &self,
         request: UserServiceFindRequest,
-    ) -> Result<UserServiceFindResponse, FindUserError> {
+    ) -> ApiResult<UserServiceFindResponse> {
         let mut db = self.shared_state.db.lock().await;
 
         Ok(UserServiceFindResponse {
@@ -19,7 +18,7 @@ impl crate::AppState {
     pub async fn list_users(
         &self,
         _request: UserServiceListRequest,
-    ) -> Result<UserServiceListResponse, ListUsersError> {
+    ) -> ApiResult<UserServiceListResponse> {
         let mut db = self.shared_state.db.lock().await;
 
         Ok(UserServiceListResponse {
@@ -30,7 +29,7 @@ impl crate::AppState {
     pub async fn create_user(
         &self,
         request: UserServiceCreateRequest,
-    ) -> Result<UserServiceCreateResponse, CreateUserError> {
+    ) -> ApiResult<UserServiceCreateResponse> {
         let mut db = self.shared_state.db.lock().await;
 
         Ok(UserServiceCreateResponse {

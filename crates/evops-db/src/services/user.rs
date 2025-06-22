@@ -4,6 +4,8 @@ use diesel_async::{AsyncConnection as _, RunQueryDsl as _};
 use url::Url;
 use uuid::Uuid;
 
+use evops_models::{ApiError, ApiResult};
+
 use crate::models;
 use crate::schema;
 
@@ -18,10 +20,7 @@ struct NewUser<'a> {
 
 #[allow(clippy::missing_panics_doc)]
 impl crate::Database {
-    pub async fn find_user(
-        &mut self,
-        id: evops_models::UserId,
-    ) -> Result<evops_models::User, evops_models::FindUserError> {
+    pub async fn find_user(&mut self, id: evops_models::UserId) -> ApiResult<evops_models::User> {
         self.conn
             .transaction(|conn| {
                 async move {
@@ -33,7 +32,7 @@ impl crate::Database {
                             .await
                             .map_err(|e| match e {
                                 diesel::result::Error::NotFound => {
-                                    evops_models::FindUserError::NotFound(id)
+                                    ApiError::NotFound(format!("No user with ID {id} found."))
                                 }
                                 _ => e.into(),
                             })?
@@ -50,9 +49,7 @@ impl crate::Database {
             .await
     }
 
-    pub async fn list_users(
-        &mut self,
-    ) -> Result<Vec<evops_models::User>, evops_models::ListUsersError> {
+    pub async fn list_users(&mut self) -> ApiResult<Vec<evops_models::User>> {
         self.conn
             .transaction(|conn| {
                 async move {
@@ -78,7 +75,7 @@ impl crate::Database {
     pub async fn create_user(
         &mut self,
         form: evops_models::NewUserForm,
-    ) -> Result<evops_models::User, evops_models::CreateUserError> {
+    ) -> ApiResult<evops_models::User> {
         self.conn
             .transaction(|conn| {
                 async move {

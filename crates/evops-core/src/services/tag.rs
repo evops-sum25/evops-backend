@@ -1,13 +1,13 @@
 use evops_models::{
-    CreateTagError, FindTagError, ListTagsError, TagServiceCreateRequest, TagServiceCreateResponse,
-    TagServiceFindRequest, TagServiceFindResponse, TagServiceListRequest, TagServiceListResponse,
+    ApiResult, TagServiceCreateRequest, TagServiceCreateResponse, TagServiceFindRequest,
+    TagServiceFindResponse, TagServiceListRequest, TagServiceListResponse,
 };
 
 impl crate::AppState {
     pub async fn find_tag(
         &self,
         request: TagServiceFindRequest,
-    ) -> Result<TagServiceFindResponse, FindTagError> {
+    ) -> ApiResult<TagServiceFindResponse> {
         let mut db = self.shared_state.db.lock().await;
 
         Ok(TagServiceFindResponse {
@@ -18,7 +18,7 @@ impl crate::AppState {
     pub async fn list_tags(
         &self,
         _request: TagServiceListRequest,
-    ) -> Result<TagServiceListResponse, ListTagsError> {
+    ) -> ApiResult<TagServiceListResponse> {
         let mut db = self.shared_state.db.lock().await;
 
         Ok(TagServiceListResponse {
@@ -29,7 +29,7 @@ impl crate::AppState {
     pub async fn create_tag(
         &self,
         request: TagServiceCreateRequest,
-    ) -> Result<TagServiceCreateResponse, CreateTagError> {
+    ) -> ApiResult<TagServiceCreateResponse> {
         let mut db = self.shared_state.db.lock().await;
 
         Ok(TagServiceCreateResponse {

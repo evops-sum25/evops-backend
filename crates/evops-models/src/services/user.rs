@@ -1,5 +1,4 @@
 use nutype::nutype;
-use thiserror::Error;
 use url::Url;
 use uuid::Uuid;
 
@@ -42,26 +41,6 @@ pub struct User {
     pub id: crate::UserId,
     pub name: crate::UserName,
     pub profile_picture_url: Option<Url>,
-}
-
-#[derive(Error, Debug)]
-pub enum FindUserError {
-    #[error("User with ID {0} was not found.")]
-    NotFound(UserId),
-    #[error(transparent)]
-    Db(#[from] diesel::result::Error),
-}
-
-#[derive(Error, Debug)]
-pub enum ListUsersError {
-    #[error(transparent)]
-    Db(#[from] diesel::result::Error),
-}
-
-#[derive(Error, Debug)]
-pub enum CreateUserError {
-    #[error(transparent)]
-    Db(#[from] diesel::result::Error),
 }
 
 #[nutype(derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Display))]

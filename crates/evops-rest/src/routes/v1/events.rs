@@ -4,6 +4,8 @@ use aide::transform::{TransformOperation, TransformPathItem};
 use axum::Json;
 use axum::extract::State;
 
+use evops_models::ApiResult;
+
 use crate::error::AddResponse as _;
 
 mod _id;
@@ -31,7 +33,7 @@ fn get_docs(o: TransformOperation) -> TransformOperation {
 async fn get(
     State(state): State<crate::AppState>,
     // Query(request): Query<crate::types::EventServiceListRequest>,
-) -> crate::Result<Json<crate::types::EventServiceListResponse>> {
+) -> ApiResult<Json<crate::types::EventServiceListResponse>> {
     Ok(Json({
         state
             .list_events(crate::types::EventServiceListRequest.into())
@@ -50,6 +52,6 @@ fn post_docs(o: TransformOperation) -> TransformOperation {
 async fn post(
     State(state): State<crate::AppState>,
     Json(request): Json<crate::types::EventServiceCreateRequest>,
-) -> crate::Result<Json<crate::types::EventServiceCreateResponse>> {
+) -> ApiResult<Json<crate::types::EventServiceCreateResponse>> {
     Ok(Json(state.create_event(request.try_into()?).await?.into()))
 }
