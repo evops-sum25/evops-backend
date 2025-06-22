@@ -1,11 +1,13 @@
 use std::time::SystemTime;
 
-fn invalid_argument(message: impl ToString) -> tonic::Status {
-    tonic::Status::invalid_argument(message.to_string())
+use evops_models::ApiError;
+
+fn invalid_argument(message: impl ToString) -> ApiError {
+    ApiError::InvalidArgument(message.to_string())
 }
 
 impl TryFrom<crate::pb::EventServiceFindRequest> for evops_models::EventServiceFindRequest {
-    type Error = tonic::Status;
+    type Error = ApiError;
 
     fn try_from(value: crate::pb::EventServiceFindRequest) -> Result<Self, Self::Error> {
         Ok(Self {
@@ -37,7 +39,7 @@ impl From<evops_models::EventServiceListResponse> for crate::pb::EventServiceLis
 }
 
 impl TryFrom<crate::pb::EventServiceCreateRequest> for evops_models::EventServiceCreateRequest {
-    type Error = tonic::Status;
+    type Error = ApiError;
 
     fn try_from(value: crate::pb::EventServiceCreateRequest) -> Result<Self, Self::Error> {
         Ok(Self {
@@ -62,7 +64,7 @@ impl From<evops_models::EventServiceCreateResponse> for crate::pb::EventServiceC
 }
 
 impl TryFrom<crate::pb::TagServiceFindRequest> for evops_models::TagServiceFindRequest {
-    type Error = tonic::Status;
+    type Error = ApiError;
 
     fn try_from(value: crate::pb::TagServiceFindRequest) -> Result<Self, Self::Error> {
         Ok(Self {
@@ -94,7 +96,7 @@ impl From<evops_models::TagServiceListResponse> for crate::pb::TagServiceListRes
 }
 
 impl TryFrom<crate::pb::TagServiceCreateRequest> for evops_models::TagServiceCreateRequest {
-    type Error = tonic::Status;
+    type Error = ApiError;
 
     fn try_from(value: crate::pb::TagServiceCreateRequest) -> Result<Self, Self::Error> {
         Ok(Self {
@@ -119,7 +121,7 @@ impl From<evops_models::TagServiceCreateResponse> for crate::pb::TagServiceCreat
 }
 
 impl TryFrom<crate::pb::UserServiceFindRequest> for evops_models::UserServiceFindRequest {
-    type Error = tonic::Status;
+    type Error = ApiError;
 
     fn try_from(value: crate::pb::UserServiceFindRequest) -> Result<Self, Self::Error> {
         Ok(Self {
@@ -151,7 +153,7 @@ impl From<evops_models::UserServiceListResponse> for crate::pb::UserServiceListR
 }
 
 impl TryFrom<crate::pb::UserServiceCreateRequest> for evops_models::UserServiceCreateRequest {
-    type Error = tonic::Status;
+    type Error = ApiError;
 
     fn try_from(value: crate::pb::UserServiceCreateRequest) -> Result<Self, Self::Error> {
         Ok(Self {
@@ -176,7 +178,7 @@ impl From<evops_models::UserServiceCreateResponse> for crate::pb::UserServiceCre
 }
 
 impl TryFrom<crate::pb::NewEventForm> for evops_models::NewEventForm {
-    type Error = tonic::Status;
+    type Error = ApiError;
 
     fn try_from(value: crate::pb::NewEventForm) -> Result<Self, Self::Error> {
         Ok(Self {
@@ -232,7 +234,7 @@ impl From<evops_models::Event> for crate::pb::Event {
 }
 
 impl TryFrom<crate::pb::NewTagForm> for evops_models::NewTagForm {
-    type Error = tonic::Status;
+    type Error = ApiError;
 
     fn try_from(value: crate::pb::NewTagForm) -> Result<Self, Self::Error> {
         Ok(Self {
@@ -263,7 +265,7 @@ impl From<evops_models::Tag> for crate::pb::Tag {
 }
 
 impl TryFrom<crate::pb::NewUserForm> for evops_models::NewUserForm {
-    type Error = tonic::Status;
+    type Error = ApiError;
 
     fn try_from(value: crate::pb::NewUserForm) -> Result<Self, Self::Error> {
         Ok(Self {

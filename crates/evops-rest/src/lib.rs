@@ -6,8 +6,6 @@ use axum::Extension;
 
 use evops_core::AppState;
 
-type Result<T> = std::result::Result<T, self::error::Error>;
-
 mod docs;
 mod error;
 mod routes;

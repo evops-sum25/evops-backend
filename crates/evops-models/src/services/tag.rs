@@ -2,7 +2,6 @@ use std::sync::LazyLock;
 
 use nutype::nutype;
 use regex::Regex;
-use thiserror::Error;
 use uuid::Uuid;
 
 #[derive(Debug)]
@@ -44,28 +43,6 @@ pub struct Tag {
     pub id: crate::TagId,
     pub name: crate::TagName,
     pub aliases: Vec<crate::TagAlias>,
-}
-
-#[derive(Error, Debug)]
-pub enum FindTagError {
-    #[error("Tag with ID {0} was not found.")]
-    NotFound(crate::TagId),
-    #[error(transparent)]
-    Db(#[from] diesel::result::Error),
-}
-
-#[derive(Error, Debug)]
-pub enum ListTagsError {
-    #[error(transparent)]
-    Db(#[from] diesel::result::Error),
-}
-
-#[derive(Error, Debug)]
-pub enum CreateTagError {
-    #[error("{0}")]
-    AlreadyExists(String),
-    #[error(transparent)]
-    Db(#[from] diesel::result::Error),
 }
 
 #[nutype(derive(Debug, Clone, Copy, Debug, PartialEq, Eq, Hash, Display))]

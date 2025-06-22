@@ -19,14 +19,7 @@ impl UserService for self::Service {
         Ok(Response::new({
             self.state
                 .find_user(request.into_inner().try_into()?)
-                .await
-                .map_err(|e| {
-                    use evops_models::FindUserError as E;
-                    match e {
-                        E::NotFound(_) => Status::not_found(e.to_string()),
-                        E::Db(_) => Status::internal(e.to_string()),
-                    }
-                })?
+                .await?
                 .into()
         }))
     }
@@ -38,13 +31,7 @@ impl UserService for self::Service {
         Ok(Response::new({
             self.state
                 .list_users(request.into_inner().into())
-                .await
-                .map_err(|e| {
-                    use evops_models::ListUsersError as E;
-                    match e {
-                        E::Db(e) => Status::internal(e.to_string()),
-                    }
-                })?
+                .await?
                 .into()
         }))
     }
@@ -56,13 +43,7 @@ impl UserService for self::Service {
         Ok(Response::new({
             self.state
                 .create_user(request.into_inner().try_into()?)
-                .await
-                .map_err(|e| {
-                    use evops_models::CreateUserError as E;
-                    match e {
-                        E::Db(e) => Status::internal(e.to_string()),
-                    }
-                })?
+                .await?
                 .into()
         }))
     }

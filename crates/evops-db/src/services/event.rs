@@ -9,6 +9,8 @@ use diesel_async::scoped_futures::ScopedFutureExt as _;
 use diesel_async::{AsyncConnection as _, RunQueryDsl as _};
 use uuid::Uuid;
 
+use evops_models::{ApiError, ApiResult};
+
 use crate::models;
 use crate::schema;
 
@@ -48,7 +50,7 @@ impl crate::Database {
     pub async fn find_event(
         &mut self,
         id: evops_models::EventId,
-    ) -> Result<evops_models::Event, evops_models::FindEventError> {
+    ) -> ApiResult<evops_models::Event> {
         self.conn
             .transaction(|conn| {
                 async move {
@@ -60,7 +62,7 @@ impl crate::Database {
                             .await
                             .map_err(|e| match e {
                                 diesel::result::Error::NotFound => {
-                                    evops_models::FindEventError::NotFound(id)
+                                    ApiError::NotFound(format!("No event with ID {id} found."))
                                 }
                                 e => e.into(),
                             })?
@@ -148,9 +150,7 @@ impl crate::Database {
     }
 
     #[allow(clippy::missing_panics_doc, clippy::too_many_lines)]
-    pub async fn list_events(
-        &mut self,
-    ) -> Result<Vec<evops_models::Event>, evops_models::ListEventsError> {
+    pub async fn list_events(&mut self) -> ApiResult<Vec<evops_models::Event>> {
         self.conn
             .transaction(|conn| {
                 async move {
@@ -287,7 +287,7 @@ impl crate::Database {
     pub async fn create_event(
         &mut self,
         form: evops_models::NewEventForm,
-    ) -> Result<evops_models::Event, evops_models::CreateEventError> {
+    ) -> ApiResult<evops_models::Event> {
         self.conn
             .transaction(|conn| {
                 async move {
@@ -299,11 +299,9 @@ impl crate::Database {
                                 .get_result(conn)
                                 .await
                                 .map_err(|e| match e {
-                                    diesel::result::Error::NotFound => {
-                                        evops_models::CreateEventError::AuthorNotFound({
-                                            form.author_id
-                                        })
-                                    }
+                                    diesel::result::Error::NotFound => ApiError::InvalidArgument(
+                                        format!("No author with ID {} found", form.author_id),
+                                    ),
                                     _ => e.into(),
                                 })?
                         };
@@ -358,7 +356,9 @@ impl crate::Database {
                                 Err(e) => {
                                     return Err(match e {
                                         diesel::result::Error::NotFound => {
-                                            evops_models::CreateEventError::TagNotFound(id)
+                                            ApiError::InvalidArgument(format!(
+                                                "No tag with ID {id} found.",
+                                            ))
                                         }
                                         _ => e.into(),
                                     });

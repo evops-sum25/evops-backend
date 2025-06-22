@@ -4,7 +4,7 @@ edition = "2024"
 
 [dependencies]
 evops-core = { workspace = true }
-evops-models = { workspace = true }
+evops-models = { workspace = true, features = ["tonic"] }
 
 axum = { workspace = true }
 http = { workspace = true }

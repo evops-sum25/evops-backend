@@ -19,14 +19,7 @@ impl TagService for self::Service {
         Ok(Response::new({
             self.state
                 .find_tag(request.into_inner().try_into()?)
-                .await
-                .map_err(|e| {
-                    use evops_models::FindTagError as E;
-                    match e {
-                        E::NotFound(_) => Status::not_found(e.to_string()),
-                        E::Db(_) => Status::internal(e.to_string()),
-                    }
-                })?
+                .await?
                 .into()
         }))
     }
@@ -38,13 +31,7 @@ impl TagService for self::Service {
         Ok(Response::new({
             self.state
                 .list_tags(request.into_inner().into())
-                .await
-                .map_err(|e| {
-                    use evops_models::ListTagsError as E;
-                    match e {
-                        E::Db(_) => Status::internal(e.to_string()),
-                    }
-                })?
+                .await?
                 .into()
         }))
     }
@@ -56,14 +43,7 @@ impl TagService for self::Service {
         Ok(Response::new({
             self.state
                 .create_tag(request.into_inner().try_into()?)
-                .await
-                .map_err(|e| {
-                    use evops_models::CreateTagError as E;
-                    match e {
-                        E::AlreadyExists(_) => Status::already_exists(e.to_string()),
-                        E::Db(_) => Status::internal(e.to_string()),
-                    }
-                })?
+                .await?
                 .into()
         }))
     }

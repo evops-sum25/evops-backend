@@ -1,14 +1,13 @@
 use evops_models::{
-    CreateEventError, EventServiceCreateRequest, EventServiceCreateResponse,
-    EventServiceFindRequest, EventServiceFindResponse, EventServiceListRequest,
-    EventServiceListResponse, FindEventError, ListEventsError,
+    ApiResult, EventServiceCreateRequest, EventServiceCreateResponse, EventServiceFindRequest,
+    EventServiceFindResponse, EventServiceListRequest, EventServiceListResponse,
 };
 
 impl crate::AppState {
     pub async fn find_event(
         &self,
         request: EventServiceFindRequest,
-    ) -> Result<EventServiceFindResponse, FindEventError> {
+    ) -> ApiResult<EventServiceFindResponse> {
         let mut db = self.shared_state.db.lock().await;
 
         Ok(EventServiceFindResponse {
@@ -19,7 +18,7 @@ impl crate::AppState {
     pub async fn list_events(
         &self,
         _request: EventServiceListRequest,
-    ) -> Result<EventServiceListResponse, ListEventsError> {
+    ) -> ApiResult<EventServiceListResponse> {
         let mut db = self.shared_state.db.lock().await;
 
         Ok(EventServiceListResponse {
@@ -30,7 +29,7 @@ impl crate::AppState {
     pub async fn create_event(
         &self,
         request: EventServiceCreateRequest,
-    ) -> Result<EventServiceCreateResponse, CreateEventError> {
+    ) -> ApiResult<EventServiceCreateResponse> {
         let mut db = self.shared_state.db.lock().await;
 
         Ok(EventServiceCreateResponse {

@@ -4,6 +4,8 @@ use aide::transform::{TransformOperation, TransformPathItem};
 use axum::Json;
 use axum::extract::State;
 
+use evops_models::ApiResult;
+
 use crate::error::AddResponse as _;
 
 mod _id;
@@ -32,7 +34,7 @@ fn get_docs(o: TransformOperation) -> TransformOperation {
 async fn get(
     State(state): State<crate::AppState>,
     // Query(request): Query<crate::types::TagServiceListRequest>,
-) -> crate::Result<Json<crate::types::TagServiceListResponse>> {
+) -> ApiResult<Json<crate::types::TagServiceListResponse>> {
     Ok(Json({
         state
             .list_tags(crate::types::TagServiceListRequest.into())
@@ -52,6 +54,6 @@ fn post_docs(o: TransformOperation) -> TransformOperation {
 async fn post(
     State(state): State<crate::AppState>,
     Json(request): Json<crate::types::TagServiceCreateRequest>,
-) -> crate::Result<Json<crate::types::TagServiceCreateResponse>> {
+) -> ApiResult<Json<crate::types::TagServiceCreateResponse>> {
     Ok(Json(state.create_tag(request.try_into()?).await?.into()))
 }

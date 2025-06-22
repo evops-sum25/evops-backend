@@ -7,6 +7,8 @@ use diesel_async::scoped_futures::ScopedFutureExt as _;
 use diesel_async::{AsyncConnection as _, RunQueryDsl as _};
 use uuid::Uuid;
 
+use evops_models::{ApiError, ApiResult};
+
 use crate::models;
 use crate::schema;
 
@@ -27,10 +29,7 @@ struct NewTagAlias<'a> {
 }
 
 impl crate::Database {
-    pub async fn find_tag(
-        &mut self,
-        id: evops_models::TagId,
-    ) -> Result<evops_models::Tag, evops_models::FindTagError> {
+    pub async fn find_tag(&mut self, id: evops_models::TagId) -> ApiResult<evops_models::Tag> {
         self.conn
             .transaction(|conn| {
                 async move {
@@ -67,7 +66,7 @@ impl crate::Database {
                         }),
                         Err(e) => Err(match e {
                             diesel::result::Error::NotFound => {
-                                evops_models::FindTagError::NotFound(id)
+                                ApiError::NotFound(format!("No tag with ID {id} found."))
                             }
                             _ => e.into(),
                         }),
@@ -78,9 +77,7 @@ impl crate::Database {
             .await
     }
 
-    pub async fn list_tags(
-        &mut self,
-    ) -> Result<Vec<evops_models::Tag>, evops_models::ListTagsError> {
+    pub async fn list_tags(&mut self) -> ApiResult<Vec<evops_models::Tag>> {
         self.conn
             .transaction(|conn| {
                 async move {
@@ -131,7 +128,7 @@ impl crate::Database {
     pub async fn create_tag(
         &mut self,
         form: evops_models::NewTagForm,
-    ) -> Result<evops_models::Tag, evops_models::CreateTagError> {
+    ) -> ApiResult<evops_models::Tag> {
         self.conn
             .transaction(|conn| {
                 async move {
@@ -151,9 +148,7 @@ impl crate::Database {
                         info,
                     )) = insert_tag_result
                     {
-                        return Err(evops_models::CreateTagError::AlreadyExists({
-                            info.message().to_owned()
-                        }));
+                        return Err(ApiError::AlreadyExists(info.message().to_owned()));
                     }
 
                     let aliases = form.aliases.unwrap_or_default();
