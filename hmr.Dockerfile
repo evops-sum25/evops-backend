@@ -1,4 +1,4 @@
-FROM lukemathwalker/cargo-chef:0.1.71-rust-1.87.0-alpine3.22 AS chef
+FROM lukemathwalker/cargo-chef:0.1.71-rust-1.87.0-slim-bookworm AS chef
 RUN cargo install bacon@3.15.0
 RUN apk update && apk add --no-cache libpq-dev protoc
 WORKDIR /app/
