@@ -1,6 +1,6 @@
 FROM lukemathwalker/cargo-chef:0.1.71-rust-1.87.0-slim-bookworm AS chef
 RUN cargo install bacon@3.15.0
-RUN apt-get update && apt-get install -y libpq-dev protobuf-compiler && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install --assume-yes libpq-dev protobuf-compiler
 WORKDIR /app/
 
 FROM chef AS planner
