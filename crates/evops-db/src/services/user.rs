@@ -1,7 +1,6 @@
 use diesel::{Insertable, QueryDsl as _, SelectableHelper as _};
 use diesel_async::scoped_futures::ScopedFutureExt as _;
 use diesel_async::{AsyncConnection as _, RunQueryDsl as _};
-use url::Url;
 use uuid::Uuid;
 
 use evops_models::{ApiError, ApiResult};
@@ -15,7 +14,6 @@ use crate::schema;
 struct NewUser<'a> {
     id: Uuid,
     name: &'a str,
-    profile_picture_url: Option<&'a str>,
 }
 
 #[allow(clippy::missing_panics_doc)]
@@ -41,7 +39,6 @@ impl crate::Database {
                     Ok(evops_models::User {
                         id,
                         name: unsafe { evops_models::UserName::new_unchecked(user.name) },
-                        profile_picture_url: user.profile_picture_url.map(|s| s.parse().unwrap()),
                     })
                 }
                 .scope_boxed()
@@ -63,7 +60,6 @@ impl crate::Database {
                         .map(|u| evops_models::User {
                             id: evops_models::UserId::new(u.id),
                             name: unsafe { evops_models::UserName::new_unchecked(u.name) },
-                            profile_picture_url: u.profile_picture_url.map(|s| s.parse().unwrap()),
                         })
                         .collect::<Vec<_>>())
                 }
@@ -85,7 +81,6 @@ impl crate::Database {
                         .values(NewUser {
                             id: user_id,
                             name: form.name.as_ref(),
-                            profile_picture_url: form.profile_picture_url.as_ref().map(Url::as_str),
                         })
                         .returning(models::User::as_returning())
                         .execute(conn)
@@ -94,7 +89,6 @@ impl crate::Database {
                     Ok(evops_models::User {
                         id: evops_models::UserId::new(user_id),
                         name: form.name,
-                        profile_picture_url: form.profile_picture_url,
                     })
                 }
                 .scope_boxed()

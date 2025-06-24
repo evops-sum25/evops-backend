@@ -1,7 +1,6 @@
 CREATE TABLE users (
     id uuid PRIMARY KEY,
-    name text NOT NULL,
-    profile_picture_url text
+    name text NOT NULL
 );
 
 CREATE TABLE tags (

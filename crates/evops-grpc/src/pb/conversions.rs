@@ -270,10 +270,6 @@ impl TryFrom<crate::pb::NewUserForm> for evops_models::NewUserForm {
     fn try_from(value: crate::pb::NewUserForm) -> Result<Self, Self::Error> {
         Ok(Self {
             name: evops_models::UserName::try_new(value.name).map_err(self::invalid_argument)?,
-            profile_picture_url: match value.profile_picture_url {
-                Some(pp) => Some(pp.parse().map_err(self::invalid_argument)?),
-                None => None,
-            },
         })
     }
 }
@@ -283,7 +279,6 @@ impl From<evops_models::User> for crate::pb::User {
         Self {
             id: value.id.to_string(),
             name: value.name.into_inner(),
-            profile_picture_url: value.profile_picture_url.map(Into::into),
         }
     }
 }

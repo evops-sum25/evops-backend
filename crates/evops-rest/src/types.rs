@@ -165,8 +165,6 @@ struct Tag {
 struct NewUserForm {
     /// Display name.
     name: crate::types::UserName,
-    /// URL of profile image.
-    profile_picture_url: Option<Url>,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
@@ -175,8 +173,6 @@ struct User {
     id: crate::types::UserId,
     /// Display name.
     name: crate::types::UserName,
-    /// URL of profile image.
-    profile_picture_url: Option<Url>,
 }
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]

@@ -108,9 +108,6 @@ impl crate::Database {
                         author: evops_models::User {
                             id: evops_models::UserId::new(author.id),
                             name: unsafe { evops_models::UserName::new_unchecked(author.name) },
-                            profile_picture_url: {
-                                author.profile_picture_url.map(|s| s.parse().unwrap())
-                            },
                         },
                         image_urls: {
                             images
@@ -235,9 +232,6 @@ impl crate::Database {
                             author: evops_models::User {
                                 id: evops_models::UserId::new(author.id),
                                 name: unsafe { evops_models::UserName::new_unchecked(author.name) },
-                                profile_picture_url: author
-                                    .profile_picture_url
-                                    .map(|s| s.parse().unwrap()),
                             },
                             image_urls: {
                                 images_per_event
@@ -309,9 +303,6 @@ impl crate::Database {
                         evops_models::User {
                             id: form.author_id,
                             name: unsafe { evops_models::UserName::new_unchecked(user.name) },
-                            profile_picture_url: user
-                                .profile_picture_url
-                                .map(|s| s.parse().unwrap()),
                         }
                     };
 

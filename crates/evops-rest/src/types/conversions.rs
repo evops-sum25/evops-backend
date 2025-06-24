@@ -1,6 +1,6 @@
 use evops_models::ApiError;
 
-fn invalid_argument(e: impl ToString) -> ApiError {
+fn invalid_argument(e: &impl ToString) -> ApiError {
     ApiError::InvalidArgument(e.to_string())
 }
 
@@ -217,7 +217,6 @@ impl TryFrom<crate::types::NewUserForm> for evops_models::NewUserForm {
     fn try_from(value: crate::types::NewUserForm) -> Result<Self, Self::Error> {
         Ok(Self {
             name: value.name.try_into()?,
-            profile_picture_url: value.profile_picture_url,
         })
     }
 }
@@ -227,7 +226,6 @@ impl From<evops_models::User> for crate::types::User {
         Self {
             id: value.id.into(),
             name: value.name.into(),
-            profile_picture_url: value.profile_picture_url,
         }
     }
 }
@@ -248,7 +246,7 @@ impl TryFrom<crate::types::EventTitle> for evops_models::EventTitle {
     type Error = ApiError;
 
     fn try_from(value: crate::types::EventTitle) -> Result<Self, Self::Error> {
-        Ok(Self::try_new(value.0).map_err(self::invalid_argument)?)
+        Self::try_new(value.0).map_err(|e| self::invalid_argument(&e))
     }
 }
 
@@ -262,7 +260,7 @@ impl TryFrom<crate::types::EventDescription> for evops_models::EventDescription 
     type Error = ApiError;
 
     fn try_from(value: crate::types::EventDescription) -> Result<Self, Self::Error> {
-        Ok(Self::try_new(value.0).map_err(self::invalid_argument)?)
+        Self::try_new(value.0).map_err(|e| self::invalid_argument(&e))
     }
 }
 
@@ -276,7 +274,7 @@ impl TryFrom<crate::types::UserName> for evops_models::UserName {
     type Error = ApiError;
 
     fn try_from(value: crate::types::UserName) -> Result<Self, Self::Error> {
-        Ok(Self::try_new(value.0).map_err(self::invalid_argument)?)
+        Self::try_new(value.0).map_err(|e| self::invalid_argument(&e))
     }
 }
 
@@ -314,7 +312,7 @@ impl TryFrom<crate::types::TagName> for evops_models::TagName {
     type Error = ApiError;
 
     fn try_from(value: crate::types::TagName) -> Result<Self, Self::Error> {
-        Ok(Self::try_new(value.0).map_err(self::invalid_argument)?)
+        Self::try_new(value.0).map_err(|e| self::invalid_argument(&e))
     }
 }
 
@@ -328,7 +326,7 @@ impl TryFrom<crate::types::TagAlias> for evops_models::TagAlias {
     type Error = ApiError;
 
     fn try_from(value: crate::types::TagAlias) -> Result<Self, Self::Error> {
-        Ok(Self::try_new(value.0).map_err(self::invalid_argument)?)
+        Self::try_new(value.0).map_err(|e| self::invalid_argument(&e))
     }
 }
 
