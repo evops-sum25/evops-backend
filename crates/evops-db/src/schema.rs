@@ -45,7 +45,6 @@ diesel::table! {
     users (id) {
         id -> Uuid,
         name -> Text,
-        profile_picture_url -> Nullable<Text>,
     }
 }
 

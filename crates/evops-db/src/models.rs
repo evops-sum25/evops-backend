@@ -10,7 +10,6 @@ use crate::schema;
 pub struct User {
     pub id: Uuid,
     pub name: String,
-    pub profile_picture_url: Option<String>,
 }
 
 #[derive(Queryable, Selectable, Identifiable)]
