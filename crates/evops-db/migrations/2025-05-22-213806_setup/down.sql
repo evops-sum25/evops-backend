@@ -10,6 +10,6 @@ DROP TABLE tags;
 
 DROP TABLE users;
 
-DROP INDEX idx_tags_name;
+DROP INDEX idx_tags_id;
 
-DROP INDEX idx_events_created_at_id;
+DROP INDEX idx_events_id;

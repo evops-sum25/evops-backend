@@ -8,7 +8,7 @@ CREATE TABLE tags (
     name text UNIQUE NOT NULL
 );
 
-CREATE INDEX idx_tags_name ON tags(id);
+CREATE INDEX idx_tags_id ON tags (id);
 
 CREATE TABLE tags_aliases (
     tag_id uuid REFERENCES tags (id),
@@ -26,7 +26,7 @@ CREATE TABLE events (
     modified_at timestamptz NOT NULL
 );
 
-CREATE INDEX idx_events_created_at_id ON events(id);
+CREATE INDEX idx_events_id ON events (id);
 
 CREATE TABLE images (
     id uuid PRIMARY KEY,

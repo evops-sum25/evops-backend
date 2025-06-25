@@ -171,15 +171,13 @@ impl crate::Database {
                         query = query.order(schema::events::id.asc());
 
                         if let Some(lim) = limit {
-                            
                             query = query.limit(lim.into());
-                            
                         }
                         query
                             .load(conn)
                             .await?
                     };
-                    
+
                     if event_ids.is_empty() {
                         return Ok(Vec::new()); // Nothing to do
                     }
@@ -223,12 +221,12 @@ impl crate::Database {
                         };
                         event_tags
                             .into_iter()
-                            .fold(HashMap::new(), |mut outer_map, (event_id, tag)| {                                
+                            .fold(HashMap::new(), |mut outer_map, (event_id, tag)| {
                                 outer_map
                                     .entry(event_id)
                                     .or_default()
                                     .insert(tag.clone(), tag_aliases.get(&tag.id).cloned());
-                            
+
                                 outer_map
                             })
                     };
@@ -246,7 +244,7 @@ impl crate::Database {
                                 images
                                     .get(&event.id)
                                     .unwrap_or(&Vec::new())
-                                    .into_iter()
+                                    .iter()
                                     .map(|img| url::Url::parse(img.url.as_str()).unwrap())
                                     .collect()
                             },
@@ -258,7 +256,7 @@ impl crate::Database {
                                 tags
                                     .get(&event.id)
                                     .unwrap_or(&HashMap::new())
-                                    .into_iter()
+                                    .iter()
                                     .map(|t: (&models::Tag, &Option<Vec<models::TagAlias>>)| evops_models::Tag {
                                         id: evops_models::TagId::new(t.0.id),
                                         name: unsafe { evops_models::TagName::new_unchecked(t.0.name.clone()) },
@@ -267,7 +265,7 @@ impl crate::Database {
                                                 Some(aliases) => {
                                                     aliases
                                                         .into_iter()
-                                                        .map(|alias: &models::TagAlias| 
+                                                        .map(|alias: &models::TagAlias|
                                                             unsafe { evops_models::TagAlias::new_unchecked(alias.alias.clone()) })
                                                         .collect()
                                                 },
