@@ -83,9 +83,24 @@ impl From<evops_models::TagServiceFindResponse> for crate::types::TagServiceFind
     }
 }
 
-impl From<crate::types::TagServiceListRequest> for evops_models::TagServiceListRequest {
-    fn from(_value: crate::types::TagServiceListRequest) -> Self {
-        Self
+impl TryFrom<crate::types::TagServiceListRequest> for evops_models::TagServiceListRequest {
+    type Error = ApiError;
+
+    fn try_from(value: crate::types::TagServiceListRequest) -> Result<Self, Self::Error> {
+        Ok(Self {
+            last_id: match value.last_id {
+                Some(id) => {
+                    Some(
+                        id.into()
+                    )
+                }
+                _ => None,
+            },
+            limit: match value.limit {
+                Some(l) => Some(l.try_into().map_err(|e| self::invalid_argument(&e))?),
+                _ => None,
+            }
+        })
     }
 }
 

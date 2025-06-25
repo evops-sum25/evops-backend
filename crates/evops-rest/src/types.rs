@@ -57,7 +57,12 @@ pub struct TagServiceFindResponse {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct TagServiceListRequest;
+pub struct TagServiceListRequest {
+    /// UUID of last listed event.
+    last_id: Option<crate::types::TagId>,
+    /// Size of one batch of events.
+    limit: Option<crate::types::PgLimit>,
+}
 
 #[derive(Debug, Serialize, JsonSchema)]
 pub struct TagServiceListResponse {
