@@ -10,10 +10,10 @@ eyre = { workspace = true }
 diesel = { workspace = true, features = ["chrono", "postgres", "uuid"] }
 diesel-async = { workspace = true, features = ["postgres"] }
 diesel_migrations = { workspace = true }
+itertools = { workspace = true }
 tracing = { workspace = true }
 url = { workspace = true }
 uuid = { workspace = true, features = ["v7"] }
-itertools = "0.14.0"
 
 [lints]
 workspace = true
