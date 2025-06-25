@@ -26,17 +26,13 @@ impl TryFrom<crate::types::EventServiceListRequest> for evops_models::EventServi
     fn try_from(value: crate::types::EventServiceListRequest) -> Result<Self, Self::Error> {
         Ok(Self {
             last_id: match value.last_id {
-                Some(id) => {
-                    Some(
-                        id.into()
-                    )
-                }
+                Some(id) => Some(id.into()),
                 _ => None,
             },
             limit: match value.limit {
                 Some(l) => Some(l.try_into().map_err(|e| self::invalid_argument(&e))?),
                 _ => None,
-            }
+            },
         })
     }
 }
@@ -89,17 +85,13 @@ impl TryFrom<crate::types::TagServiceListRequest> for evops_models::TagServiceLi
     fn try_from(value: crate::types::TagServiceListRequest) -> Result<Self, Self::Error> {
         Ok(Self {
             last_id: match value.last_id {
-                Some(id) => {
-                    Some(
-                        id.into()
-                    )
-                }
+                Some(id) => Some(id.into()),
                 _ => None,
             },
             limit: match value.limit {
                 Some(l) => Some(l.try_into().map_err(|e| self::invalid_argument(&e))?),
                 _ => None,
-            }
+            },
         })
     }
 }

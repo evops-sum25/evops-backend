@@ -150,7 +150,8 @@ impl crate::Database {
     }
 
     #[allow(clippy::missing_panics_doc, clippy::too_many_lines)]
-    pub async fn list_events( // FIXME: Reversed output?
+    pub async fn list_events(
+        // FIXME: Reversed output?
         &mut self,
         last_id: Option<evops_models::EventId>,
         limit: Option<PgLimit>,
@@ -160,7 +161,7 @@ impl crate::Database {
                 async move {
                     let event_ids: Vec<Uuid> = {
                         let mut query = schema::events::table
-                            .select(schema::events::id) 
+                            .select(schema::events::id)
                             .into_boxed(); // Runtime query
 
                         if let Some(id) = last_id {
@@ -187,6 +188,7 @@ impl crate::Database {
                         schema::events::table
                             .inner_join(schema::users::table)
                             .filter(schema::events::id.eq_any(&event_ids))
+                            .order(schema::events::id.asc())
                             .select((models::Event::as_select(), models::User::as_select()))
                             .load(conn)
                             .await?

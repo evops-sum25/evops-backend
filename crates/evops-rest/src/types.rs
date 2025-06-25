@@ -242,7 +242,7 @@ struct TagAlias(
 struct PgLimit(
     #[schemars(
         range(min = 0),
-        description = "Non-negative integer for database limits",
+        description = "Non-negative integer for database limits"
     )]
     i64,
 );

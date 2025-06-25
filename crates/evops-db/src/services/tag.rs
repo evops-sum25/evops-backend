@@ -86,9 +86,7 @@ impl crate::Database {
             .transaction(|conn| {
                 async move {
                     let tag_ids: Vec<Uuid> = {
-                        let mut query = schema::tags::table
-                            .select(schema::tags::id) 
-                            .into_boxed(); // Runtime query
+                        let mut query = schema::tags::table.select(schema::tags::id).into_boxed(); // Runtime query
 
                         if let Some(id) = last_id {
                             query = query.filter(schema::tags::id.gt(id.into_inner()));
@@ -97,13 +95,9 @@ impl crate::Database {
                         query = query.order(schema::tags::id.asc());
 
                         if let Some(lim) = limit {
-                            
                             query = query.limit(lim.into());
-                            
                         }
-                        query
-                            .load(conn)
-                            .await?
+                        query.load(conn).await?
                     };
                     let tags: Vec<models::Tag> = {
                         schema::tags::table

@@ -35,10 +35,7 @@ async fn get(
     Query(request): Query<crate::types::EventServiceListRequest>,
 ) -> ApiResult<Json<crate::types::EventServiceListResponse>> {
     Ok(Json({
-        state
-            .list_events(request.try_into()?)
-            .await?
-            .into()
+        state.list_events(request.try_into()?).await?.into()
     }))
 }
 

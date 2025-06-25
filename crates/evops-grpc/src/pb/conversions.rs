@@ -30,20 +30,15 @@ impl TryFrom<crate::pb::EventServiceListRequest> for evops_models::EventServiceL
     fn try_from(value: crate::pb::EventServiceListRequest) -> Result<Self, Self::Error> {
         Ok(Self {
             last_id: match value.last_id {
-                Some(id) => {
-                    Some(
-                        evops_models::EventId::new(
-                            id.parse().map_err(self::invalid_argument)?
-                        )
-                    )
-                }
+                Some(id) => Some(evops_models::EventId::new(
+                    id.parse().map_err(self::invalid_argument)?,
+                )),
                 _ => None,
             },
             limit: match value.limit {
-                Some(l) => Some(evops_models::PgLimit::try_new(l)
-                    .map_err(self::invalid_argument)?),
+                Some(l) => Some(evops_models::PgLimit::try_new(l).map_err(self::invalid_argument)?),
                 _ => None,
-            }
+            },
         })
     }
 }
@@ -105,20 +100,15 @@ impl TryFrom<crate::pb::TagServiceListRequest> for evops_models::TagServiceListR
     fn try_from(value: crate::pb::TagServiceListRequest) -> Result<Self, Self::Error> {
         Ok(Self {
             last_id: match value.last_id {
-                Some(id) => {
-                    Some(
-                        evops_models::TagId::new(
-                            id.parse().map_err(self::invalid_argument)?
-                        )
-                    )
-                }
+                Some(id) => Some(evops_models::TagId::new(
+                    id.parse().map_err(self::invalid_argument)?,
+                )),
                 _ => None,
             },
             limit: match value.limit {
-                Some(l) => Some(evops_models::PgLimit::try_new(l)
-                    .map_err(self::invalid_argument)?),
+                Some(l) => Some(evops_models::PgLimit::try_new(l).map_err(self::invalid_argument)?),
                 _ => None,
-            }
+            },
         })
     }
 }
