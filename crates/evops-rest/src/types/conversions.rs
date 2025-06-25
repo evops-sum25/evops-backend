@@ -20,9 +20,24 @@ impl From<evops_models::EventServiceFindResponse> for crate::types::EventService
     }
 }
 
-impl From<crate::types::EventServiceListRequest> for evops_models::EventServiceListRequest {
-    fn from(_value: crate::types::EventServiceListRequest) -> Self {
-        Self
+impl TryFrom<crate::types::EventServiceListRequest> for evops_models::EventServiceListRequest {
+    type Error = ApiError;
+
+    fn try_from(value: crate::types::EventServiceListRequest) -> Result<Self, Self::Error> {
+        Ok(Self {
+            last_id: match value.last_id {
+                Some(id) => {
+                    Some(
+                        id.into()
+                    )
+                }
+                _ => None,
+            },
+            limit: match value.limit {
+                Some(l) => Some(l.try_into().map_err(|e| self::invalid_argument(&e))?),
+                _ => None,
+            }
+        })
     }
 }
 
@@ -239,6 +254,20 @@ impl From<evops_models::EventId> for crate::types::EventId {
 impl From<crate::types::EventId> for evops_models::EventId {
     fn from(value: crate::types::EventId) -> Self {
         Self::new(value.0)
+    }
+}
+
+impl From<evops_models::PgLimit> for crate::types::PgLimit {
+    fn from(value: evops_models::PgLimit) -> Self {
+        Self(value.into_inner())
+    }
+}
+
+impl TryFrom<crate::types::PgLimit> for evops_models::PgLimit {
+    type Error = ApiError;
+
+    fn try_from(value: crate::types::PgLimit) -> Result<Self, Self::Error> {
+        evops_models::PgLimit::try_new(value.0).map_err(|e| self::invalid_argument(&e))
     }
 }
 

@@ -7,9 +7,12 @@ use diesel::{
 };
 use diesel_async::scoped_futures::ScopedFutureExt as _;
 use diesel_async::{AsyncConnection as _, RunQueryDsl as _};
+use tracing::field::debug;
 use uuid::Uuid;
 
-use evops_models::{ApiError, ApiResult};
+use evops_models::{ApiError, ApiResult, PgLimit};
+
+use tracing::{debug};
 
 use crate::models;
 use crate::schema;
@@ -147,18 +150,53 @@ impl crate::Database {
     }
 
     #[allow(clippy::missing_panics_doc, clippy::too_many_lines)]
-    pub async fn list_events(&mut self) -> ApiResult<Vec<evops_models::Event>> {
+    pub async fn list_events(
+        &mut self,
+        last_id: Option<evops_models::EventId>,
+        limit: Option<PgLimit>,
+    ) -> ApiResult<(Vec<evops_models::Event>, Option<evops_models::EventId>)> {
+        debug!("new list event request: last_id {:?}, limit {:?}", last_id, limit);
         self.conn
             .transaction(|conn| {
                 async move {
-                    let events_with_authors: Vec<(models::Event, models::User)> = {
+                    let event_ids: Vec<Uuid> = {
+                        let mut query = schema::events::table
+                            .select(schema::events::id) 
+                            .into_boxed(); // Runtime query
+
+                        if let Some(id) = last_id {
+                            query = query.filter(schema::events::id.gt(id.into_inner()));
+                        }
+
+                        query = query.order(schema::events::id.asc());
+
+                        if let Some(lim) = limit {
+                            
+                            query = query.limit(lim.into());
+                            
+                        }
+                        query
+                            .load(conn)
+                            .await?
+                    };
+                    
+                    if event_ids.is_empty() {
+                        return Ok((Vec::new(), None)); // Nothing to do
+                    }
+
+                    let filtered_events_query = || {
                         schema::events::table
+                            .filter(schema::events::id.eq_any(&event_ids))
+                            .into_boxed()
+                    };
+
+                    let events_with_authors: Vec<(models::Event, models::User)> = {
+                        filtered_events_query()
                             .inner_join(schema::users::table)
                             .select((models::Event::as_select(), models::User::as_select()))
                             .load(conn)
                             .await?
                     };
-
                     let images: Vec<models::Image> = {
                         schema::images::table
                             .select(models::Image::as_select())
@@ -167,12 +205,12 @@ impl crate::Database {
                     };
 
                     let events: Vec<models::Event> = {
-                        schema::events::table
+                        filtered_events_query()
                             .select(models::Event::as_select())
                             .load(conn)
                             .await?
                     };
-
+                    debug!("Images size: {}, events size: {}", images.len(), events.len());
                     let mut images_per_event: HashMap<Uuid, Vec<models::Image>> = {
                         images
                             .grouped_by(&events)
@@ -224,8 +262,9 @@ impl crate::Database {
                             event_bucket.push((tag, aliases));
                         }
                     }
-
-                    Ok(events_with_authors
+                    debug!("ping?");
+                    let events : Vec<evops_models::Event> = {
+                        events_with_authors
                         .into_iter()
                         .map(|(event, author)| evops_models::Event {
                             id: evops_models::EventId::new(event.id),
@@ -270,7 +309,13 @@ impl crate::Database {
                             created_at: event.created_at,
                             modified_at: event.modified_at,
                         })
-                        .collect())
+                        .collect()
+                    };
+                    debug!("result ready");
+                    Ok((
+                        events,
+                        event_ids.last().map(|id| evops_models::EventId::new(*id)),
+                    ))
                 }
                 .scope_boxed()
             })

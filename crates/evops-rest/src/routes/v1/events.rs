@@ -2,7 +2,7 @@ use aide::axum::ApiRouter;
 use aide::axum::routing::get_with;
 use aide::transform::{TransformOperation, TransformPathItem};
 use axum::Json;
-use axum::extract::State;
+use axum::extract::{Query, State};
 
 use evops_models::ApiResult;
 
@@ -32,11 +32,11 @@ fn get_docs(o: TransformOperation) -> TransformOperation {
 
 async fn get(
     State(state): State<crate::AppState>,
-    // Query(request): Query<crate::types::EventServiceListRequest>,
+    Query(request): Query<crate::types::EventServiceListRequest>,
 ) -> ApiResult<Json<crate::types::EventServiceListResponse>> {
     Ok(Json({
         state
-            .list_events(crate::types::EventServiceListRequest.into())
+            .list_events(request.try_into()?)
             .await?
             .into()
     }))
