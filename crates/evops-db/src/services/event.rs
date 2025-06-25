@@ -7,10 +7,10 @@ use diesel::{
 };
 use diesel_async::scoped_futures::ScopedFutureExt as _;
 use diesel_async::{AsyncConnection as _, RunQueryDsl as _};
-use tracing::field::debug;
+
 use uuid::Uuid;
 
-use evops_models::{ApiError, ApiResult, PgLimit, TagAlias};
+use evops_models::{ApiError, ApiResult, PgLimit};
 
 use tracing::{debug};
 use itertools::Itertools;
@@ -188,14 +188,14 @@ impl crate::Database {
                     let events_with_authors: Vec<(models::Event, models::User)> = {
                         schema::events::table
                             .inner_join(schema::users::table)
-                            .filter(schema::events::id.eq_any(event_ids))
+                            .filter(schema::events::id.eq_any(&event_ids))
                             .select((models::Event::as_select(), models::User::as_select()))
                             .load(conn)
                             .await?
                     };
                     let images = {
                         schema::images::table
-                            .filter(schema::images::event_id.eq_any(event_ids))
+                            .filter(schema::images::event_id.eq_any(&event_ids))
                             .select(models::Image::as_select())
                             .load(conn)
                             .await?
@@ -205,13 +205,13 @@ impl crate::Database {
 
                     let tags: HashMap<Uuid, HashMap<models::Tag, Option<Vec<models::TagAlias>>>> = {
                         let event_tags:Vec<(Uuid, models::Tag)> = schema::events_tags::table
-                            .filter(schema::events_tags::event_id.eq_any(event_ids))
+                            .filter(schema::events_tags::event_id.eq_any(&event_ids))
                             .inner_join(schema::tags::table)
                             .select((schema::events_tags::event_id, models::Tag::as_select()))
                             .load::<(Uuid, models::Tag)>(conn)
                             .await?;
 
-                        let tag_ids = event_tags.iter().map(|(event_id, tag)| tag.id).collect();
+                        let tag_ids: Vec<Uuid> = event_tags.iter().map(|(_, tag)| tag.id).collect();
                         let tag_aliases = {
                             schema::tags_aliases::table
                                 .filter(schema::tags_aliases::tag_id.eq_any(tag_ids))
@@ -227,7 +227,7 @@ impl crate::Database {
                                 outer_map
                                     .entry(event_id)
                                     .or_default()
-                                    .insert(tag, tag_aliases.get(&tag.id).cloned());
+                                    .insert(tag.clone(), tag_aliases.get(&tag.id).cloned());
                             
                                 outer_map
                             })
@@ -261,14 +261,14 @@ impl crate::Database {
                                     .into_iter()
                                     .map(|t: (&models::Tag, &Option<Vec<models::TagAlias>>)| evops_models::Tag {
                                         id: evops_models::TagId::new(t.0.id),
-                                        name: unsafe { evops_models::TagName::new_unchecked(t.0.name) },
+                                        name: unsafe { evops_models::TagName::new_unchecked(t.0.name.clone()) },
                                         aliases: {
                                             match t.1 {
                                                 Some(aliases) => {
                                                     aliases
                                                         .into_iter()
                                                         .map(|alias: &models::TagAlias| 
-                                                            unsafe { evops_models::TagAlias::new_unchecked(alias.alias) })
+                                                            unsafe { evops_models::TagAlias::new_unchecked(alias.alias.clone()) })
                                                         .collect()
                                                 },
                                                 _ => Vec::new(),
