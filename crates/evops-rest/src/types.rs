@@ -22,7 +22,7 @@ pub struct EventServiceFindResponse {
 pub struct EventServiceListRequest {
     /// UUID of last listed event.
     last_id: Option<crate::types::EventId>,
-    /// Size of one batch of events
+    /// Size of one batch of events.
     limit: Option<crate::types::PgLimit>,
 }
 

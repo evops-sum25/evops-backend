@@ -20,8 +20,8 @@ impl crate::AppState {
         request: EventServiceListRequest,
     ) -> ApiResult<EventServiceListResponse> {
         let mut db = self.shared_state.db.lock().await;
-        let (events, last_id) = db.list_events(request.last_id, request.limit).await?;
-        Ok(EventServiceListResponse { events, last_id })
+        let events = db.list_events(request.last_id, request.limit).await?;
+        Ok(EventServiceListResponse { events })
     }
 
     pub async fn create_event(

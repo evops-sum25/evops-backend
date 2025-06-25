@@ -12,7 +12,6 @@ use uuid::Uuid;
 
 use evops_models::{ApiError, ApiResult, PgLimit};
 
-use tracing::{debug};
 use itertools::Itertools;
 
 use crate::models;
@@ -151,12 +150,11 @@ impl crate::Database {
     }
 
     #[allow(clippy::missing_panics_doc, clippy::too_many_lines)]
-    pub async fn list_events(
+    pub async fn list_events( // FIXME: Reversed output?
         &mut self,
         last_id: Option<evops_models::EventId>,
         limit: Option<PgLimit>,
-    ) -> ApiResult<(Vec<evops_models::Event>, Option<evops_models::EventId>)> {
-        debug!("new list event request: last_id {:?}, limit {:?}", last_id, limit);
+    ) -> ApiResult<Vec<evops_models::Event>> {
         self.conn
             .transaction(|conn| {
                 async move {
@@ -182,7 +180,7 @@ impl crate::Database {
                     };
                     
                     if event_ids.is_empty() {
-                        return Ok((Vec::new(), None)); // Nothing to do
+                        return Ok(Vec::new()); // Nothing to do
                     }
 
                     let events_with_authors: Vec<(models::Event, models::User)> = {
@@ -283,11 +281,10 @@ impl crate::Database {
                         })
                         .collect()
                     };
-                    debug!("result ready");
-                    Ok((
-                        events,
-                        event_ids.last().map(|id| evops_models::EventId::new(*id)),
-                    ))
+                    // Maybe we will do it... Later
+                    // last_id = event_ids.last().map(|id| evops_models::EventId::new(*id))
+
+                    Ok(events)
                 }
                 .scope_boxed()
             })
