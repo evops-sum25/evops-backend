@@ -35,7 +35,7 @@ async fn get(
     State(state): State<crate::AppState>,
     Query(request): Query<crate::types::TagServiceListRequest>,
 ) -> ApiResult<Json<crate::types::TagServiceListResponse>> {
-    Ok(Json( state.list_tags(request.try_into()?).await?.into() ))
+    Ok(Json(state.list_tags(request.try_into()?).await?.into()))
 }
 
 fn post_docs(o: TransformOperation) -> TransformOperation {
