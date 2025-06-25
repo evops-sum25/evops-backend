@@ -10,9 +10,10 @@ use diesel_async::{AsyncConnection as _, RunQueryDsl as _};
 use tracing::field::debug;
 use uuid::Uuid;
 
-use evops_models::{ApiError, ApiResult, PgLimit};
+use evops_models::{ApiError, ApiResult, PgLimit, TagAlias};
 
 use tracing::{debug};
+use itertools::Itertools;
 
 use crate::models;
 use crate::schema;
@@ -184,85 +185,54 @@ impl crate::Database {
                         return Ok((Vec::new(), None)); // Nothing to do
                     }
 
-                    let filtered_events_query = || {
-                        schema::events::table
-                            .filter(schema::events::id.eq_any(&event_ids))
-                            .into_boxed()
-                    };
-
                     let events_with_authors: Vec<(models::Event, models::User)> = {
-                        filtered_events_query()
+                        schema::events::table
                             .inner_join(schema::users::table)
+                            .filter(schema::events::id.eq_any(event_ids))
                             .select((models::Event::as_select(), models::User::as_select()))
                             .load(conn)
                             .await?
                     };
-                    let images: Vec<models::Image> = {
+                    let images = {
                         schema::images::table
+                            .filter(schema::images::event_id.eq_any(event_ids))
                             .select(models::Image::as_select())
                             .load(conn)
                             .await?
-                    };
-
-                    let events: Vec<models::Event> = {
-                        filtered_events_query()
-                            .select(models::Event::as_select())
-                            .load(conn)
-                            .await?
-                    };
-                    debug!("Images size: {}, events size: {}", images.len(), events.len());
-                    let mut images_per_event: HashMap<Uuid, Vec<models::Image>> = {
-                        images
-                            .grouped_by(&events)
                             .into_iter()
-                            .zip(&events)
-                            .map(|(im, ev)| (ev.id, im))
-                            .collect()
+                            .into_group_map_by(|img| img.event_id)
                     };
 
-                    let tag_ids_per_event: Vec<(Uuid, Vec<Uuid>)> = {
-                        let ets = schema::events_tags::table
-                            .inner_join(schema::events::table)
-                            .select(models::EventTag::as_select())
-                            .load(conn)
+                    let tags: HashMap<Uuid, HashMap<models::Tag, Option<Vec<models::TagAlias>>>> = {
+                        let event_tags:Vec<(Uuid, models::Tag)> = schema::events_tags::table
+                            .filter(schema::events_tags::event_id.eq_any(event_ids))
+                            .inner_join(schema::tags::table)
+                            .select((schema::events_tags::event_id, models::Tag::as_select()))
+                            .load::<(Uuid, models::Tag)>(conn)
                             .await?;
 
-                        ets.grouped_by(&events)
+                        let tag_ids = event_tags.iter().map(|(event_id, tag)| tag.id).collect();
+                        let tag_aliases = {
+                            schema::tags_aliases::table
+                                .filter(schema::tags_aliases::tag_id.eq_any(tag_ids))
+                                .select(models::TagAlias::as_select())
+                                .load(conn)
+                                .await?
+                                .into_iter()
+                                .into_group_map_by(|alias| alias.tag_id)
+                        };
+                        event_tags
                             .into_iter()
-                            .zip(events)
-                            .map(|(et, ev)| {
-                                (ev.id, et.into_iter().map(|t| t.tag_id).collect::<Vec<_>>())
+                            .fold(HashMap::new(), |mut outer_map, (event_id, tag)| {                                
+                                outer_map
+                                    .entry(event_id)
+                                    .or_default()
+                                    .insert(tag, tag_aliases.get(&tag.id).cloned());
+                            
+                                outer_map
                             })
-                            .collect()
                     };
 
-                    let mut tags_with_aliases_per_event =
-                        HashMap::<Uuid, Vec<(models::Tag, Vec<models::TagAlias>)>>::new();
-
-                    for (event_id, tag_ids) in tag_ids_per_event {
-                        let event_bucket = tags_with_aliases_per_event.entry(event_id).or_default();
-
-                        for tag_id in tag_ids {
-                            let tag: models::Tag = {
-                                schema::tags::table
-                                    .find(tag_id)
-                                    .select(models::Tag::as_select())
-                                    .get_result(conn)
-                                    .await?
-                            };
-
-                            let aliases: Vec<models::TagAlias> = {
-                                schema::tags_aliases::table
-                                    .filter(schema::tags_aliases::tag_id.eq(tag_id))
-                                    .select(models::TagAlias::as_select())
-                                    .load(conn)
-                                    .await?
-                            };
-
-                            event_bucket.push((tag, aliases));
-                        }
-                    }
-                    debug!("ping?");
                     let events : Vec<evops_models::Event> = {
                         events_with_authors
                         .into_iter()
@@ -273,11 +243,11 @@ impl crate::Database {
                                 name: unsafe { evops_models::UserName::new_unchecked(author.name) },
                             },
                             image_urls: {
-                                images_per_event
-                                    .remove(&event.id)
-                                    .unwrap_or_default()
+                                images
+                                    .get(&event.id)
+                                    .unwrap_or(&Vec::new())
                                     .into_iter()
-                                    .map(|im| im.url.parse().unwrap())
+                                    .map(|img| url::Url::parse(img.url.as_str()).unwrap())
                                     .collect()
                             },
                             title: unsafe { evops_models::EventTitle::new_unchecked(event.title) },
@@ -285,22 +255,24 @@ impl crate::Database {
                                 evops_models::EventDescription::new_unchecked(event.description)
                             },
                             tags: {
-                                tags_with_aliases_per_event
-                                    .remove(&event.id)
-                                    .unwrap_or_default()
+                                tags
+                                    .get(&event.id)
+                                    .unwrap_or(&HashMap::new())
                                     .into_iter()
-                                    .map(|(tag, aliases)| evops_models::Tag {
-                                        id: evops_models::TagId::new(tag.id),
-                                        name: unsafe {
-                                            evops_models::TagName::new_unchecked(tag.name)
-                                        },
+                                    .map(|t: (&models::Tag, &Option<Vec<models::TagAlias>>)| evops_models::Tag {
+                                        id: evops_models::TagId::new(t.0.id),
+                                        name: unsafe { evops_models::TagName::new_unchecked(t.0.name) },
                                         aliases: {
-                                            aliases
-                                                .into_iter()
-                                                .map(|a| unsafe {
-                                                    evops_models::TagAlias::new_unchecked(a.alias)
-                                                })
-                                                .collect()
+                                            match t.1 {
+                                                Some(aliases) => {
+                                                    aliases
+                                                        .into_iter()
+                                                        .map(|alias: &models::TagAlias| 
+                                                            unsafe { evops_models::TagAlias::new_unchecked(alias.alias) })
+                                                        .collect()
+                                                },
+                                                _ => Vec::new(),
+                                            }
                                         },
                                     })
                                     .collect()

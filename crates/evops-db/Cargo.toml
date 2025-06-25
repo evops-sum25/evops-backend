@@ -13,6 +13,7 @@ diesel_migrations = { workspace = true }
 tracing = { workspace = true }
 url = { workspace = true }
 uuid = { workspace = true, features = ["v7"] }
+itertools = "0.14.0"
 
 [lints]
 workspace = true

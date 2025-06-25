@@ -546,6 +546,7 @@ dependencies = [
  "diesel_migrations",
  "evops-models",
  "eyre",
+ "itertools",
  "tracing",
  "url",
  "uuid",
