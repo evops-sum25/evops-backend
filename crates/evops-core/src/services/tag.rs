@@ -17,13 +17,11 @@ impl crate::AppState {
 
     pub async fn list_tags(
         &self,
-        _request: TagServiceListRequest,
+        request: TagServiceListRequest,
     ) -> ApiResult<TagServiceListResponse> {
         let mut db = self.shared_state.db.lock().await;
-
-        Ok(TagServiceListResponse {
-            tags: db.list_tags().await?,
-        })
+        let tags = db.list_tags(request.last_id, request.limit).await?;
+        Ok(TagServiceListResponse { tags })
     }
 
     pub async fn create_tag(

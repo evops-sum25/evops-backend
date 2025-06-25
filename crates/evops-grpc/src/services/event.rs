@@ -30,7 +30,7 @@ impl EventService for self::Service {
     ) -> Result<Response<crate::pb::EventServiceListResponse>, Status> {
         Ok(Response::new({
             self.state
-                .list_events(request.into_inner().into())
+                .list_events(request.into_inner().try_into()?)
                 .await?
                 .into()
         }))

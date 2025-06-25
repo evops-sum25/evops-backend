@@ -77,12 +77,31 @@ impl crate::Database {
             .await
     }
 
-    pub async fn list_tags(&mut self) -> ApiResult<Vec<evops_models::Tag>> {
+    pub async fn list_tags(
+        &mut self,
+        last_id: Option<evops_models::TagId>,
+        limit: Option<evops_models::PgLimit>,
+    ) -> ApiResult<Vec<evops_models::Tag>> {
         self.conn
             .transaction(|conn| {
                 async move {
+                    let tag_ids: Vec<Uuid> = {
+                        let mut query = schema::tags::table.select(schema::tags::id).into_boxed(); // Runtime query
+
+                        if let Some(id) = last_id {
+                            query = query.filter(schema::tags::id.gt(id.into_inner()));
+                        }
+
+                        query = query.order(schema::tags::id.asc());
+
+                        if let Some(lim) = limit {
+                            query = query.limit(lim.into());
+                        }
+                        query.load(conn).await?
+                    };
                     let tags: Vec<models::Tag> = {
                         schema::tags::table
+                            .filter(schema::tags::id.eq_any(&tag_ids))
                             .select(models::Tag::as_select())
                             .load(conn)
                             .await?

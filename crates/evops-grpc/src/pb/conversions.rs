@@ -24,9 +24,22 @@ impl From<evops_models::EventServiceFindResponse> for crate::pb::EventServiceFin
     }
 }
 
-impl From<crate::pb::EventServiceListRequest> for evops_models::EventServiceListRequest {
-    fn from(_value: crate::pb::EventServiceListRequest) -> Self {
-        Self
+impl TryFrom<crate::pb::EventServiceListRequest> for evops_models::EventServiceListRequest {
+    type Error = ApiError;
+
+    fn try_from(value: crate::pb::EventServiceListRequest) -> Result<Self, Self::Error> {
+        Ok(Self {
+            last_id: match value.last_id {
+                Some(id) => Some(evops_models::EventId::new(
+                    id.parse().map_err(self::invalid_argument)?,
+                )),
+                _ => None,
+            },
+            limit: match value.limit {
+                Some(l) => Some(evops_models::PgLimit::try_new(l).map_err(self::invalid_argument)?),
+                _ => None,
+            },
+        })
     }
 }
 
@@ -81,9 +94,22 @@ impl From<evops_models::TagServiceFindResponse> for crate::pb::TagServiceFindRes
     }
 }
 
-impl From<crate::pb::TagServiceListRequest> for evops_models::TagServiceListRequest {
-    fn from(_value: crate::pb::TagServiceListRequest) -> Self {
-        Self
+impl TryFrom<crate::pb::TagServiceListRequest> for evops_models::TagServiceListRequest {
+    type Error = ApiError;
+
+    fn try_from(value: crate::pb::TagServiceListRequest) -> Result<Self, Self::Error> {
+        Ok(Self {
+            last_id: match value.last_id {
+                Some(id) => Some(evops_models::TagId::new(
+                    id.parse().map_err(self::invalid_argument)?,
+                )),
+                _ => None,
+            },
+            limit: match value.limit {
+                Some(l) => Some(evops_models::PgLimit::try_new(l).map_err(self::invalid_argument)?),
+                _ => None,
+            },
+        })
     }
 }
 

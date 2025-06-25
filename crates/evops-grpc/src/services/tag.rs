@@ -30,7 +30,7 @@ impl TagService for self::Service {
     ) -> Result<Response<crate::pb::TagServiceListResponse>, Status> {
         Ok(Response::new({
             self.state
-                .list_tags(request.into_inner().into())
+                .list_tags(request.into_inner().try_into()?)
                 .await?
                 .into()
         }))

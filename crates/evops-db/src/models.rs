@@ -15,6 +15,7 @@ pub struct User {
 #[derive(Queryable, Selectable, Identifiable)]
 #[diesel(table_name = schema::tags)]
 #[diesel(check_for_backend(diesel::pg::Pg))]
+#[derive(Eq, Hash, PartialEq, Clone)]
 pub struct Tag {
     pub id: Uuid,
     pub name: String,
@@ -25,6 +26,7 @@ pub struct Tag {
 #[diesel(belongs_to(Tag))]
 #[diesel(primary_key(tag_id, alias))]
 #[diesel(check_for_backend(diesel::pg::Pg))]
+#[derive(Eq, Hash, PartialEq, Clone)]
 pub struct TagAlias {
     pub tag_id: Uuid,
     pub alias: String,
