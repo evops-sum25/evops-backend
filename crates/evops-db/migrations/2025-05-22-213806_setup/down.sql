@@ -1,3 +1,7 @@
+DROP INDEX idx_tags_id;
+
+DROP INDEX idx_events_id;
+
 DROP TABLE events_tags;
 
 DROP TABLE images;
