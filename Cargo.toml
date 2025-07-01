@@ -1,20 +1,19 @@
 [workspace]
 resolver = "3"
-members = ["crates/*/"]
-exclude = ["client-ext/", "server-ext/"]
+members = ["crates/*/", "server-ext/"]
+exclude = ["client-ext/"]
 default-members = ["crates/evops/"]
 
 [workspace.dependencies]
 # Local
 evops-core = { path = "crates/evops-core/" }
-evops-db = { path = "crates/evops-db/" }
 evops-grpc = { path = "crates/evops-grpc/" }
 evops-rest = { path = "crates/evops-rest/" }
-evops-server-ext = { path = "server-ext/crate/" }
 evops-storage = { path = "crates/evops-storage/" }
 
 # Client Extension
 evops-models = { path = "client-ext/crates/evops-models/" }
+evops-db = { path = "server-ext/crates/evops-db/" }
 # evops-markdown = { path = "client-ext/crates/evops-markdown/" }
 
 # External
