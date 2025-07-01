@@ -3,4 +3,5 @@
 	url = https://github.com/evops-sum25/evops-client-ext
 [submodule "server-ext"]
 	path = server-ext
-	url = https://github.com/evops-sum25/evops-server-ext/tree/22-optimize-diesel-queries
+	url = https://github.com/evops-sum25/evops-server-ext
+	branch = 22-optimize-diesel-queries
