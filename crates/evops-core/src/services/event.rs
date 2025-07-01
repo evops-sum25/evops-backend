@@ -12,19 +12,21 @@ impl crate::AppState {
             _ = self.shared_state.storage.lock().await;
         }
 
-        let mut db = self.shared_state.db.lock().await;
-
-        Ok(EventServiceFindResponse {
-            event: db.find_event(request.id).await?,
-        })
+        let event = {
+            let mut db = self.shared_state.db.lock().await;
+            db.find_event(request.id).await
+        }?;
+        Ok(EventServiceFindResponse { event })
     }
 
     pub async fn list_events(
         &self,
         request: EventServiceListRequest,
     ) -> ApiResult<EventServiceListResponse> {
-        let mut db = self.shared_state.db.lock().await;
-        let events = db.list_events(request.last_id, request.limit).await?;
+        let events = {
+            let mut db = self.shared_state.db.lock().await;
+            db.list_events(request.last_id, request.limit).await
+        }?;
         Ok(EventServiceListResponse { events })
     }
 
@@ -32,10 +34,10 @@ impl crate::AppState {
         &self,
         request: EventServiceCreateRequest,
     ) -> ApiResult<EventServiceCreateResponse> {
-        let mut db = self.shared_state.db.lock().await;
-
-        Ok(EventServiceCreateResponse {
-            event: db.create_event(request.form).await?,
-        })
+        let event = {
+            let mut db = self.shared_state.db.lock().await;
+            db.create_event(request.form).await
+        }?;
+        Ok(EventServiceCreateResponse { event })
     }
 }

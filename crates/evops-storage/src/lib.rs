@@ -39,14 +39,14 @@ impl self::Storage {
                 .send()
                 .await?
         };
-        if !response.exists {
+        if response.exists {
+            debug!("bucket {} already exists", Self::BUCKET_EVENT_IMAGES);
+        } else {
             debug!("creating bucket {}...", Self::BUCKET_EVENT_IMAGES);
             self.client
                 .create_bucket(Self::BUCKET_EVENT_IMAGES)
                 .send()
                 .await?;
-        } else {
-            debug!("bucket {} already exists", Self::BUCKET_EVENT_IMAGES);
         }
 
         Ok(())

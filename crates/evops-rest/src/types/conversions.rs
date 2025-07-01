@@ -25,10 +25,7 @@ impl TryFrom<crate::types::EventServiceListRequest> for evops_models::EventServi
 
     fn try_from(value: crate::types::EventServiceListRequest) -> Result<Self, Self::Error> {
         Ok(Self {
-            last_id: match value.last_id {
-                Some(id) => Some(id.into()),
-                _ => None,
-            },
+            last_id: value.last_id.map(Into::into),
             limit: match value.limit {
                 Some(l) => Some(l.try_into().map_err(|e| self::invalid_argument(&e))?),
                 _ => None,
@@ -84,10 +81,7 @@ impl TryFrom<crate::types::TagServiceListRequest> for evops_models::TagServiceLi
 
     fn try_from(value: crate::types::TagServiceListRequest) -> Result<Self, Self::Error> {
         Ok(Self {
-            last_id: match value.last_id {
-                Some(id) => Some(id.into()),
-                _ => None,
-            },
+            last_id: value.last_id.map(Into::into),
             limit: match value.limit {
                 Some(l) => Some(l.try_into().map_err(|e| self::invalid_argument(&e))?),
                 _ => None,
@@ -274,7 +268,7 @@ impl TryFrom<crate::types::PgLimit> for evops_models::PgLimit {
     type Error = ApiError;
 
     fn try_from(value: crate::types::PgLimit) -> Result<Self, Self::Error> {
-        evops_models::PgLimit::try_new(value.0).map_err(|e| self::invalid_argument(&e))
+        Self::try_new(value.0).map_err(|e| self::invalid_argument(&e))
     }
 }
 
