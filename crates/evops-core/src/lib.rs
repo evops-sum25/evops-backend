@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use bon::bon;
 use eyre::Context as _;
 use url::Url;
 
@@ -10,6 +11,7 @@ mod services;
 // rather than wrapping every field (such as `db`).
 struct State {
     db: tokio::sync::Mutex<evops_db::Database>,
+    storage: tokio::sync::Mutex<evops_storage::Storage>,
 }
 
 #[derive(Clone)]
@@ -18,18 +20,35 @@ pub struct AppState {
     shared_state: Arc<self::State>,
 }
 
+#[bon]
 impl AppState {
-    pub async fn try_new(database_url: &Url) -> eyre::Result<Self> {
+    #[builder]
+    pub async fn new(
+        database_url: &Url,
+        storage_url: &Url,
+        storage_username: &str,
+        storage_password: &str,
+    ) -> eyre::Result<Self> {
         let db = {
             evops_db::Database::establish_connection(database_url)
                 .await
                 .wrap_err("error connecting to db")?
+        };
+        let storage = {
+            evops_storage::Storage::builder()
+                .base_url(storage_url)
+                .username(storage_username)
+                .password(storage_password)
+                .build()
+                .await
+                .wrap_err("error connecting to file storage")?
         };
 
         Ok(Self {
             shared_state: {
                 Arc::new(self::State {
                     db: tokio::sync::Mutex::new(db),
+                    storage: tokio::sync::Mutex::new(storage),
                 })
             },
         })

@@ -1,0 +1,13 @@
+[package]
+name = "evops-storage"
+edition = "2024"
+
+[dependencies]
+bon = { workspace = true }
+eyre = { workspace = true }
+minio = { workspace = true }
+tracing = { workspace = true }
+url = { workspace = true }
+
+[lints]
+workspace = true
