@@ -7,6 +7,7 @@ evops-db = { workspace = true }
 evops-models = { workspace = true }
 evops-storage = { workspace = true }
 
+bon = { workspace = true }
 eyre = { workspace = true }
 tokio = { workspace = true, features = ["sync"] }
 url = { workspace = true }

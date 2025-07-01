@@ -78,13 +78,13 @@ async fn tcp_listener(port: u16) -> io::Result<(SocketAddr, TcpListener)> {
 
 async fn rest_grpc_app(config: &self::config::Config) -> eyre::Result<RestGrpcService> {
     let state = {
-        evops_core::AppState::try_new(
-            &config.database_url,
-            &config.storage_url,
-            &config.storage_username,
-            &config.storage_password,
-        )
-        .await?
+        evops_core::AppState::builder()
+            .database_url(&config.database_url)
+            .storage_url(&config.storage_url)
+            .storage_username(&config.storage_username)
+            .storage_password(&config.storage_password)
+            .build()
+            .await?
     };
 
     let timeout_layer = TimeoutLayer::new(Duration::from_secs(10));

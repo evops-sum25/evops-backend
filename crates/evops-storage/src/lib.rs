@@ -1,3 +1,4 @@
+use bon::bon;
 use minio::s3::types::S3Api as _;
 use tracing::debug;
 use url::Url;
@@ -10,8 +11,12 @@ pub struct Storage {
 
 impl self::Storage {
     const BUCKET_EVENT_IMAGES: &str = "event-images";
+}
 
-    pub async fn new_client(base_url: &Url, username: &str, password: &str) -> eyre::Result<Self> {
+#[bon]
+impl self::Storage {
+    #[builder]
+    pub async fn new(base_url: &Url, username: &str, password: &str) -> eyre::Result<Self> {
         let static_provider = minio::s3::creds::StaticProvider::new(username, password, None);
         let client = {
             minio::s3::ClientBuilder::new(base_url.as_str().parse()?)

@@ -21,6 +21,7 @@ evops-models = { path = "client-ext/crates/evops-models/" }
 aide = "0.15.0"
 axum = "0.8.4"
 axum_tonic = "0.4.0"
+bon = "3.6.4"
 chrono = "0.4.41"
 color-eyre = "0.6.5"
 const_format = "0.2.34"

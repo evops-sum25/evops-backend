@@ -271,6 +271,31 @@ dependencies = [
 ]
 
 [[package]]
+name = "bon"
+version = "3.6.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f61138465baf186c63e8d9b6b613b508cd832cba4ce93cf37ce5f096f91ac1a6"
+dependencies = [
+ "bon-macros",
+ "rustversion",
+]
+
+[[package]]
+name = "bon-macros"
+version = "3.6.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "40d1dad34aa19bf02295382f08d9bc40651585bd497266831d40ee6296fb49ca"
+dependencies = [
+ "darling",
+ "ident_case",
+ "prettyplease",
+ "proc-macro2",
+ "quote",
+ "rustversion",
+ "syn 2.0.101",
+]
+
+[[package]]
 name = "bumpalo"
 version = "3.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -675,6 +700,7 @@ dependencies = [
 name = "evops-core"
 version = "0.0.0"
 dependencies = [
+ "bon",
  "evops-db",
  "evops-models",
  "evops-storage",
@@ -756,6 +782,7 @@ dependencies = [
 name = "evops-storage"
 version = "0.0.0"
 dependencies = [
+ "bon",
  "eyre",
  "minio",
  "tracing",

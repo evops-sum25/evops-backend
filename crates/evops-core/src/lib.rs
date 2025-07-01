@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use bon::bon;
 use eyre::Context as _;
 use url::Url;
 
@@ -19,8 +20,10 @@ pub struct AppState {
     shared_state: Arc<self::State>,
 }
 
+#[bon]
 impl AppState {
-    pub async fn try_new(
+    #[builder]
+    pub async fn new(
         database_url: &Url,
         storage_url: &Url,
         storage_username: &str,
@@ -32,7 +35,11 @@ impl AppState {
                 .wrap_err("error connecting to db")?
         };
         let storage = {
-            evops_storage::Storage::new_client(storage_url, storage_username, storage_password)
+            evops_storage::Storage::builder()
+                .base_url(storage_url)
+                .username(storage_username)
+                .password(storage_password)
+                .build()
                 .await
                 .wrap_err("error connecting to file storage")?
         };
