@@ -1,3 +1,6 @@
+use aide_axum_typed_multipart::FieldData;
+use axum_typed_multipart::TryFromMultipart;
+use bytes::Bytes;
 use chrono::{DateTime, Utc};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
@@ -115,12 +118,15 @@ pub struct UserServiceCreateResponse {
     user: crate::types::User,
 }
 
+#[derive(TryFromMultipart)]
+struct NewEventFormMultipart {
+    images: FieldData<Bytes>,
+}
+
 #[derive(Debug, Deserialize, JsonSchema)]
 struct NewEventForm {
     /// UUID of the creating user.
     author_id: crate::types::UserId,
-    /// URLs of event images.
-    image_urls: Option<Vec<Url>>,
     /// Event title.
     title: crate::types::EventTitle,
     /// Detailed description.

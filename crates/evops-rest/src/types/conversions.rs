@@ -170,7 +170,7 @@ impl TryFrom<crate::types::NewEventForm> for evops_models::NewEventForm {
     fn try_from(value: crate::types::NewEventForm) -> Result<Self, Self::Error> {
         Ok(Self {
             author_id: value.author_id.into(),
-            image_urls: value.image_urls,
+            image_urls: todo!(),
             title: value.title.try_into()?,
             description: value.description.try_into()?,
             tag_ids: {
