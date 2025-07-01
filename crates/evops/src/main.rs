@@ -11,7 +11,6 @@ use tracing::{debug, info};
 use tracing_subscriber::EnvFilter;
 use tracing_subscriber::layer::SubscriberExt as _;
 use tracing_subscriber::util::SubscriberInitExt as _;
-use url::Url;
 
 mod config;
 mod shutdown;
@@ -31,7 +30,7 @@ async fn main() -> eyre::Result<()> {
     let config = self::config::from_env()?;
 
     let (addr, listener) = self::tcp_listener(config.port).await?;
-    let app = self::rest_grpc_app(&config.database_url).await?;
+    let app = self::rest_grpc_app(&config).await?;
 
     info!("listening on {addr}");
     axum::serve(listener, app.into_make_service())
@@ -77,8 +76,16 @@ async fn tcp_listener(port: u16) -> io::Result<(SocketAddr, TcpListener)> {
     Ok((addr, listener))
 }
 
-async fn rest_grpc_app(database_url: &Url) -> eyre::Result<RestGrpcService> {
-    let state = evops_core::AppState::try_new(database_url).await?;
+async fn rest_grpc_app(config: &self::config::Config) -> eyre::Result<RestGrpcService> {
+    let state = {
+        evops_core::AppState::try_new(
+            &config.database_url,
+            &config.storage_url,
+            &config.storage_username,
+            &config.storage_password,
+        )
+        .await?
+    };
 
     let timeout_layer = TimeoutLayer::new(Duration::from_secs(10));
 

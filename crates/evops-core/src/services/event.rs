@@ -8,6 +8,10 @@ impl crate::AppState {
         &self,
         request: EventServiceFindRequest,
     ) -> ApiResult<EventServiceFindResponse> {
+        {
+            _ = self.shared_state.storage.lock().await;
+        }
+
         let mut db = self.shared_state.db.lock().await;
 
         Ok(EventServiceFindResponse {
