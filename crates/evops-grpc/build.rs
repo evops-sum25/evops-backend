@@ -7,8 +7,8 @@ fn main() -> eyre::Result<()> {
         .build_client(false)
         .file_descriptor_set_path(out_dir.join("api-descriptor.bin"))
         .compile_protos(
-            &["../../client-ext/proto/evops/api/v1/api.proto"],
-            &["../../client-ext/proto/"],
+            &["../../server-ext/client-ext/proto/evops/api/v1/api.proto"],
+            &["../../server-ext/client-ext/proto/"],
         )?;
 
     Ok(())
