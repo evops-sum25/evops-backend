@@ -6,14 +6,16 @@ use axum::extract::State;
 
 use evops_models::ApiResult;
 
+use crate::AppState;
 use crate::error::AddResponse as _;
+use crate::types::{UserServiceCreateRequest, UserServiceCreateResponse, UserServiceListResponse};
 
 mod _id;
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::UserService.into())
 }
-pub fn router() -> ApiRouter<crate::AppState> {
+pub fn router() -> ApiRouter<AppState> {
     ApiRouter::new()
         .api_route_with(
             "/",
@@ -31,16 +33,13 @@ fn get_docs(o: TransformOperation) -> TransformOperation {
         .response_internal_server_error()
 }
 
-async fn get(
-    State(state): State<crate::AppState>,
-    // Query(request): Query<crate::types::UserServiceListRequest>,
-) -> ApiResult<Json<crate::types::UserServiceListResponse>> {
-    Ok(Json({
-        state
-            .list_users(crate::types::UserServiceListRequest.into())
-            .await?
-            .into()
-    }))
+async fn get(State(state): State<AppState>) -> ApiResult<Json<UserServiceListResponse>> {
+    let users = state.list_users().await?;
+
+    let response_data = UserServiceListResponse {
+        users: users.into_iter().map(Into::into).collect(),
+    };
+    Ok(Json(response_data))
 }
 
 fn post_docs(o: TransformOperation) -> TransformOperation {
@@ -51,8 +50,14 @@ fn post_docs(o: TransformOperation) -> TransformOperation {
         .response_internal_server_error()
 }
 async fn post(
-    State(state): State<crate::AppState>,
-    Json(request): Json<crate::types::UserServiceCreateRequest>,
-) -> ApiResult<Json<crate::types::UserServiceCreateResponse>> {
-    Ok(Json(state.create_user(request.try_into()?).await?.into()))
+    State(state): State<AppState>,
+    Json(request): Json<UserServiceCreateRequest>,
+) -> ApiResult<Json<UserServiceCreateResponse>> {
+    let form = request.form.try_into()?;
+    let user_id = state.create_user(form).await?;
+
+    let response_data = UserServiceCreateResponse {
+        user_id: user_id.into(),
+    };
+    Ok(Json(response_data))
 }

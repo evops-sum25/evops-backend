@@ -1,39 +1,31 @@
-use evops_models::{
-    ApiResult, TagServiceCreateRequest, TagServiceCreateResponse, TagServiceFindRequest,
-    TagServiceFindResponse, TagServiceListRequest, TagServiceListResponse,
-};
+use evops_models::{ApiResult, NewTagForm, PgLimit, Tag, TagId};
 
 impl crate::AppState {
-    pub async fn find_tag(
-        &self,
-        request: TagServiceFindRequest,
-    ) -> ApiResult<TagServiceFindResponse> {
-        let tag = {
-            let mut db = self.shared_state.db.lock().await;
-            db.find_tag(request.id).await
-        }?;
-        Ok(TagServiceFindResponse { tag })
-    }
-
     pub async fn list_tags(
         &self,
-        request: TagServiceListRequest,
-    ) -> ApiResult<TagServiceListResponse> {
+        last_id: Option<TagId>,
+        limit: Option<PgLimit>,
+    ) -> ApiResult<Vec<Tag>> {
         let tags = {
             let mut db = self.shared_state.db.lock().await;
-            db.list_tags(request.last_id, request.limit).await
+            db.list_tags(last_id, limit).await
         }?;
-        Ok(TagServiceListResponse { tags })
+        Ok(tags)
     }
 
-    pub async fn create_tag(
-        &self,
-        request: TagServiceCreateRequest,
-    ) -> ApiResult<TagServiceCreateResponse> {
+    pub async fn create_tag(&self, request: NewTagForm) -> ApiResult<TagId> {
+        let tag_id = {
+            let mut db = self.shared_state.db.lock().await;
+            db.create_tag(request).await
+        }?;
+        Ok(tag_id)
+    }
+
+    pub async fn find_tag(&self, id: TagId) -> ApiResult<Tag> {
         let tag = {
             let mut db = self.shared_state.db.lock().await;
-            db.create_tag(request.form).await
+            db.find_tag(id).await
         }?;
-        Ok(TagServiceCreateResponse { tag })
+        Ok(tag)
     }
 }

@@ -25,7 +25,7 @@ impl AddResponse for TransformOperation<'_> {
     }
 
     fn response_not_found(self) -> Self {
-        self.response_with::<404, String, _>(|r| r.description("Not Found (needs no introduction)"))
+        self.response_with::<404, String, _>(|r| r.description("Not Found (e.g. nonexistent ID)"))
     }
 
     fn response_conflict(self) -> Self {
@@ -41,6 +41,6 @@ impl AddResponse for TransformOperation<'_> {
     }
 
     fn response_internal_server_error(self) -> Self {
-        self.response_with::<500, String, _>(|r| r.description("Internal Server Error (sorry)"))
+        self.response_with::<500, String, _>(|r| r.description("Internal Server Error"))
     }
 }

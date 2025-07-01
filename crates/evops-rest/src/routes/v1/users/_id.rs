@@ -2,16 +2,18 @@ use aide::axum::ApiRouter;
 use aide::axum::routing::get_with;
 use aide::transform::{TransformOperation, TransformPathItem};
 use axum::Json;
-use axum::extract::{Query, State};
+use axum::extract::{Path, State};
 
 use evops_models::ApiResult;
 
+use crate::AppState;
 use crate::error::AddResponse as _;
+use crate::types::{UserServiceFindRequest, UserServiceFindResponse};
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::UserService.into())
 }
-pub fn router() -> ApiRouter<crate::AppState> {
+pub fn router() -> ApiRouter<AppState> {
     ApiRouter::new().api_route_with("/", get_with(self::get, self::get_docs), self::route_docs)
 }
 
@@ -24,8 +26,14 @@ fn get_docs(o: TransformOperation) -> TransformOperation {
         .response_internal_server_error()
 }
 async fn get(
-    State(state): State<crate::AppState>,
-    Query(request): Query<crate::types::UserServiceFindRequest>,
-) -> ApiResult<Json<crate::types::UserServiceFindResponse>> {
-    Ok(Json(state.find_user(request.into()).await?.into()))
+    State(state): State<AppState>,
+    Path(request): Path<UserServiceFindRequest>,
+) -> ApiResult<Json<UserServiceFindResponse>> {
+    let request = request.id.into();
+    let found_user = state.find_user(request).await?;
+
+    let response_data = UserServiceFindResponse {
+        user: found_user.into(),
+    };
+    Ok(Json(response_data))
 }

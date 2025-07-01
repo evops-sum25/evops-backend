@@ -3,9 +3,13 @@ name = "evops-storage"
 edition = "2024"
 
 [dependencies]
+evops-models = { workspace = true }
+
 bon = { workspace = true }
+bytes = { workspace = true }
 eyre = { workspace = true }
 minio = { workspace = true }
+tap = { workspace = true }
 tracing = { workspace = true }
 url = { workspace = true }
 

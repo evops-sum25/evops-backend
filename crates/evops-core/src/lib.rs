@@ -11,7 +11,7 @@ mod services;
 // rather than wrapping every field (such as `db`).
 struct State {
     db: tokio::sync::Mutex<evops_db::Database>,
-    storage: tokio::sync::Mutex<evops_storage::Storage>,
+    storage: evops_storage::Storage,
 }
 
 #[derive(Clone)]
@@ -48,7 +48,7 @@ impl AppState {
             shared_state: {
                 Arc::new(self::State {
                     db: tokio::sync::Mutex::new(db),
-                    storage: tokio::sync::Mutex::new(storage),
+                    storage,
                 })
             },
         })

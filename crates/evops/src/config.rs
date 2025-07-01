@@ -4,9 +4,9 @@ use url::Url;
 
 const SERVER_PORT: &str = "SERVER_PORT";
 const DATABASE_URL: &str = "DATABASE_URL";
-const STORAGE_URL: &str = "STORAGE_URL";
-const STORAGE_USERNAME: &str = "STORAGE_USERNAME";
-const STORAGE_PASSWORD: &str = "STORAGE_PASSWORD";
+const MINIO_URL: &str = "MINIO_URL";
+const MINIO_ROOT_USER: &str = "MINIO_ROOT_USER";
+const MINIO_ROOT_PASSWORD: &str = "MINIO_ROOT_PASSWORD";
 
 pub struct Config {
     pub port: u16,
@@ -28,12 +28,12 @@ pub fn from_env() -> eyre::Result<self::Config> {
             .wrap_err(formatcp!("variable {DATABASE_URL} is malformed"))?
     };
     let storage_url = {
-        let raw = std::env::var(STORAGE_URL).wrap_err(STORAGE_URL)?;
+        let raw = std::env::var(MINIO_URL).wrap_err(MINIO_URL)?;
         raw.parse::<Url>()
-            .wrap_err(formatcp!("variable {STORAGE_URL} is malformed"))?
+            .wrap_err(formatcp!("variable {MINIO_URL} is malformed"))?
     };
-    let storage_username = std::env::var(STORAGE_USERNAME).wrap_err(STORAGE_USERNAME)?;
-    let storage_password = std::env::var(STORAGE_PASSWORD).wrap_err(STORAGE_PASSWORD)?;
+    let storage_username = std::env::var(MINIO_ROOT_USER).wrap_err(MINIO_ROOT_USER)?;
+    let storage_password = std::env::var(MINIO_ROOT_PASSWORD).wrap_err(MINIO_ROOT_PASSWORD)?;
 
     Ok(self::Config {
         port,

@@ -3,17 +3,23 @@ use aide::axum::routing::get_with;
 use aide::transform::{TransformOperation, TransformPathItem};
 use axum::Json;
 use axum::extract::{Query, State};
+use tap::TryConv as _;
 
-use evops_models::ApiResult;
+use evops_models::{ApiError, ApiResult};
 
+use crate::AppState;
 use crate::error::AddResponse as _;
+use crate::types::{
+    TagServiceCreateRequest, TagServiceCreateResponse, TagServiceListRequest,
+    TagServiceListResponse,
+};
 
 mod _id;
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::TagService.into())
 }
-pub fn router() -> ApiRouter<crate::AppState> {
+pub fn router() -> ApiRouter<AppState> {
     ApiRouter::new()
         .api_route_with(
             "/",
@@ -32,10 +38,23 @@ fn get_docs(o: TransformOperation) -> TransformOperation {
 }
 
 async fn get(
-    State(state): State<crate::AppState>,
-    Query(request): Query<crate::types::TagServiceListRequest>,
-) -> ApiResult<Json<crate::types::TagServiceListResponse>> {
-    Ok(Json(state.list_tags(request.try_into()?).await?.into()))
+    State(state): State<AppState>,
+    Query(request): Query<TagServiceListRequest>,
+) -> ApiResult<Json<TagServiceListResponse>> {
+    let last_id = request.last_id.map(Into::into);
+    let limit = match request.limit {
+        Some(lim) => Some({
+            lim.try_conv::<evops_models::PgLimit>()
+                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+        }),
+        None => None,
+    };
+    let tags = state.list_tags(last_id, limit).await?;
+
+    let response_data = TagServiceListResponse {
+        tags: tags.into_iter().map(Into::into).collect(),
+    };
+    Ok(Json(response_data))
 }
 
 fn post_docs(o: TransformOperation) -> TransformOperation {
@@ -47,8 +66,14 @@ fn post_docs(o: TransformOperation) -> TransformOperation {
         .response_internal_server_error()
 }
 async fn post(
-    State(state): State<crate::AppState>,
-    Json(request): Json<crate::types::TagServiceCreateRequest>,
-) -> ApiResult<Json<crate::types::TagServiceCreateResponse>> {
-    Ok(Json(state.create_tag(request.try_into()?).await?.into()))
+    State(state): State<AppState>,
+    Json(request): Json<TagServiceCreateRequest>,
+) -> ApiResult<Json<TagServiceCreateResponse>> {
+    let form = request.form.try_into()?;
+    let tag_id = state.create_tag(form).await?;
+
+    let response_data = TagServiceCreateResponse {
+        tag_id: tag_id.into(),
+    };
+    Ok(Json(response_data))
 }
