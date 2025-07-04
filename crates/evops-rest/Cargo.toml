@@ -12,14 +12,18 @@ aide = { workspace = true, features = [
   "scalar",
   "swagger",
 ] }
+aide-axum-typed-multipart = { workspace = true }
 axum = { workspace = true }
+axum-extra = { workspace = true, features = ["file-stream"] }
+axum_typed_multipart = { workspace = true }
 chrono = { workspace = true, features = ["serde"] }
-schemars = { workspace = true, features = ["chrono04", "url2", "uuid1"] }
+futures = { workspace = true }
+schemars = { workspace = true, features = ["bytes1", "chrono04", "uuid1"] }
 serde = { workspace = true, features = ["rc"] }
 strum = { workspace = true, features = ["derive"] }
+tap = { workspace = true }
 tokio = { workspace = true }
 tracing = { workspace = true }
-url = { workspace = true, features = ["serde"] }
 uuid = { workspace = true, features = ["serde"] }
 
 [lints]
