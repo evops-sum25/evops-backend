@@ -1,7 +1,16 @@
+use std::pin::Pin;
+
+use aide::OperationOutput;
+use aide::axum::ApiRouter;
 use aide::axum::routing::get_with;
-use aide::axum::{ApiRouter, IntoApiResponse};
 use aide::transform::{TransformOperation, TransformPathItem};
+use axum::body::Bytes;
 use axum::extract::{Path, State};
+use axum::http::header::CONTENT_TYPE;
+use axum::http::{HeaderMap, HeaderValue};
+use axum::response::IntoResponse;
+use axum_extra::response::FileStream;
+use futures::Stream;
 
 use evops_models::ApiResult;
 
@@ -27,11 +36,48 @@ fn get_docs(o: TransformOperation) -> TransformOperation {
 async fn get(
     State(state): State<AppState>,
     Path(path): Path<EventServiceFindImageRequest>,
-) -> ApiResult<impl IntoApiResponse> {
+) -> ApiResult<PostResponse> {
     let id = path.id.into();
-    let _image_binary = state.find_event_image(id).await?;
+    let image_stream = state.stream_event_image(id).await?;
 
-    let headers = ();
-    let body = ();
-    Ok((headers, body))
+    let response_stream = FileStream::new(image_stream);
+    Ok(PostResponse(response_stream))
+}
+
+const POST_MIME_TYPE: &str = "image/webp";
+
+struct PostResponse(FileStream<Pin<Box<dyn Stream<Item = ApiResult<Bytes>> + Send>>>);
+impl IntoResponse for PostResponse {
+    fn into_response(self) -> axum::response::Response {
+        let mut headers = HeaderMap::with_capacity(1);
+        headers.append(CONTENT_TYPE, HeaderValue::from_static(self::POST_MIME_TYPE));
+        (headers, self.0).into_response()
+    }
+}
+
+impl OperationOutput for self::PostResponse {
+    type Inner = Bytes;
+
+    fn operation_response(
+        _ctx: &mut aide::generate::GenContext,
+        _operation: &mut aide::openapi::Operation,
+    ) -> Option<aide::openapi::Response> {
+        Some(aide::openapi::Response {
+            content: [(
+                self::POST_MIME_TYPE.to_owned(),
+                aide::openapi::MediaType::default(),
+            )]
+            .into(),
+            ..Default::default()
+        })
+    }
+
+    fn inferred_responses(
+        ctx: &mut aide::generate::GenContext,
+        operation: &mut aide::openapi::Operation,
+    ) -> Vec<(Option<u16>, aide::openapi::Response)> {
+        Self::operation_response(ctx, operation)
+            .map(|resp| vec![(Some(200), resp)])
+            .unwrap_or_default()
+    }
 }

@@ -1,6 +1,18 @@
+use std::pin::Pin;
+
 use bytes::Bytes;
+use evops_models::{ApiError, ApiResult};
+use futures::{Stream, StreamExt as _};
 use minio::s3::types::S3Api as _;
-use tap::Conv as _;
+
+fn encode_as_webp(image: evops_models::EventImage) -> ApiResult<Bytes> {
+    let webp_image = {
+        webp::Encoder::from_image(&image.into_inner())
+            .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+            .encode_lossless()
+    };
+    Ok(Bytes::copy_from_slice(&webp_image))
+}
 
 impl crate::Storage {
     fn event_image_filename(id: evops_models::EventImageId) -> String {
@@ -11,15 +23,43 @@ impl crate::Storage {
         &self,
         id: evops_models::EventImageId,
         image: evops_models::EventImage,
-    ) -> eyre::Result<(), minio::s3::error::Error> {
+    ) -> ApiResult<()> {
+        let image_binary = self::encode_as_webp(image)?;
         self.client
             .put_object(
                 Self::BUCKET_EVENT_IMAGES,
                 Self::event_image_filename(id),
-                image.into_inner().into_bytes().conv::<Bytes>().into(),
+                image_binary.into(),
             )
             .send()
-            .await?;
+            .await
+            .map_err(|e| ApiError::Storage(e.to_string()))?;
         Ok(())
+    }
+
+    pub async fn stream_event_image(
+        &self,
+        id: evops_models::EventImageId,
+    ) -> ApiResult<Pin<Box<dyn Stream<Item = ApiResult<Bytes>> + Send>>> {
+        let response = {
+            self.client
+                .get_object(Self::BUCKET_EVENT_IMAGES, Self::event_image_filename(id))
+                .send()
+                .await
+                .map_err(|e| ApiError::Storage(e.to_string()))?
+        };
+        let stream = {
+            response
+                .content
+                .to_stream()
+                .await
+                .map_err(|e| ApiError::Storage(e.to_string()))?
+                .0
+                .map(|chunk| -> ApiResult<Bytes> {
+                    chunk.map_err(|e| ApiError::Storage(e.to_string()))
+                })
+                .boxed()
+        };
+        Ok(stream)
     }
 }

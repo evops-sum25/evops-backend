@@ -171,17 +171,27 @@ impl EventService for self::Service {
                 .parse::<Uuid>()
                 .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
         });
-        let image_binary = self.state.find_event_image(id).await?;
+        let mut image_stream = self.state.stream_event_image(id).await?;
 
         let (tx, rx) = tokio::sync::mpsc::channel(4);
+        let chunk_size = bytesize::kib(40_u64).try_into().unwrap();
         tokio::spawn(async move {
-            tx.send(Ok(EventServiceFindImageResponse {
-                chunk: image_binary.into(),
-            }))
-            .await
-            .unwrap();
+            while let Some(storage_chunk_result) = image_stream.next().await {
+                let storage_chunk = match storage_chunk_result {
+                    Ok(chunk) => chunk,
+                    Err(e) => {
+                        tx.send(Err(e.into())).await.unwrap();
+                        continue;
+                    }
+                };
+                while let Some(chunk) = storage_chunk.chunks(chunk_size).next() {
+                    let message = EventServiceFindImageResponse {
+                        chunk: chunk.to_vec(),
+                    };
+                    tx.send(Ok(message)).await.unwrap();
+                }
+            }
         });
-
         Ok(Response::new(ReceiverStream::new(rx)))
     }
 }

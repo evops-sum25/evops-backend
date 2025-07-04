@@ -8,6 +8,7 @@ evops-models = { workspace = true, features = ["tonic"] }
 
 axum = { workspace = true }
 bytes = { workspace = true }
+bytesize = { workspace = true }
 http = { workspace = true }
 # Needed by build.rs for the `crate::pb` module.
 prost = { workspace = true }

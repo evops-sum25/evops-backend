@@ -1,7 +1,9 @@
+use std::pin::Pin;
+
 use bytes::Bytes;
-use evops_models::{
-    ApiError, ApiResult, Event, EventId, EventImage, EventImageId, NewEventForm, PgLimit,
-};
+use futures::Stream;
+
+use evops_models::{ApiResult, Event, EventId, EventImage, EventImageId, NewEventForm, PgLimit};
 
 impl crate::AppState {
     pub async fn list_events(
@@ -45,13 +47,18 @@ impl crate::AppState {
         let upload_image_result = storage.upload_event_image(image_id, image).await;
         if let Err(e) = upload_image_result {
             // TODO: remove from the DB.
-            return Err(ApiError::Storage(e.to_string()));
+            return Err(e);
         }
 
         Ok(image_id)
     }
 
-    pub async fn find_event_image(&self, _id: EventImageId) -> ApiResult<Bytes> {
-        todo!()
+    pub async fn stream_event_image(
+        &self,
+        id: EventImageId,
+    ) -> ApiResult<Pin<Box<dyn Stream<Item = ApiResult<Bytes>> + Send>>> {
+        let storage = &self.shared_state.storage;
+        let image_stream = storage.stream_event_image(id).await?;
+        Ok(image_stream)
     }
 }
