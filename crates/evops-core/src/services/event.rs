@@ -44,11 +44,7 @@ impl crate::AppState {
             db.reserve_image(event_id).await?
         };
         let storage = &self.shared_state.storage;
-        let upload_image_result = storage.upload_event_image(image_id, image).await;
-        if let Err(e) = upload_image_result {
-            // TODO: remove from the DB.
-            return Err(e);
-        }
+        storage.upload_event_image(image_id, image).await?; // TODO: remove from the DB on error.
 
         Ok(image_id)
     }

@@ -173,14 +173,16 @@ impl EventService for self::Service {
         });
         let mut image_stream = self.state.stream_event_image(id).await?;
 
-        let (tx, rx) = tokio::sync::mpsc::channel(4);
+        let (tx, rx) = tokio::sync::mpsc::channel(128);
         let chunk_size = bytesize::kib(40_u64).try_into().unwrap();
         tokio::spawn(async move {
             while let Some(storage_chunk_result) = image_stream.next().await {
                 let storage_chunk = match storage_chunk_result {
                     Ok(chunk) => chunk,
                     Err(e) => {
-                        tx.send(Err(e.into())).await.unwrap();
+                        if tx.send(Err(e.into())).await.is_err() {
+                            break;
+                        }
                         continue;
                     }
                 };
@@ -188,7 +190,9 @@ impl EventService for self::Service {
                     let message = EventServiceFindImageResponse {
                         chunk: chunk.to_vec(),
                     };
-                    tx.send(Ok(message)).await.unwrap();
+                    if tx.send(Ok(message)).await.is_err() {
+                        break;
+                    }
                 }
             }
         });
