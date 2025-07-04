@@ -1166,6 +1166,7 @@ dependencies = [
  "thiserror 2.0.12",
  "tonic",
  "uuid",
+ "webp",
 ]
 
 [[package]]
@@ -1202,7 +1203,6 @@ dependencies = [
  "minio",
  "tracing",
  "url",
- "webp",
 ]
 
 [[package]]

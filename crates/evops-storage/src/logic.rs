@@ -5,15 +5,6 @@ use evops_models::{ApiError, ApiResult};
 use futures::{Stream, StreamExt as _};
 use minio::s3::types::S3Api as _;
 
-fn encode_as_webp(image: evops_models::EventImage) -> ApiResult<Bytes> {
-    let webp_image = {
-        webp::Encoder::from_image(&image.into_inner())
-            .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
-            .encode_lossless()
-    };
-    Ok(Bytes::copy_from_slice(&webp_image))
-}
-
 impl crate::Storage {
     fn event_image_filename(id: evops_models::EventImageId) -> String {
         format!("{id}.webp")
@@ -24,12 +15,11 @@ impl crate::Storage {
         id: evops_models::EventImageId,
         image: evops_models::EventImage,
     ) -> ApiResult<()> {
-        let image_binary = self::encode_as_webp(image)?;
         self.client
             .put_object(
                 Self::BUCKET_EVENT_IMAGES,
                 Self::event_image_filename(id),
-                image_binary.into(),
+                image.encode_as_webp()?.into(),
             )
             .send()
             .await
