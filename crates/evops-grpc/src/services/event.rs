@@ -133,10 +133,12 @@ impl EventService for self::Service {
         };
         let image = {
             let mut buffer = BytesMut::new();
-            while let Some(message) = request_stream.next().await {
-                let message = message?
-                    .message
-                    .ok_or(ApiError::InvalidArgument(err_msg_not_null.to_owned()))?;
+            while let Some(message) = request_stream.message().await? {
+                let message = {
+                    message
+                        .message
+                        .ok_or(ApiError::InvalidArgument(err_msg_not_null.to_owned()))?
+                };
                 let chunk = match message {
                     Message::Metadata(_) => {
                         let err_msg = "Expected chunk, found metadata. Only the first message needs to contain metadata.";
@@ -180,18 +182,16 @@ impl EventService for self::Service {
                 let storage_chunk = match storage_chunk_result {
                     Ok(chunk) => chunk,
                     Err(e) => {
-                        if tx.send(Err(e.into())).await.is_err() {
-                            break;
-                        }
-                        continue;
+                        _ = tx.send(Err(e.into())).await;
+                        return;
                     }
                 };
-                while let Some(chunk) = storage_chunk.chunks(chunk_size).next() {
+                for chunk in storage_chunk.chunks(chunk_size) {
                     let message = EventServiceFindImageResponse {
                         chunk: chunk.to_vec(),
                     };
                     if tx.send(Ok(message)).await.is_err() {
-                        break;
+                        return;
                     }
                 }
             }
