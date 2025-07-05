@@ -83,6 +83,7 @@ async fn rest_grpc_app(config: &self::config::Config) -> eyre::Result<RestGrpcSe
             .storage_url(&config.storage_url)
             .storage_username(&config.storage_username)
             .storage_password(&config.storage_password)
+            .ml_client_url(&config.ml_server_url)
             .build()
             .await?
     };

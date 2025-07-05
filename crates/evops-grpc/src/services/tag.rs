@@ -1,7 +1,7 @@
 use tonic::{Request, Response, Status};
 use uuid::Uuid;
 
-use evops_models::ApiError;
+use evops_models::{ApiError, EventDescription};
 
 use crate::pb::tag_service_server::{TagService, TagServiceServer};
 use crate::pb::{TagServiceCreateResponse, TagServiceFindResponse, TagServiceListResponse};
@@ -84,6 +84,25 @@ impl TagService for self::Service {
         let response_data = TagServiceCreateResponse {
             tag_id: tag_id.to_string(),
         };
+        Ok(Response::new(response_data))
+    }
+
+    async fn get_tags_by_description(
+        &self,
+        request: Request<crate::pb::TagServiceGetTagsByDescriptionRequest>,
+    ) -> Result<Response<crate::pb::TagServiceGetTagsByDescriptionResponse>, Status> {
+        let tag_ids = self
+            .state
+            .get_tags_by_description(
+                EventDescription::try_new(request.into_inner().description).map_err(|_| {
+                    ApiError::InvalidArgument("Description should be a valid string".to_owned())
+                })?,
+            )
+            .await?
+            .into_iter()
+            .map(|tag| tag.to_string())
+            .collect();
+        let response_data = crate::pb::TagServiceGetTagsByDescriptionResponse { tag_ids };
         Ok(Response::new(response_data))
     }
 }

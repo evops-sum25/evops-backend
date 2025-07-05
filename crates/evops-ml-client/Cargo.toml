@@ -1,0 +1,21 @@
+[package]
+name = "evops-ml-client"
+edition = "2024"
+
+[dependencies]
+evops-models = { workspace = true }
+
+eyre = { workspace = true }
+tonic = { workspace = true }
+prost = { workspace = true }
+url = { workspace = true }
+uuid = { workspace = true }
+tracing = { workspace = true }
+tokio = { workspace = true }
+
+[build-dependencies]
+eyre = { workspace = true }
+tonic-build = { workspace = true }
+
+[lints]
+workspace = true

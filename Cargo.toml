@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["crates/*/"]
+members = ["crates/*/", "crates/evops-ml-client"]
 exclude = ["server-ext/"]
 default-members = ["crates/evops/"]
 
@@ -10,6 +10,7 @@ evops-core = { path = "crates/evops-core/" }
 evops-grpc = { path = "crates/evops-grpc/" }
 evops-rest = { path = "crates/evops-rest/" }
 evops-storage = { path = "crates/evops-storage/" }
+evops-ml-client = { path = "crates/evops-ml-client/" }
 
 # Client/Server Extensions
 evops-db = { path = "server-ext/crates/evops-db/" }

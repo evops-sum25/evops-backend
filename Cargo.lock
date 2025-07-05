@@ -1029,6 +1029,7 @@ dependencies = [
  "bon",
  "bytes",
  "evops-db",
+ "evops-ml-client",
  "evops-models",
  "evops-storage",
  "eyre",
@@ -1074,6 +1075,21 @@ dependencies = [
  "tonic-reflection",
  "tonic-web",
  "tower-http",
+ "uuid",
+]
+
+[[package]]
+name = "evops-ml-client"
+version = "0.0.0"
+dependencies = [
+ "evops-models",
+ "eyre",
+ "prost",
+ "tokio",
+ "tonic",
+ "tonic-build",
+ "tracing",
+ "url",
  "uuid",
 ]
 

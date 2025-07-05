@@ -96,6 +96,18 @@ pub struct TagServiceCreateResponse {
     pub tag_id: crate::types::TagId,
 }
 
+#[derive(Debug, Serialize, JsonSchema)]
+pub struct TagServiceGetTagsByDescriptionRequest {
+    /// Description to predict tags for.
+    description: crate::types::EventDescription,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct TagServiceGetTagsByDescriptionResponse {
+    /// A list of predicted tag IDs for a description.
+    tag_ids: Vec<crate::types::TagId>,
+}
+
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct UserServiceFindRequest {
     /// UUID of the user to retrieve.
