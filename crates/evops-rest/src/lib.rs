@@ -3,6 +3,8 @@ use std::sync::Arc;
 use aide::NoApi;
 use aide::openapi::OpenApi;
 use axum::Extension;
+use axum::http::StatusCode;
+use axum::routing::options;
 
 use evops_core::AppState;
 
@@ -18,6 +20,11 @@ pub fn router(state: AppState) -> axum::Router {
 
     let api_routes = {
         self::routes::router()
+            .route(
+                // HACK: I guess this shouldn't stay here forever...
+                "/{*cors_preflight}",
+                options(async || StatusCode::NO_CONTENT),
+            )
             .with_state(state)
             .merge(self::docs::router())
             .finish_api_with(&mut api, self::docs::transform_api)
