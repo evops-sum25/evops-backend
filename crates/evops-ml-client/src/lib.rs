@@ -33,21 +33,23 @@ impl MlClient {
         });
 
         let mut client = self.client.lock().await;
-        let response = client.get_tags(request).await.map_err(ApiError::from)?;
-
-        Ok(response
-            .into_inner()
-            .tag_ids
-            .into_iter()
-            .filter_map(|tag| {
-                Uuid::parse_str(&tag)
-                    .map(TagId::new)
-                    .map_err(|e| {
-                        tracing::warn!("Ml client: Skipping invalid tag UUID: {}", tag);
-                        e
-                    })
-                    .ok()
-            })
-            .collect())
+        let response_raw = client.get_tags(request).await.map_err(ApiError::from)?;
+        let response = {
+            response_raw
+                .into_inner()
+                .tag_ids
+                .into_iter()
+                .filter_map(|tag| {
+                    Uuid::parse_str(&tag)
+                        .map(TagId::new)
+                        .map_err(|e| {
+                            tracing::warn!("Ml client: Skipping invalid tag UUID: {}", tag);
+                            e
+                        })
+                        .ok()
+                })
+                .collect()
+        };
+        Ok(response)
     }
 }

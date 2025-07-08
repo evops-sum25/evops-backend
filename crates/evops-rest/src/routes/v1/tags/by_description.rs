@@ -37,7 +37,7 @@ async fn post(
     let description: evops_models::EventDescription = request.description.try_into()?;
     let tags_ids = state.get_tags_by_description(description).await?;
     let response_data = TagServiceGetTagsByDescriptionResponse {
-        tag_ids: tags_ids.into_iter().map(|tag| tag.into()).collect(),
+        tag_ids: tags_ids.into_iter().map(Into::into).collect(),
     };
     Ok(Json(response_data))
 }
