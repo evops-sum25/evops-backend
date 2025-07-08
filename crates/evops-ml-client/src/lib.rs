@@ -6,10 +6,10 @@ use uuid::Uuid;
 
 use evops_models::{ApiError, ApiResult, EventDescription, TagId};
 
-pub mod pb;
-
 use crate::pb::MlServiceGetTagsRequest;
 use crate::pb::ml_service_client::MlServiceClient;
+
+pub mod pb;
 
 pub struct MlClient {
     client: Mutex<MlServiceClient<Channel>>,
