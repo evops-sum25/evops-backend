@@ -8,6 +8,7 @@ default-members = ["crates/evops/"]
 # Local
 evops-core = { path = "crates/evops-core/" }
 evops-grpc = { path = "crates/evops-grpc/" }
+evops-ml-client = { path = "crates/evops-ml-client/" }
 evops-rest = { path = "crates/evops-rest/" }
 evops-storage = { path = "crates/evops-storage/" }
 

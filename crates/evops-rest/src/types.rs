@@ -97,6 +97,18 @@ pub struct TagServiceCreateResponse {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
+pub struct TagServiceGetTagsByDescriptionRequest {
+    /// Description to predict tags for.
+    pub description: crate::types::EventDescription,
+}
+
+#[derive(Debug, Serialize, JsonSchema)]
+pub struct TagServiceGetTagsByDescriptionResponse {
+    /// A list of predicted tag IDs for a description.
+    pub tag_ids: Vec<crate::types::TagId>,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct UserServiceFindRequest {
     /// UUID of the user to retrieve.
     pub id: crate::types::UserId,
@@ -240,7 +252,7 @@ struct EventTitle(
 );
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
-struct EventDescription(
+pub struct EventDescription(
     #[schemars(
         length(
             min = evops_models::EVENT_DESCRIPTION_MIN_LEN,

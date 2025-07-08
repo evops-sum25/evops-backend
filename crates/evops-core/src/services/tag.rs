@@ -1,4 +1,4 @@
-use evops_models::{ApiResult, NewTagForm, PgLimit, Tag, TagId};
+use evops_models::{ApiResult, EventDescription, NewTagForm, PgLimit, Tag, TagId};
 
 impl crate::AppState {
     pub async fn list_tags(
@@ -27,5 +27,14 @@ impl crate::AppState {
             db.find_tag(id).await
         }?;
         Ok(tag)
+    }
+
+    pub async fn get_tags_by_description(
+        &self,
+        description: EventDescription,
+    ) -> ApiResult<Vec<TagId>> {
+        let ml_client = &self.shared_state.ml_client;
+        let tags = ml_client.get_tags(description).await?;
+        Ok(tags)
     }
 }

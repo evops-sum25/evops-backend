@@ -12,6 +12,7 @@ mod services;
 struct State {
     db: tokio::sync::Mutex<evops_db::Database>,
     storage: evops_storage::Storage,
+    ml_client: evops_ml_client::MlClient,
 }
 
 #[derive(Clone)]
@@ -28,6 +29,7 @@ impl AppState {
         storage_url: &Url,
         storage_username: &str,
         storage_password: &str,
+        ml_client_url: &Url,
     ) -> eyre::Result<Self> {
         let db = {
             evops_db::Database::establish_connection(database_url)
@@ -43,12 +45,16 @@ impl AppState {
                 .await
                 .wrap_err("error connecting to file storage")?
         };
+        let ml_client = evops_ml_client::MlClient::new(ml_client_url)
+            .await
+            .wrap_err("error connecting to ml server")?;
 
         Ok(Self {
             shared_state: {
                 Arc::new(self::State {
                     db: tokio::sync::Mutex::new(db),
                     storage,
+                    ml_client,
                 })
             },
         })

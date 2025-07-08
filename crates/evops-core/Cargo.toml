@@ -5,6 +5,7 @@ edition = "2024"
 [dependencies]
 evops-db = { workspace = true }
 evops-models = { workspace = true }
+evops-ml-client = { workspace = true }
 evops-storage = { workspace = true }
 
 bon = { workspace = true }
