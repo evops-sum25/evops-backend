@@ -17,10 +17,12 @@ pub struct MlClient {
 
 impl MlClient {
     pub async fn new(server_url: &Url) -> ApiResult<Self> {
-        let channel = Channel::from_shared(server_url.to_string())
-            .map_err(|e| ApiError::InvalidArgument(format!("Invalid server URL: {}", e)))?
-            .connect()
-            .await?;
+        let channel = {
+            Channel::from_shared(server_url.to_string())
+                .map_err(|e| ApiError::InvalidArgument(format!("Invalid server URL: {}", e)))?
+                .connect()
+                .await?
+        };
 
         Ok(Self {
             client: Mutex::new(MlServiceClient::new(channel)),
