@@ -3,15 +3,14 @@ name = "evops"
 edition = "2024"
 
 [dependencies]
-evops-core = { workspace = true }
-evops-grpc = { workspace = true }
-evops-rest = { workspace = true }
-
 axum = { workspace = true }
 axum_tonic = { workspace = true }
 color-eyre = { workspace = true }
 const_format = { workspace = true }
 dotenvy = { workspace = true }
+evops-core = { workspace = true }
+evops-grpc = { workspace = true }
+evops-rest = { workspace = true }
 eyre = { workspace = true }
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "signal"] }
 tower-http = { workspace = true, features = ["timeout", "trace"] }

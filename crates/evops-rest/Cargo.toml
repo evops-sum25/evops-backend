@@ -3,9 +3,6 @@ name = "evops-rest"
 edition = "2024"
 
 [dependencies]
-evops-core = { workspace = true }
-evops-models = { workspace = true, features = ["aide"] }
-
 aide = { workspace = true, features = [
   "axum-json",
   "axum-query",
@@ -14,9 +11,11 @@ aide = { workspace = true, features = [
 ] }
 aide-axum-typed-multipart = { workspace = true }
 axum = { workspace = true }
-axum-extra = { workspace = true, features = ["file-stream"] }
 axum_typed_multipart = { workspace = true }
+axum-extra = { workspace = true, features = ["file-stream"] }
 chrono = { workspace = true, features = ["serde"] }
+evops-core = { workspace = true }
+evops-models = { workspace = true, features = ["aide"] }
 futures = { workspace = true }
 schemars = { workspace = true, features = ["bytes1", "chrono04", "uuid1"] }
 serde = { workspace = true, features = ["rc"] }

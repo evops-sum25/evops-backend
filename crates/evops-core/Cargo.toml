@@ -3,13 +3,12 @@ name = "evops-core"
 edition = "2024"
 
 [dependencies]
-evops-db = { workspace = true }
-evops-models = { workspace = true }
-evops-ml-client = { workspace = true }
-evops-storage = { workspace = true }
-
 bon = { workspace = true }
 bytes = { workspace = true }
+evops-db = { workspace = true }
+evops-ml-client = { workspace = true }
+evops-models = { workspace = true }
+evops-storage = { workspace = true }
 eyre = { workspace = true }
 futures = { workspace = true }
 tokio = { workspace = true, features = ["sync"] }

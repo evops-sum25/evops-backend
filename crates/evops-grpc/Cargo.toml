@@ -3,15 +3,13 @@ name = "evops-grpc"
 edition = "2024"
 
 [dependencies]
-evops-core = { workspace = true }
-evops-models = { workspace = true, features = ["tonic"] }
-
 axum = { workspace = true }
 bytes = { workspace = true }
 bytesize = { workspace = true }
+evops-core = { workspace = true }
+evops-models = { workspace = true, features = ["tonic"] }
 http = { workspace = true }
-# Needed by build.rs for the `crate::pb` module.
-prost = { workspace = true }
+prost = { workspace = true }  # Needed by build.rs for the `crate::pb` module.
 prost-types = { workspace = true }
 tokio = { workspace = true, features = ["sync"] }
 tokio-stream = { workspace = true }
