@@ -15,7 +15,9 @@ pub fn router() -> ApiRouter {
     }
 
     ApiRouter::new()
-        // .route("/favicon.ico", get(async || Redirect::temporary(todo!())))
+        .route("/favicon.ico", {
+            get(async || Redirect::temporary("https://cdn.svgporn.com/logos/swagger.svg"))
+        })
         .route("/", get(async || Redirect::permanent("/swagger")))
         .route("/api.json", get(self::serve))
         .route("/swagger", {
