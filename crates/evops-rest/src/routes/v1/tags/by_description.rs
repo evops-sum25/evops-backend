@@ -25,11 +25,9 @@ fn post_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.TagService.GetTagsByDescription")
         .description("Get relevant tag IDs for an event description.")
         .response_bad_request()
-        .response_not_found()
         .response_unprocessable_entity()
         .response_internal_server_error()
 }
-
 async fn post(
     State(state): State<AppState>,
     Json(request): Json<TagServiceGetTagsByDescriptionRequest>,

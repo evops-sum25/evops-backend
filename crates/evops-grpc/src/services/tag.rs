@@ -4,7 +4,11 @@ use uuid::Uuid;
 use evops_models::{ApiError, EventDescription};
 
 use crate::pb::tag_service_server::{TagService, TagServiceServer};
-use crate::pb::{TagServiceCreateResponse, TagServiceFindResponse, TagServiceListResponse};
+use crate::pb::{
+    TagServiceCreateRequest, TagServiceCreateResponse, TagServiceFindRequest,
+    TagServiceFindResponse, TagServiceGetTagsByDescriptionRequest,
+    TagServiceGetTagsByDescriptionResponse, TagServiceListRequest, TagServiceListResponse,
+};
 
 pub fn server(state: crate::AppState) -> TagServiceServer<self::Service> {
     TagServiceServer::new(self::Service { state })
@@ -18,8 +22,8 @@ pub struct Service {
 impl TagService for self::Service {
     async fn find(
         &self,
-        request: Request<crate::pb::TagServiceFindRequest>,
-    ) -> Result<Response<crate::pb::TagServiceFindResponse>, Status> {
+        request: Request<TagServiceFindRequest>,
+    ) -> Result<Response<TagServiceFindResponse>, Status> {
         let request_data = request.into_inner();
 
         let id = evops_models::TagId::new({
@@ -38,8 +42,8 @@ impl TagService for self::Service {
 
     async fn list(
         &self,
-        request: Request<crate::pb::TagServiceListRequest>,
-    ) -> Result<Response<crate::pb::TagServiceListResponse>, Status> {
+        request: Request<TagServiceListRequest>,
+    ) -> Result<Response<TagServiceListResponse>, Status> {
         let request_data = request.into_inner();
 
         let last_id = match request_data.last_id {
@@ -66,8 +70,8 @@ impl TagService for self::Service {
 
     async fn create(
         &self,
-        request: Request<crate::pb::TagServiceCreateRequest>,
-    ) -> Result<Response<crate::pb::TagServiceCreateResponse>, Status> {
+        request: Request<TagServiceCreateRequest>,
+    ) -> Result<Response<TagServiceCreateResponse>, Status> {
         let request_data = request.into_inner();
 
         let form = {
@@ -89,20 +93,20 @@ impl TagService for self::Service {
 
     async fn get_tags_by_description(
         &self,
-        request: Request<crate::pb::TagServiceGetTagsByDescriptionRequest>,
-    ) -> Result<Response<crate::pb::TagServiceGetTagsByDescriptionResponse>, Status> {
-        let tag_ids = self
-            .state
-            .get_tags_by_description(
-                EventDescription::try_new(request.into_inner().description).map_err(|_| {
-                    ApiError::InvalidArgument("Description should be a valid string".to_owned())
-                })?,
-            )
-            .await?
-            .into_iter()
-            .map(|tag| tag.to_string())
-            .collect();
-        let response_data = crate::pb::TagServiceGetTagsByDescriptionResponse { tag_ids };
+        request: Request<TagServiceGetTagsByDescriptionRequest>,
+    ) -> Result<Response<TagServiceGetTagsByDescriptionResponse>, Status> {
+        let request_data = request.into_inner();
+        let description = {
+            EventDescription::try_new(request_data.description)
+                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+        };
+        let tag_ids = self.state.get_tags_by_description(description).await?;
+        let response_data = TagServiceGetTagsByDescriptionResponse {
+            tag_ids: tag_ids
+                .into_iter()
+                .map(|tag_id| tag_id.to_string())
+                .collect(),
+        };
         Ok(Response::new(response_data))
     }
 }

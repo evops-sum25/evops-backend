@@ -1085,12 +1085,9 @@ dependencies = [
  "evops-models",
  "eyre",
  "prost",
- "tokio",
  "tonic",
  "tonic-build",
- "tracing",
  "url",
- "uuid",
 ]
 
 [[package]]

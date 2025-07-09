@@ -28,7 +28,7 @@ pub fn router() -> ApiRouter<AppState> {
             self::route_docs,
         )
         .nest("/{id}", self::_id::router())
-        .nest("/by_description", self::by_description::router())
+        .nest("/by-description", self::by_description::router())
 }
 
 fn get_docs(o: TransformOperation) -> TransformOperation {

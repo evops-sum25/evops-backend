@@ -33,8 +33,10 @@ impl crate::AppState {
         &self,
         description: EventDescription,
     ) -> ApiResult<Vec<TagId>> {
-        let ml_client = &self.shared_state.ml_client;
-        let tags = ml_client.get_tags(description).await?;
+        let tags = {
+            let mut ml_client = self.shared_state.ml_client.lock().await;
+            ml_client.predict_tags(description).await?
+        };
         Ok(tags)
     }
 }
