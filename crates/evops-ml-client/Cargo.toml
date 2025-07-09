@@ -6,7 +6,9 @@ edition = "2024"
 evops-models = { workspace = true }
 eyre = { workspace = true }
 prost = { workspace = true }
+tokio = { workspace = true, features = ["time"] }
 tonic = { workspace = true }
+tracing = { workspace = true }
 url = { workspace = true }
 
 [build-dependencies]

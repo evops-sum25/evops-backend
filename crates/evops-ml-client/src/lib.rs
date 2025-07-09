@@ -1,3 +1,5 @@
+use std::time::Duration;
+
 use url::Url;
 
 use crate::pb::ml_service_client::MlServiceClient;
@@ -11,11 +13,26 @@ pub struct MlClient {
 
 impl MlClient {
     pub async fn new(server_url: &Url) -> eyre::Result<Self> {
-        let channel = {
-            tonic::transport::Channel::from_shared(server_url.to_string())?
-                .connect()
-                .await?
-        };
+        let channel;
+        // HACK: this should be done in Docker.
+        loop {
+            tracing::debug!("connecting to ml server, please wait...");
+            let connection_result = {
+                tonic::transport::Channel::from_shared(server_url.to_string())?
+                    .connect()
+                    .await
+            };
+            match connection_result {
+                Ok(ch) => {
+                    channel = ch;
+                    break;
+                }
+                Err(_) => {
+                    tokio::time::sleep(Duration::from_secs(5)).await;
+                    continue;
+                }
+            }
+        }
         let ml_grpc_client = MlServiceClient::new(channel);
         Ok(Self {
             grpc: ml_grpc_client,
