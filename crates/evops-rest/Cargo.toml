@@ -3,12 +3,7 @@ name = "evops-rest"
 edition = "2024"
 
 [dependencies]
-aide = { workspace = true, features = [
-  "axum-json",
-  "axum-query",
-  "scalar",
-  "swagger",
-] }
+aide = { workspace = true, features = ["axum-json", "axum-query", "swagger"] }
 aide-axum-typed-multipart = { workspace = true }
 axum = { workspace = true }
 axum_typed_multipart = { workspace = true }
