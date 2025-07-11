@@ -12,6 +12,8 @@ mod routes;
 pub enum Tag {
     /// Manages event-related operations
     EventService,
+    /// Manages human languages
+    LanguageService,
     /// Manages event tags
     TagService,
     /// Manages user accounts
