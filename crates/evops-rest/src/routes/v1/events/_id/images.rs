@@ -12,7 +12,7 @@ use crate::AppState;
 use crate::error::AddResponse as _;
 use crate::types::{
     EventServicePushImageRequestMultipart, EventServicePushImageRequestPath,
-    EventServicePushImageResponse,
+    EventServicePushImageResponse, EventServiceReorderImagesRequest,
 };
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
@@ -21,7 +21,7 @@ fn route_docs(r: TransformPathItem) -> TransformPathItem {
 pub fn router() -> ApiRouter<AppState> {
     ApiRouter::new().api_route_with(
         "/",
-        post_with(self::post, self::post_docs),
+        post_with(self::post, self::post_docs).put_with(self::put, self::put_docs),
         self::route_docs,
     )
 }
@@ -48,4 +48,17 @@ async fn post(
         image_id: image_id.into(),
     };
     Ok(Json(response_data))
+}
+
+fn put_docs(mut o: TransformOperation) -> TransformOperation {
+    o.inner_mut().deprecated = true;
+    o.summary("evops.api.v1.EventService.ReorderImages")
+        .description("Reorders images of an event according to a new list.")
+        .response_bad_request()
+        .response_not_found()
+        .response_unprocessable_entity()
+        .response_internal_server_error()
+}
+async fn put(Json(_request): Json<EventServiceReorderImagesRequest>) -> ApiResult<()> {
+    todo!();
 }

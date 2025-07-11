@@ -37,7 +37,6 @@ fn get_docs(o: TransformOperation) -> TransformOperation {
         .response_bad_request()
         .response_internal_server_error()
 }
-
 async fn get(
     State(state): State<AppState>,
     Query(request): Query<EventServiceListRequest>,
@@ -65,7 +64,6 @@ fn post_docs(o: TransformOperation) -> TransformOperation {
         .response_unprocessable_entity()
         .response_internal_server_error()
 }
-
 async fn post(
     State(state): State<AppState>,
     Json(request): Json<EventServiceCreateRequest>,

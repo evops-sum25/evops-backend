@@ -8,7 +8,10 @@ use evops_models::ApiResult;
 
 use crate::AppState;
 use crate::error::AddResponse as _;
-use crate::types::{EventServiceFindRequest, EventServiceFindResponse};
+use crate::types::{
+    EventServiceDeleteRequest, EventServiceFindRequest, EventServiceFindResponse,
+    EventServiceUpdateRequest,
+};
 
 mod images;
 
@@ -17,7 +20,15 @@ fn route_docs(r: TransformPathItem) -> TransformPathItem {
 }
 pub fn router() -> ApiRouter<AppState> {
     ApiRouter::new()
-        .api_route_with("/", get_with(self::get, self::get_docs), self::route_docs)
+        .api_route_with(
+            "/",
+            {
+                get_with(self::get, self::get_docs)
+                    .delete_with(self::delete, self::delete_docs)
+                    .put_with(self::put, self::put_docs)
+            },
+            self::route_docs,
+        )
         .nest("/images", self::images::router())
 }
 
@@ -40,4 +51,30 @@ async fn get(
         event: found_event.into(),
     };
     Ok(Json(response_data))
+}
+
+fn delete_docs(mut o: TransformOperation) -> TransformOperation {
+    o.inner_mut().deprecated = true;
+    o.summary("evops.api.v1.EventService.Delete")
+        .description("Deletes an event by ID.")
+        .response_bad_request()
+        .response_not_found()
+        .response_unprocessable_entity()
+        .response_internal_server_error()
+}
+async fn delete(Path(_request): Path<EventServiceDeleteRequest>) -> ApiResult<()> {
+    todo!();
+}
+
+fn put_docs(mut o: TransformOperation) -> TransformOperation {
+    o.inner_mut().deprecated = true;
+    o.summary("evops.api.v1.EventService.Update")
+        .description("Updates an event by ID.")
+        .response_bad_request()
+        .response_not_found()
+        .response_unprocessable_entity()
+        .response_internal_server_error()
+}
+async fn put(Path(_request): Path<EventServiceUpdateRequest>) -> ApiResult<()> {
+    todo!();
 }
