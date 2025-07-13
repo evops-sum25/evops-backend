@@ -53,8 +53,7 @@ async fn get(
     Ok(Json(response_data))
 }
 
-fn delete_docs(mut o: TransformOperation) -> TransformOperation {
-    o.inner_mut().deprecated = true;
+fn delete_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.EventService.Delete")
         .description("Deletes an event by ID.")
         .response_bad_request()
@@ -62,12 +61,16 @@ fn delete_docs(mut o: TransformOperation) -> TransformOperation {
         .response_unprocessable_entity()
         .response_internal_server_error()
 }
-async fn delete(Path(_request): Path<EventServiceDeleteRequest>) -> ApiResult<()> {
-    todo!();
+async fn delete(
+    State(state): State<AppState>,
+    Path(request): Path<EventServiceDeleteRequest>,
+) -> ApiResult<()> {
+    let request: evops_models::EventId = request.event_id.into();
+    tracing::debug!("delete request received for {}", request);
+    state.delete_event(request).await
 }
 
-fn put_docs(mut o: TransformOperation) -> TransformOperation {
-    o.inner_mut().deprecated = true;
+fn put_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.EventService.Update")
         .description("Updates an event by ID.")
         .response_bad_request()
@@ -75,6 +78,10 @@ fn put_docs(mut o: TransformOperation) -> TransformOperation {
         .response_unprocessable_entity()
         .response_internal_server_error()
 }
-async fn put(Path(_request): Path<EventServiceUpdateRequest>) -> ApiResult<()> {
-    todo!();
+async fn put(
+    State(state): State<AppState>,
+    Path(request): Path<EventServiceUpdateRequest>,
+) -> ApiResult<()> {
+    let form = request.form.try_into()?;
+    state.update_event(form).await
 }

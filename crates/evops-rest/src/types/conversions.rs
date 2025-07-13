@@ -14,6 +14,19 @@ impl TryFrom<crate::types::NewEventForm> for evops_models::NewEventForm {
     }
 }
 
+impl TryFrom<crate::types::UpdateEventForm> for evops_models::UpdateEventForm {
+    type Error = ApiError;
+
+    fn try_from(value: crate::types::UpdateEventForm) -> Result<Self, Self::Error> {
+        Ok(Self {
+            title: value.title.map(|t| t.try_into()).transpose()?,
+            description: value.description.map(|t| t.try_into()).transpose()?,
+            tag_ids: value.tag_ids.map(|t| t.try_into()).transpose()?,
+            track_attendance: value.track_attendance,
+        })
+    }
+}
+
 impl TryFrom<crate::types::EventTagIds> for evops_models::EventTagIds {
     type Error = ApiError;
 
@@ -26,6 +39,24 @@ impl TryFrom<crate::types::EventTagIds> for evops_models::EventTagIds {
 impl From<crate::types::EventImageId> for evops_models::EventImageId {
     fn from(value: crate::types::EventImageId) -> Self {
         Self::new(value.0)
+    }
+}
+
+impl From<crate::types::EventImageIds> for evops_models::EventImageIds {
+    fn from(value: crate::types::EventImageIds) -> Self {
+        // SAFETY:
+        // 1. EventImageId::from is infallible (as shown above)
+        // 2. Vec construction cannot fail
+        // 3. new_unchecked is just an optimization of new() with same guarantees
+        unsafe {
+            Self::new_unchecked(
+                value
+                    .0
+                    .into_iter()
+                    .map(evops_models::EventImageId::from)
+                    .collect(),
+            )
+        }
     }
 }
 

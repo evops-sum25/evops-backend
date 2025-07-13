@@ -88,6 +88,12 @@ pub struct EventServicePushImageRequestPath {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
+pub struct EventServiceReorderImageRequestPath {
+    /// UUID of the event to reorder images for.
+    pub id: EventId,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
 pub struct EventServiceFindRequest {
     /// UUID of the event to retrieve.
     pub id: EventId,
@@ -238,7 +244,9 @@ struct EventTags(#[schemars(length(max = evops_models::EVENT_MAX_TAGS))] Vec<Tag
 pub struct EventImageId(Uuid);
 
 #[derive(Debug, Deserialize, Serialize, JsonSchema)]
-struct EventImageIds(#[schemars(length(max = evops_models::EVENT_MAX_IMAGES))] Vec<EventImageId>);
+pub struct EventImageIds(
+    #[schemars(length(max = evops_models::EVENT_MAX_IMAGES))] Vec<EventImageId>,
+);
 
 #[derive(Debug, TryFromMultipart, JsonSchema)]
 pub struct EventServicePushImageRequestMultipart {

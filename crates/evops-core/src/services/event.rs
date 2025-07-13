@@ -3,7 +3,10 @@ use std::pin::Pin;
 use bytes::Bytes;
 use futures::Stream;
 
-use evops_models::{ApiResult, Event, EventId, EventImage, EventImageId, NewEventForm, PgLimit};
+use evops_models::{
+    ApiResult, Event, EventId, EventImage, EventImageId, EventImageIds, NewEventForm, PgLimit,
+    UpdateEventForm,
+};
 use uuid::Uuid;
 
 impl crate::AppState {
@@ -35,6 +38,16 @@ impl crate::AppState {
         Ok(event)
     }
 
+    pub async fn delete_event(&self, id: EventId) -> ApiResult<()> {
+        let mut db = self.shared_state.db.lock().await;
+        db.delete_event(id).await
+    }
+
+    pub async fn update_event(&self, form: UpdateEventForm) -> ApiResult<()> {
+        let mut db = self.shared_state.db.lock().await;
+        db.update_event(form).await
+    }
+
     pub async fn push_event_image(
         &self,
         event_id: EventId,
@@ -49,6 +62,15 @@ impl crate::AppState {
         };
         db_result?;
         Ok(image_id)
+    }
+
+    pub async fn reorder_image(
+        &self,
+        event_id: EventId,
+        image_order: EventImageIds,
+    ) -> ApiResult<()> {
+        let mut db = self.shared_state.db.lock().await;
+        db.reorder_images(event_id, image_order).await
     }
 
     pub async fn stream_event_image(
