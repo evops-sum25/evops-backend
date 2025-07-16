@@ -1036,6 +1036,7 @@ dependencies = [
  "futures",
  "tokio",
  "url",
+ "uuid",
 ]
 
 [[package]]

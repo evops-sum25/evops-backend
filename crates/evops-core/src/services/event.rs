@@ -4,6 +4,7 @@ use bytes::Bytes;
 use futures::Stream;
 
 use evops_models::{ApiResult, Event, EventId, EventImage, EventImageId, NewEventForm, PgLimit};
+use uuid::Uuid;
 
 impl crate::AppState {
     pub async fn list_events(
@@ -39,13 +40,14 @@ impl crate::AppState {
         event_id: EventId,
         image: EventImage,
     ) -> ApiResult<EventImageId> {
-        let image_id = {
-            let mut db = self.shared_state.db.lock().await;
-            db.reserve_image(event_id).await?
-        };
         let storage = &self.shared_state.storage;
-        storage.upload_event_image(image_id, image).await?; // TODO: remove from the DB on error.
-
+        let image_id = EventImageId::new(Uuid::now_v7());
+        storage.upload_event_image(image_id, image).await?;
+        let db_result = {
+            let mut db = self.shared_state.db.lock().await;
+            db.reserve_image(event_id, image_id).await
+        };
+        db_result?;
         Ok(image_id)
     }
 

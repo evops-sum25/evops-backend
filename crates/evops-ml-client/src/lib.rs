@@ -22,16 +22,11 @@ impl MlClient {
                     .connect()
                     .await
             };
-            match connection_result {
-                Ok(ch) => {
-                    channel = ch;
-                    break;
-                }
-                Err(_) => {
-                    tokio::time::sleep(Duration::from_secs(5)).await;
-                    continue;
-                }
+            if let Ok(ch) = connection_result {
+                channel = ch;
+                break;
             }
+            tokio::time::sleep(Duration::from_secs(5)).await;
         }
         let ml_grpc_client = MlServiceClient::new(channel);
         Ok(Self {

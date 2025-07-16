@@ -13,6 +13,7 @@ eyre = { workspace = true }
 futures = { workspace = true }
 tokio = { workspace = true, features = ["sync"] }
 url = { workspace = true }
+uuid = { workspace = true, features = ["v7"] }
 
 [lints]
 workspace = true
