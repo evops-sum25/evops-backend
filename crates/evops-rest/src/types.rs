@@ -15,17 +15,6 @@ pub struct TagServiceDeleteRequest {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct TagServiceUpdateRequest {
-    pub form: UpdateTagForm,
-}
-
-#[derive(Debug, Deserialize, JsonSchema)]
-pub struct UpdateTagForm {
-    name: Option<TagName>,
-    aliases: Option<TagAliases>,
-}
-
-#[derive(Debug, Deserialize, JsonSchema)]
 pub struct EventServiceReorderImagesRequest {
     pub image_ids: EventImageIds,
 }

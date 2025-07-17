@@ -8,9 +8,7 @@ use evops_models::ApiResult;
 
 use crate::AppState;
 use crate::error::AddResponse as _;
-use crate::types::{
-    TagServiceDeleteRequest, TagServiceFindRequest, TagServiceFindResponse, TagServiceUpdateRequest,
-};
+use crate::types::{TagServiceDeleteRequest, TagServiceFindRequest, TagServiceFindResponse};
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::TagService.into())
@@ -18,7 +16,7 @@ fn route_docs(r: TransformPathItem) -> TransformPathItem {
 pub fn router() -> ApiRouter<AppState> {
     ApiRouter::new().api_route_with(
         "/",
-        { get_with(self::get, self::get_docs).delete_with(self::delete, self::delete_docs) },
+        get_with(self::get, self::get_docs).delete_with(self::delete, self::delete_docs),
         self::route_docs,
     )
 }
