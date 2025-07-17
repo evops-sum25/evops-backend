@@ -9,10 +9,12 @@ use evops_models::ApiError;
 use crate::AppState;
 use crate::pb::event_service_server::{EventService, EventServiceServer};
 use crate::pb::{
-    EventServiceCreateRequest, EventServiceCreateResponse, EventServiceFindImageRequest,
-    EventServiceFindImageResponse, EventServiceFindRequest, EventServiceFindResponse,
-    EventServiceListRequest, EventServiceListResponse, EventServicePushImageRequest,
-    EventServicePushImageResponse,
+    EventServiceCreateRequest, EventServiceCreateResponse, EventServiceDeleteImageRequest,
+    EventServiceDeleteImageResponse, EventServiceDeleteRequest, EventServiceDeleteResponse,
+    EventServiceFindImageRequest, EventServiceFindImageResponse, EventServiceFindRequest,
+    EventServiceFindResponse, EventServiceListRequest, EventServiceListResponse,
+    EventServicePushImageRequest, EventServicePushImageResponse, EventServiceReorderImagesRequest,
+    EventServiceReorderImagesResponse, EventServiceUpdateRequest, EventServiceUpdateResponse,
 };
 
 pub fn server(state: AppState) -> EventServiceServer<self::Service> {
@@ -95,6 +97,27 @@ impl EventService for self::Service {
             event: Some(found_event.into()),
         };
         Ok(Response::new(response_data))
+    }
+
+    async fn update(
+        &self,
+        request: Request<EventServiceUpdateRequest>,
+    ) -> Result<Response<EventServiceUpdateResponse>, Status> {
+        todo!();
+    }
+
+    async fn delete(
+        &self,
+        request: Request<EventServiceDeleteRequest>,
+    ) -> Result<Response<EventServiceDeleteResponse>, Status> {
+        todo!();
+    }
+
+    async fn reorder_images(
+        &self,
+        request: Request<EventServiceReorderImagesRequest>,
+    ) -> Result<Response<EventServiceReorderImagesResponse>, Status> {
+        todo!();
     }
 
     async fn push_image(
@@ -197,5 +220,12 @@ impl EventService for self::Service {
             }
         });
         Ok(Response::new(ReceiverStream::new(rx)))
+    }
+
+    async fn delete_image(
+        &self,
+        request: Request<EventServiceDeleteImageRequest>,
+    ) -> Result<Response<EventServiceDeleteImageResponse>, Status> {
+        todo!();
     }
 }
