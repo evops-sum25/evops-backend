@@ -21,7 +21,7 @@ pub fn router() -> ApiRouter<AppState> {
     )
 }
 
-fn post_docs(mut o: TransformOperation) -> TransformOperation {
+fn post_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.LanguageService.Add")
         .description("Adds a new language to the system.")
         .response_bad_request()
