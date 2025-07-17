@@ -291,7 +291,8 @@ impl EventService for self::Service {
                 .parse::<Uuid>()
                 .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
         });
+        self.state.delete_image(image_id).await?;
 
-        todo!();
+        Ok(Response::new(EventServiceDeleteImageResponse {}))
     }
 }
