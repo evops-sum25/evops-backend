@@ -1,5 +1,31 @@
 use evops_models::ApiError;
 
+use crate::types::{LanguageId, LanguageName, NewLanguageForm};
+
+impl TryFrom<NewLanguageForm> for evops_models::NewLanguageForm {
+    type Error = ApiError;
+
+    fn try_from(value: NewLanguageForm) -> Result<Self, Self::Error> {
+        Ok(Self {
+            name: value.name.try_into()?,
+        })
+    }
+}
+
+impl TryFrom<LanguageName> for evops_models::LanguageName {
+    type Error = ApiError;
+
+    fn try_from(value: LanguageName) -> Result<Self, Self::Error> {
+        Ok(Self::try_new(value.0).map_err(|e| ApiError::InvalidArgument(e.to_string()))?)
+    }
+}
+
+impl From<evops_models::LanguageId> for LanguageId {
+    fn from(value: evops_models::LanguageId) -> Self {
+        Self(value.into_inner())
+    }
+}
+
 impl TryFrom<crate::types::NewEventForm> for evops_models::NewEventForm {
     type Error = ApiError;
 
