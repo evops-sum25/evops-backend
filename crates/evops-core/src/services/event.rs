@@ -83,6 +83,7 @@ impl crate::AppState {
         Ok(image_stream)
     }
 
+    #[allow(clippy::unused_async)]
     pub async fn delete_image(&self, _id: EventImageId) -> ApiResult<()> {
         todo!()
     }

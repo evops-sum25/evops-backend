@@ -16,7 +16,7 @@ impl TryFrom<LanguageName> for evops_models::LanguageName {
     type Error = ApiError;
 
     fn try_from(value: LanguageName) -> Result<Self, Self::Error> {
-        Ok(Self::try_new(value.0).map_err(|e| ApiError::InvalidArgument(e.to_string()))?)
+        Self::try_new(value.0).map_err(|e| ApiError::InvalidArgument(e.to_string()))
     }
 }
 
@@ -45,9 +45,9 @@ impl TryFrom<crate::types::UpdateEventForm> for evops_models::UpdateEventForm {
 
     fn try_from(value: crate::types::UpdateEventForm) -> Result<Self, Self::Error> {
         Ok(Self {
-            title: value.title.map(|t| t.try_into()).transpose()?,
-            description: value.description.map(|t| t.try_into()).transpose()?,
-            tag_ids: value.tag_ids.map(|t| t.try_into()).transpose()?,
+            title: value.title.map(TryInto::try_into).transpose()?,
+            description: value.description.map(TryInto::try_into).transpose()?,
+            tag_ids: value.tag_ids.map(TryInto::try_into).transpose()?,
             track_attendance: value.track_attendance,
         })
     }
