@@ -10,7 +10,7 @@ use crate::AppState;
 use crate::error::AddResponse as _;
 use crate::types::{
     EventServiceDeleteRequest, EventServiceFindRequest, EventServiceFindResponse,
-    EventServiceUpdateRequest,
+    EventServiceUpdateRequest, EventServiceUpdateRequestPath,
 };
 
 mod images;
@@ -44,7 +44,7 @@ async fn get(
     State(state): State<AppState>,
     Path(request): Path<EventServiceFindRequest>,
 ) -> ApiResult<Json<EventServiceFindResponse>> {
-    let request = request.id.into();
+    let request = request.event_id.into();
     let found_event = state.find_event(request).await?;
 
     let response_data = EventServiceFindResponse {
@@ -80,8 +80,9 @@ fn put_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn put(
     State(state): State<AppState>,
+    Path(path): Path<EventServiceUpdateRequestPath>,
     Json(request): Json<EventServiceUpdateRequest>,
 ) -> ApiResult<()> {
     let form = request.form.try_into()?;
-    state.update_event(form).await
+    state.update_event(todo!(), form).await
 }

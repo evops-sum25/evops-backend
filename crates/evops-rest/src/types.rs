@@ -55,8 +55,15 @@ pub struct UpdateEventForm {
 
 #[derive(Debug, Deserialize, JsonSchema)]
 #[serde(rename_all = "kebab-case")]
+pub struct EventServiceUpdateRequestPath {
+    /// UUID of the event to be updated.
+    pub event_id: EventId,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+#[serde(rename_all = "kebab-case")]
 pub struct EventServiceDeleteRequest {
-    /// UUID oxf the event to be deleted.
+    /// UUID of the event to be deleted.
     pub event_id: EventId,
 }
 
@@ -94,9 +101,10 @@ pub struct EventServiceReorderImageRequestPath {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
+#[serde(rename_all = "kebab-case")]
 pub struct EventServiceFindRequest {
     /// UUID of the event to retrieve.
-    pub id: EventId,
+    pub event_id: EventId,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]

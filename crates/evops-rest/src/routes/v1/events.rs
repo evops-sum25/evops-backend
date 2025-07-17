@@ -14,7 +14,7 @@ use crate::types::{
     EventServiceListResponse,
 };
 
-mod _id;
+mod _event_id;
 mod images;
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
@@ -27,7 +27,7 @@ pub fn router() -> ApiRouter<AppState> {
             get_with(self::get, self::get_docs).post_with(self::post, self::post_docs),
             self::route_docs,
         )
-        .nest("/{id}", self::_id::router())
+        .nest("/{event-id}", self::_event_id::router())
         .nest("/images", self::images::router())
 }
 

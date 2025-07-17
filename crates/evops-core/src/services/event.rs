@@ -44,7 +44,7 @@ impl crate::AppState {
         db.delete_event(id).await
     }
 
-    pub async fn update_event(&self, form: UpdateEventForm) -> ApiResult<()> {
+    pub async fn update_event(&self, id: EventId, form: UpdateEventForm) -> ApiResult<()> {
         let mut db = self.shared_state.db.lock().await;
         db.update_event(form).await
     }
