@@ -1,6 +1,10 @@
 use evops_models::ApiError;
 
-use crate::types::{LanguageId, LanguageName, NewLanguageForm};
+use crate::types::{
+    Event, EventDescription, EventId, EventImageId, EventImageIds, EventTagIds, EventTags,
+    EventTitle, LanguageId, LanguageName, NewEventForm, NewLanguageForm, NewTagForm, NewUserForm,
+    PgLimit, Tag, TagAlias, TagAliases, TagId, TagName, UpdateEventForm, User, UserId, UserName,
+};
 
 impl TryFrom<NewLanguageForm> for evops_models::NewLanguageForm {
     type Error = ApiError;
@@ -26,10 +30,10 @@ impl From<evops_models::LanguageId> for LanguageId {
     }
 }
 
-impl TryFrom<crate::types::NewEventForm> for evops_models::NewEventForm {
+impl TryFrom<NewEventForm> for evops_models::NewEventForm {
     type Error = ApiError;
 
-    fn try_from(value: crate::types::NewEventForm) -> Result<Self, Self::Error> {
+    fn try_from(value: NewEventForm) -> Result<Self, Self::Error> {
         Ok(Self {
             title: value.title.try_into()?,
             description: value.description.try_into()?,
@@ -40,10 +44,10 @@ impl TryFrom<crate::types::NewEventForm> for evops_models::NewEventForm {
     }
 }
 
-impl TryFrom<crate::types::UpdateEventForm> for evops_models::UpdateEventForm {
+impl TryFrom<UpdateEventForm> for evops_models::UpdateEventForm {
     type Error = ApiError;
 
-    fn try_from(value: crate::types::UpdateEventForm) -> Result<Self, Self::Error> {
+    fn try_from(value: UpdateEventForm) -> Result<Self, Self::Error> {
         Ok(Self {
             title: value.title.map(TryInto::try_into).transpose()?,
             description: value.description.map(TryInto::try_into).transpose()?,
@@ -53,23 +57,23 @@ impl TryFrom<crate::types::UpdateEventForm> for evops_models::UpdateEventForm {
     }
 }
 
-impl TryFrom<crate::types::EventTagIds> for evops_models::EventTagIds {
+impl TryFrom<EventTagIds> for evops_models::EventTagIds {
     type Error = ApiError;
 
-    fn try_from(value: crate::types::EventTagIds) -> Result<Self, Self::Error> {
+    fn try_from(value: EventTagIds) -> Result<Self, Self::Error> {
         Self::try_new(value.0.into_iter().map(Into::into).collect())
             .map_err(|e| ApiError::InvalidArgument(e.to_string()))
     }
 }
 
-impl From<crate::types::EventImageId> for evops_models::EventImageId {
-    fn from(value: crate::types::EventImageId) -> Self {
+impl From<EventImageId> for evops_models::EventImageId {
+    fn from(value: EventImageId) -> Self {
         Self::new(value.0)
     }
 }
 
-impl From<crate::types::EventImageIds> for evops_models::EventImageIds {
-    fn from(value: crate::types::EventImageIds) -> Self {
+impl From<EventImageIds> for evops_models::EventImageIds {
+    fn from(value: EventImageIds) -> Self {
         // SAFETY:
         // 1. EventImageId::from is infallible (as shown above)
         // 2. Vec construction cannot fail
@@ -86,25 +90,25 @@ impl From<crate::types::EventImageIds> for evops_models::EventImageIds {
     }
 }
 
-impl From<evops_models::EventImageId> for crate::types::EventImageId {
+impl From<evops_models::EventImageId> for EventImageId {
     fn from(value: evops_models::EventImageId) -> Self {
         Self(value.into_inner())
     }
 }
 
-impl From<evops_models::EventImageIds> for crate::types::EventImageIds {
+impl From<evops_models::EventImageIds> for EventImageIds {
     fn from(value: evops_models::EventImageIds) -> Self {
         Self(value.into_inner().into_iter().map(Into::into).collect())
     }
 }
 
-impl From<evops_models::EventTags> for crate::types::EventTags {
+impl From<evops_models::EventTags> for EventTags {
     fn from(value: evops_models::EventTags) -> Self {
         Self(value.into_inner().into_iter().map(Into::into).collect())
     }
 }
 
-impl From<evops_models::Event> for crate::types::Event {
+impl From<evops_models::Event> for Event {
     fn from(value: evops_models::Event) -> Self {
         Self {
             id: value.id.into(),
@@ -120,10 +124,10 @@ impl From<evops_models::Event> for crate::types::Event {
     }
 }
 
-impl TryFrom<crate::types::TagAliases> for evops_models::TagAliases {
+impl TryFrom<TagAliases> for evops_models::TagAliases {
     type Error = ApiError;
 
-    fn try_from(value: crate::types::TagAliases) -> Result<Self, Self::Error> {
+    fn try_from(value: TagAliases) -> Result<Self, Self::Error> {
         Self::try_new({
             value
                 .0
@@ -135,16 +139,16 @@ impl TryFrom<crate::types::TagAliases> for evops_models::TagAliases {
     }
 }
 
-impl From<evops_models::TagAliases> for crate::types::TagAliases {
+impl From<evops_models::TagAliases> for TagAliases {
     fn from(value: evops_models::TagAliases) -> Self {
         Self(value.into_inner().into_iter().map(Into::into).collect())
     }
 }
 
-impl TryFrom<crate::types::NewTagForm> for evops_models::NewTagForm {
+impl TryFrom<NewTagForm> for evops_models::NewTagForm {
     type Error = ApiError;
 
-    fn try_from(value: crate::types::NewTagForm) -> Result<Self, Self::Error> {
+    fn try_from(value: NewTagForm) -> Result<Self, Self::Error> {
         Ok(Self {
             name: value.name.try_into()?,
             aliases: value.aliases.unwrap_or_default().try_into()?,
@@ -152,7 +156,7 @@ impl TryFrom<crate::types::NewTagForm> for evops_models::NewTagForm {
     }
 }
 
-impl From<evops_models::Tag> for crate::types::Tag {
+impl From<evops_models::Tag> for Tag {
     fn from(value: evops_models::Tag) -> Self {
         Self {
             id: value.id.into(),
@@ -162,17 +166,17 @@ impl From<evops_models::Tag> for crate::types::Tag {
     }
 }
 
-impl TryFrom<crate::types::NewUserForm> for evops_models::NewUserForm {
+impl TryFrom<NewUserForm> for evops_models::NewUserForm {
     type Error = ApiError;
 
-    fn try_from(value: crate::types::NewUserForm) -> Result<Self, Self::Error> {
+    fn try_from(value: NewUserForm) -> Result<Self, Self::Error> {
         Ok(Self {
             name: value.name.try_into()?,
         })
     }
 }
 
-impl From<evops_models::User> for crate::types::User {
+impl From<evops_models::User> for User {
     fn from(value: evops_models::User) -> Self {
         Self {
             id: value.id.into(),
@@ -181,121 +185,121 @@ impl From<evops_models::User> for crate::types::User {
     }
 }
 
-impl From<evops_models::EventId> for crate::types::EventId {
+impl From<evops_models::EventId> for EventId {
     fn from(value: evops_models::EventId) -> Self {
         Self(value.into_inner())
     }
 }
 
-impl From<crate::types::EventId> for evops_models::EventId {
-    fn from(value: crate::types::EventId) -> Self {
+impl From<EventId> for evops_models::EventId {
+    fn from(value: EventId) -> Self {
         Self::new(value.0)
     }
 }
 
-impl From<evops_models::PgLimit> for crate::types::PgLimit {
+impl From<evops_models::PgLimit> for PgLimit {
     fn from(value: evops_models::PgLimit) -> Self {
         Self(value.into_inner())
     }
 }
 
-impl TryFrom<crate::types::PgLimit> for evops_models::PgLimit {
+impl TryFrom<PgLimit> for evops_models::PgLimit {
     type Error = ApiError;
 
-    fn try_from(value: crate::types::PgLimit) -> Result<Self, Self::Error> {
+    fn try_from(value: PgLimit) -> Result<Self, Self::Error> {
         Self::try_new(value.0).map_err(|e| ApiError::InvalidArgument(e.to_string()))
     }
 }
 
-impl TryFrom<crate::types::EventTitle> for evops_models::EventTitle {
+impl TryFrom<EventTitle> for evops_models::EventTitle {
     type Error = ApiError;
 
-    fn try_from(value: crate::types::EventTitle) -> Result<Self, Self::Error> {
+    fn try_from(value: EventTitle) -> Result<Self, Self::Error> {
         Self::try_new(value.0).map_err(|e| ApiError::InvalidArgument(e.to_string()))
     }
 }
 
-impl From<evops_models::EventTitle> for crate::types::EventTitle {
+impl From<evops_models::EventTitle> for EventTitle {
     fn from(value: evops_models::EventTitle) -> Self {
         Self(value.into_inner())
     }
 }
 
-impl TryFrom<crate::types::EventDescription> for evops_models::EventDescription {
+impl TryFrom<EventDescription> for evops_models::EventDescription {
     type Error = ApiError;
 
-    fn try_from(value: crate::types::EventDescription) -> Result<Self, Self::Error> {
+    fn try_from(value: EventDescription) -> Result<Self, Self::Error> {
         Self::try_new(value.0).map_err(|e| ApiError::InvalidArgument(e.to_string()))
     }
 }
 
-impl From<evops_models::EventDescription> for crate::types::EventDescription {
+impl From<evops_models::EventDescription> for EventDescription {
     fn from(value: evops_models::EventDescription) -> Self {
         Self(value.into_inner())
     }
 }
 
-impl TryFrom<crate::types::UserName> for evops_models::UserName {
+impl TryFrom<UserName> for evops_models::UserName {
     type Error = ApiError;
 
-    fn try_from(value: crate::types::UserName) -> Result<Self, Self::Error> {
+    fn try_from(value: UserName) -> Result<Self, Self::Error> {
         Self::try_new(value.0).map_err(|e| ApiError::InvalidArgument(e.to_string()))
     }
 }
 
-impl From<evops_models::UserName> for crate::types::UserName {
+impl From<evops_models::UserName> for UserName {
     fn from(value: evops_models::UserName) -> Self {
         Self(value.into_inner())
     }
 }
 
-impl From<crate::types::UserId> for evops_models::UserId {
-    fn from(value: crate::types::UserId) -> Self {
+impl From<UserId> for evops_models::UserId {
+    fn from(value: UserId) -> Self {
         Self::new(value.0)
     }
 }
 
-impl From<evops_models::UserId> for crate::types::UserId {
+impl From<evops_models::UserId> for UserId {
     fn from(value: evops_models::UserId) -> Self {
         Self(value.into_inner())
     }
 }
 
-impl From<crate::types::TagId> for evops_models::TagId {
-    fn from(value: crate::types::TagId) -> Self {
+impl From<TagId> for evops_models::TagId {
+    fn from(value: TagId) -> Self {
         Self::new(value.0)
     }
 }
 
-impl From<evops_models::TagId> for crate::types::TagId {
+impl From<evops_models::TagId> for TagId {
     fn from(value: evops_models::TagId) -> Self {
         Self(value.into_inner())
     }
 }
 
-impl TryFrom<crate::types::TagName> for evops_models::TagName {
+impl TryFrom<TagName> for evops_models::TagName {
     type Error = ApiError;
 
-    fn try_from(value: crate::types::TagName) -> Result<Self, Self::Error> {
+    fn try_from(value: TagName) -> Result<Self, Self::Error> {
         Self::try_new(value.0).map_err(|e| ApiError::InvalidArgument(e.to_string()))
     }
 }
 
-impl From<evops_models::TagName> for crate::types::TagName {
+impl From<evops_models::TagName> for TagName {
     fn from(value: evops_models::TagName) -> Self {
         Self(value.into_inner())
     }
 }
 
-impl TryFrom<crate::types::TagAlias> for evops_models::TagAlias {
+impl TryFrom<TagAlias> for evops_models::TagAlias {
     type Error = ApiError;
 
-    fn try_from(value: crate::types::TagAlias) -> Result<Self, Self::Error> {
+    fn try_from(value: TagAlias) -> Result<Self, Self::Error> {
         Self::try_new(value.0).map_err(|e| ApiError::InvalidArgument(e.to_string()))
     }
 }
 
-impl From<evops_models::TagAlias> for crate::types::TagAlias {
+impl From<evops_models::TagAlias> for TagAlias {
     fn from(value: evops_models::TagAlias) -> Self {
         Self(value.into_inner())
     }
