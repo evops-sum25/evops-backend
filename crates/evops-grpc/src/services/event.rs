@@ -111,7 +111,17 @@ impl EventService for self::Service {
                 .parse::<Uuid>()
                 .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
         });
-        let form = request_data.form.unwrap_or_default().try_into()?;
+        let form = {
+            request_data
+                .form
+                .ok_or_else(|| {
+                    ApiError::InvalidArgument({
+                        let err_msg = "EventServiceUpdateRequest.form must not be null.";
+                        err_msg.to_owned()
+                    })
+                })?
+                .try_into()?
+        };
         self.state.update_event(event_id, form).await?;
 
         Ok(Response::new(EventServiceUpdateResponse {}))
