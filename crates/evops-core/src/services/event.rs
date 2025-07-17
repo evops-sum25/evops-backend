@@ -83,7 +83,7 @@ impl crate::AppState {
         Ok(image_stream)
     }
 
-    pub async fn delete_image(&self, id: EventImageId) -> ApiResult<()> {
+    pub async fn delete_image(&self, _id: EventImageId) -> ApiResult<()> {
         todo!()
     }
 }

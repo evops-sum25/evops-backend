@@ -22,7 +22,7 @@ pub struct EventServiceReorderImagesRequest {
 #[derive(Debug, Deserialize, JsonSchema)]
 #[serde(rename_all = "kebab-case")]
 pub struct EventServiceDeleteImageRequestPath {
-    pub image_id: EventImageId,
+    pub _image_id: EventImageId,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]

@@ -57,7 +57,7 @@ fn delete_docs(mut o: TransformOperation) -> TransformOperation {
         .response_unprocessable_entity()
         .response_internal_server_error()
 }
-async fn delete(Path(path): Path<EventServiceDeleteImageRequestPath>) -> ApiResult<()> {
+async fn delete(Path(_path): Path<EventServiceDeleteImageRequestPath>) -> ApiResult<()> {
     todo!();
 }
 
