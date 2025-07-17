@@ -4,7 +4,20 @@ use uuid::Uuid;
 
 use evops_models::{ApiError, ApiResult};
 
-use crate::pb::UpdateEventForm;
+use crate::pb::{NewLanguageForm, UpdateEventForm};
+
+impl TryFrom<NewLanguageForm> for evops_models::NewLanguageForm {
+    type Error = ApiError;
+
+    fn try_from(value: NewLanguageForm) -> Result<Self, Self::Error> {
+        Ok(Self {
+            name: {
+                evops_models::LanguageName::try_new(value.name)
+                    .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+            },
+        })
+    }
+}
 
 impl TryFrom<UpdateEventForm> for evops_models::UpdateEventForm {
     type Error = ApiError;
