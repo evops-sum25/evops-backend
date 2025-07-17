@@ -4,7 +4,7 @@ use tokio_stream::wrappers::ReceiverStream;
 use tonic::{Request, Response, Status, Streaming};
 use uuid::Uuid;
 
-use evops_models::ApiError;
+use evops_models::{ApiError, ApiResult};
 
 use crate::AppState;
 use crate::pb::event_service_server::{EventService, EventServiceServer};
@@ -148,7 +148,33 @@ impl EventService for self::Service {
         &self,
         request: Request<EventServiceReorderImagesRequest>,
     ) -> Result<Response<EventServiceReorderImagesResponse>, Status> {
-        todo!();
+        let request_data = request.into_inner();
+
+        let event_id = evops_models::EventId::new({
+            request_data
+                .event_id
+                .parse::<Uuid>()
+                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+        });
+        let image_order = {
+            evops_models::EventImageIds::try_new({
+                request_data
+                    .image_ids
+                    .into_iter()
+                    .map(|image_id| {
+                        ApiResult::Ok(evops_models::EventImageId::new({
+                            image_id
+                                .parse::<Uuid>()
+                                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+                        }))
+                    })
+                    .collect::<Result<_, _>>()?
+            })
+            .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+        };
+        self.state.reorder_images(event_id, image_order).await?;
+
+        Ok(Response::new(EventServiceReorderImagesResponse {}))
     }
 
     async fn push_image(

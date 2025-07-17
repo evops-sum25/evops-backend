@@ -67,5 +67,5 @@ async fn put(
 ) -> ApiResult<()> {
     let event_id = path.id.into();
     let image_order = request.image_ids.into();
-    state.reorder_image(event_id, image_order).await
+    state.reorder_images(event_id, image_order).await
 }

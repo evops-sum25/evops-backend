@@ -65,7 +65,7 @@ impl crate::AppState {
         Ok(image_id)
     }
 
-    pub async fn reorder_image(
+    pub async fn reorder_images(
         &self,
         event_id: EventId,
         image_order: EventImageIds,
