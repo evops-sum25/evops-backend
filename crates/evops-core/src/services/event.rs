@@ -82,4 +82,8 @@ impl crate::AppState {
         let image_stream = storage.stream_event_image(id).await?;
         Ok(image_stream)
     }
+
+    pub async fn delete_image(&self, id: EventImageId) -> ApiResult<()> {
+        todo!()
+    }
 }
