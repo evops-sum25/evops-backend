@@ -39,23 +39,9 @@ fn get_docs(o: TransformOperation) -> TransformOperation {
         .response_internal_server_error()
 }
 
-#[derive(schemars::JsonSchema, serde::Deserialize)]
-#[serde(rename_all = "kebab-case")]
-enum Order {
-    Name,
-    Time,
-}
-
-#[derive(schemars::JsonSchema, serde::Deserialize)]
-#[serde(rename_all = "kebab-case")]
-struct GetQuery {
-    order: Option<Order>,
-}
-
 async fn get(
     State(state): State<AppState>,
     Query(request): Query<TagServiceListRequest>,
-    Query(query): Query<GetQuery>,
 ) -> ApiResult<Json<TagServiceListResponse>> {
     let last_id = request.last_id.map(Into::into);
     let limit = match request.limit {
