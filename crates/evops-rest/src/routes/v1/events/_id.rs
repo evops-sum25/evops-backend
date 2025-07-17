@@ -80,7 +80,7 @@ fn put_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn put(
     State(state): State<AppState>,
-    Path(request): Path<EventServiceUpdateRequest>,
+    Json(request): Json<EventServiceUpdateRequest>,
 ) -> ApiResult<()> {
     let form = request.form.try_into()?;
     state.update_event(form).await

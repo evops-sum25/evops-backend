@@ -18,11 +18,7 @@ fn route_docs(r: TransformPathItem) -> TransformPathItem {
 pub fn router() -> ApiRouter<AppState> {
     ApiRouter::new().api_route_with(
         "/",
-        {
-            get_with(self::get, self::get_docs)
-                .put_with(self::put, self::put_docs)
-                .delete_with(self::delete, self::delete_docs)
-        },
+        { get_with(self::get, self::get_docs).delete_with(self::delete, self::delete_docs) },
         self::route_docs,
     )
 }
@@ -48,8 +44,7 @@ async fn get(
     Ok(Json(response_data))
 }
 
-fn delete_docs(mut o: TransformOperation) -> TransformOperation {
-    o.inner_mut().deprecated = true;
+fn delete_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.TagService.Delete")
         .description("Deletes a tag by ID.")
         .response_bad_request()
@@ -57,19 +52,10 @@ fn delete_docs(mut o: TransformOperation) -> TransformOperation {
         .response_unprocessable_entity()
         .response_internal_server_error()
 }
-async fn delete(Path(_request): Path<TagServiceDeleteRequest>) -> ApiResult<()> {
-    todo!();
-}
-
-fn put_docs(mut o: TransformOperation) -> TransformOperation {
-    o.inner_mut().deprecated = true;
-    o.summary("evops.api.v1.TagService.Update")
-        .description("Updates a tag by ID.")
-        .response_bad_request()
-        .response_not_found()
-        .response_unprocessable_entity()
-        .response_internal_server_error()
-}
-async fn put(Json(_request): Json<TagServiceUpdateRequest>) -> ApiResult<()> {
-    todo!();
+async fn delete(
+    State(state): State<AppState>,
+    Path(request): Path<TagServiceDeleteRequest>,
+) -> ApiResult<()> {
+    let id = request.tag_id.into();
+    state.delete_tag(id).await
 }

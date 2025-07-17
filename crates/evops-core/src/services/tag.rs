@@ -1,4 +1,4 @@
-use evops_models::{ApiResult, EventDescription, NewTagForm, PgLimit, Tag, TagId};
+use evops_models::{ApiResult, EventDescription, NewTagForm, PgLimit, Tag, TagId, UpdateEventForm};
 
 impl crate::AppState {
     pub async fn list_tags(
@@ -38,5 +38,10 @@ impl crate::AppState {
             ml_client.predict_tags(description).await?
         };
         Ok(tags)
+    }
+
+    pub async fn delete_tag(&self, id: TagId) -> ApiResult<()> {
+        let mut db = self.shared_state.db.lock().await;
+        db.delete_tag(id).await
     }
 }

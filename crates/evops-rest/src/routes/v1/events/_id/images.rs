@@ -52,6 +52,7 @@ async fn post(
 }
 
 fn put_docs(mut o: TransformOperation) -> TransformOperation {
+    o.inner_mut().deprecated = true;
     o.summary("evops.api.v1.EventService.ReorderImages")
         .description("Reorders images of an event according to a new list.")
         .response_bad_request()
