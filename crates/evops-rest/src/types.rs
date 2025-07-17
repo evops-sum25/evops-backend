@@ -113,7 +113,8 @@ pub struct EventServiceFindResponse {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct EventServiceListRequest {
+#[serde(rename_all = "kebab-case")]
+pub struct EventServiceListRequestQuery {
     /// UUID of last listed event.
     pub last_id: Option<EventId>,
     /// Size of one batch of events.
@@ -152,7 +153,8 @@ pub struct TagServiceFindResponse {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct TagServiceListRequest {
+#[serde(rename_all = "kebab-case")]
+pub struct TagServiceListRequestQuery {
     /// UUID of last listed event.
     pub last_id: Option<TagId>,
     /// Size of one batch of events.
