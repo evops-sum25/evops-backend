@@ -21,7 +21,7 @@ pub struct EventServiceReorderImagesRequest {
 
 #[derive(Debug, Deserialize, JsonSchema)]
 #[serde(rename_all = "kebab-case")]
-pub struct EventServiceDeleteImageRequest {
+pub struct EventServiceDeleteImageRequestPath {
     pub image_id: EventImageId,
 }
 
@@ -79,15 +79,17 @@ pub struct LanguageId(Uuid);
 pub struct LanguageName(String);
 
 #[derive(Debug, Deserialize, JsonSchema)]
+#[serde(rename_all = "kebab-case")]
 pub struct EventServicePushImageRequestPath {
     /// UUID of the event to add an image to.
-    pub id: EventId,
+    pub event_id: EventId,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
+#[serde(rename_all = "kebab-case")]
 pub struct EventServiceReorderImageRequestPath {
     /// UUID of the event to reorder images for.
-    pub id: EventId,
+    pub event_id: EventId,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
@@ -99,7 +101,7 @@ pub struct EventServiceFindRequestPath {
 
 #[derive(Debug, Deserialize, JsonSchema)]
 #[serde(rename_all = "kebab-case")]
-pub struct EventServiceFindImageRequest {
+pub struct EventServiceFindImageRequestPath {
     /// UUID of the event image to retrieve.
     pub image_id: EventImageId,
 }
