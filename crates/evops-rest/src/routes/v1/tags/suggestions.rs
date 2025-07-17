@@ -8,7 +8,7 @@ use evops_models::ApiResult;
 
 use crate::AppState;
 use crate::error::AddResponse as _;
-use crate::types::{TagServiceGetTagsByDescriptionRequest, TagServiceGetTagsByDescriptionResponse};
+use crate::types::{TagServiceSuggestRequest, TagServiceSuggestResponse};
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::TagService.into())
@@ -22,7 +22,7 @@ pub fn router() -> ApiRouter<AppState> {
 }
 
 fn post_docs(o: TransformOperation) -> TransformOperation {
-    o.summary("evops.api.v1.TagService.GetTagsByDescription")
+    o.summary("evops.api.v1.TagService.Suggest")
         .description("Get relevant tag IDs for an event description.")
         .response_bad_request()
         .response_unprocessable_entity()
@@ -30,11 +30,11 @@ fn post_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn post(
     State(state): State<AppState>,
-    Json(request): Json<TagServiceGetTagsByDescriptionRequest>,
-) -> ApiResult<Json<TagServiceGetTagsByDescriptionResponse>> {
+    Json(request): Json<TagServiceSuggestRequest>,
+) -> ApiResult<Json<TagServiceSuggestResponse>> {
     let description: evops_models::EventDescription = request.description.try_into()?;
     let tags_ids = state.get_tags_by_description(description).await?;
-    let response_data = TagServiceGetTagsByDescriptionResponse {
+    let response_data = TagServiceSuggestResponse {
         tag_ids: tags_ids.into_iter().map(Into::into).collect(),
     };
     Ok(Json(response_data))

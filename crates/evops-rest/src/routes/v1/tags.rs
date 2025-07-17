@@ -15,7 +15,7 @@ use crate::types::{
 };
 
 mod _tag_id;
-mod by_description;
+mod suggestions;
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::TagService.into())
@@ -28,7 +28,7 @@ pub fn router() -> ApiRouter<AppState> {
             self::route_docs,
         )
         .nest("/{tag-id}", self::_tag_id::router())
-        .nest("/by-description", self::by_description::router())
+        .nest("/suggestions", self::suggestions::router())
 }
 
 fn get_docs(o: TransformOperation) -> TransformOperation {

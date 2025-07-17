@@ -178,13 +178,13 @@ pub struct TagServiceCreateResponse {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct TagServiceGetTagsByDescriptionRequest {
+pub struct TagServiceSuggestRequest {
     /// Description to predict tags for.
     pub description: EventDescription,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
-pub struct TagServiceGetTagsByDescriptionResponse {
+pub struct TagServiceSuggestResponse {
     /// A list of predicted tag IDs for a description.
     pub tag_ids: Vec<TagId>,
 }
