@@ -39,6 +39,7 @@ impl crate::AppState {
     }
 
     pub async fn delete_event(&self, id: EventId) -> ApiResult<()> {
+        // TODO: delete from MINIO
         let mut db = self.shared_state.db.lock().await;
         db.delete_event(id).await
     }

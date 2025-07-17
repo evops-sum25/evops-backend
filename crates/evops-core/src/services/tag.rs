@@ -1,4 +1,4 @@
-use evops_models::{ApiResult, EventDescription, NewTagForm, PgLimit, Tag, TagId, UpdateEventForm};
+use evops_models::{ApiResult, EventDescription, NewTagForm, PgLimit, Tag, TagId};
 
 impl crate::AppState {
     pub async fn list_tags(
