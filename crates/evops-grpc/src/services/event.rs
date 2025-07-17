@@ -226,6 +226,8 @@ impl EventService for self::Service {
         &self,
         request: Request<EventServiceDeleteImageRequest>,
     ) -> Result<Response<EventServiceDeleteImageResponse>, Status> {
+        let request_data = request.into_inner();
+
         todo!();
     }
 }
