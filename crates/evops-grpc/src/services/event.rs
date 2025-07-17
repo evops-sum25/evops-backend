@@ -103,7 +103,18 @@ impl EventService for self::Service {
         &self,
         request: Request<EventServiceUpdateRequest>,
     ) -> Result<Response<EventServiceUpdateResponse>, Status> {
-        todo!();
+        let request_data = request.into_inner();
+
+        let event_id = evops_models::EventId::new({
+            request_data
+                .event_id
+                .parse::<Uuid>()
+                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+        });
+        let form = request_data.form.unwrap_or_default().try_into()?;
+        self.state.update_event(event_id, form).await?;
+
+        Ok(Response::new(EventServiceUpdateResponse {}))
     }
 
     async fn delete(
@@ -227,6 +238,13 @@ impl EventService for self::Service {
         request: Request<EventServiceDeleteImageRequest>,
     ) -> Result<Response<EventServiceDeleteImageResponse>, Status> {
         let request_data = request.into_inner();
+
+        let image_id = evops_models::EventImageId::new({
+            request_data
+                .image_id
+                .parse::<Uuid>()
+                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+        });
 
         todo!();
     }

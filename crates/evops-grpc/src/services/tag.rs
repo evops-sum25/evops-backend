@@ -95,7 +95,17 @@ impl TagService for self::Service {
         &self,
         request: Request<TagServiceDeleteRequest>,
     ) -> Result<Response<TagServiceDeleteResponse>, Status> {
-        todo!();
+        let request_data = request.into_inner();
+
+        let tag_id = evops_models::TagId::new({
+            request_data
+                .tag_id
+                .parse::<Uuid>()
+                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+        });
+        self.state.delete_tag(tag_id).await?;
+
+        Ok(Response::new(TagServiceDeleteResponse {}))
     }
 
     async fn suggest(
