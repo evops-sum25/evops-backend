@@ -9,7 +9,7 @@ use evops_models::ApiResult;
 use crate::AppState;
 use crate::error::AddResponse as _;
 use crate::types::{
-    EventServiceDeleteRequest, EventServiceFindRequest, EventServiceFindResponse,
+    EventServiceDeleteRequestPath, EventServiceFindRequestPath, EventServiceFindResponse,
     EventServiceUpdateRequest, EventServiceUpdateRequestPath,
 };
 
@@ -42,10 +42,10 @@ fn get_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn get(
     State(state): State<AppState>,
-    Path(request): Path<EventServiceFindRequest>,
+    Path(path): Path<EventServiceFindRequestPath>,
 ) -> ApiResult<Json<EventServiceFindResponse>> {
-    let request = request.event_id.into();
-    let found_event = state.find_event(request).await?;
+    let event_id = path.event_id.into();
+    let found_event = state.find_event(event_id).await?;
 
     let response_data = EventServiceFindResponse {
         event: found_event.into(),
@@ -63,9 +63,9 @@ fn delete_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn delete(
     State(state): State<AppState>,
-    Path(request): Path<EventServiceDeleteRequest>,
+    Path(path): Path<EventServiceDeleteRequestPath>,
 ) -> ApiResult<()> {
-    let request: evops_models::EventId = request.event_id.into();
+    let request: evops_models::EventId = path.event_id.into();
     tracing::debug!("delete request received for {}", request);
     state.delete_event(request).await
 }

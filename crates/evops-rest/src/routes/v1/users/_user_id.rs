@@ -8,7 +8,7 @@ use evops_models::ApiResult;
 
 use crate::AppState;
 use crate::error::AddResponse as _;
-use crate::types::{UserServiceFindRequest, UserServiceFindResponse};
+use crate::types::{UserServiceFindRequestPath, UserServiceFindResponse};
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::UserService.into())
@@ -27,9 +27,9 @@ fn get_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn get(
     State(state): State<AppState>,
-    Path(request): Path<UserServiceFindRequest>,
+    Path(path): Path<UserServiceFindRequestPath>,
 ) -> ApiResult<Json<UserServiceFindResponse>> {
-    let request = request.id.into();
+    let request = path.user_id.into();
     let found_user = state.find_user(request).await?;
 
     let response_data = UserServiceFindResponse {

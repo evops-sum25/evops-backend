@@ -41,7 +41,7 @@ async fn get(
     State(state): State<AppState>,
     Path(path): Path<EventServiceFindImageRequest>,
 ) -> ApiResult<PostResponse> {
-    let id = path.id.into();
+    let id = path.image_id.into();
     let image_stream = state.stream_event_image(id).await?;
 
     let response_stream = FileStream::new(image_stream);

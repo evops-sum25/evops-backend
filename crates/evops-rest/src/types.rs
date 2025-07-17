@@ -10,7 +10,7 @@ mod conversions;
 
 #[derive(Debug, Deserialize, JsonSchema)]
 #[serde(rename_all = "kebab-case")]
-pub struct TagServiceDeleteRequest {
+pub struct TagServiceDeleteRequestPath {
     pub tag_id: TagId,
 }
 
@@ -20,8 +20,9 @@ pub struct EventServiceReorderImagesRequest {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
+#[serde(rename_all = "kebab-case")]
 pub struct EventServiceDeleteImageRequest {
-    pub id: EventImageId,
+    pub image_id: EventImageId,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
@@ -51,7 +52,7 @@ pub struct EventServiceUpdateRequestPath {
 
 #[derive(Debug, Deserialize, JsonSchema)]
 #[serde(rename_all = "kebab-case")]
-pub struct EventServiceDeleteRequest {
+pub struct EventServiceDeleteRequestPath {
     /// UUID of the event to be deleted.
     pub event_id: EventId,
 }
@@ -91,15 +92,16 @@ pub struct EventServiceReorderImageRequestPath {
 
 #[derive(Debug, Deserialize, JsonSchema)]
 #[serde(rename_all = "kebab-case")]
-pub struct EventServiceFindRequest {
+pub struct EventServiceFindRequestPath {
     /// UUID of the event to retrieve.
     pub event_id: EventId,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
+#[serde(rename_all = "kebab-case")]
 pub struct EventServiceFindImageRequest {
     /// UUID of the event image to retrieve.
-    pub id: EventImageId,
+    pub image_id: EventImageId,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
@@ -135,9 +137,10 @@ pub struct EventServiceCreateResponse {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct TagServiceFindRequest {
+#[serde(rename_all = "kebab-case")]
+pub struct TagServiceFindRequestPath {
     /// UUID of the tag to retrieve.
-    pub id: TagId,
+    pub tag_id: TagId,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
@@ -185,9 +188,10 @@ pub struct TagServiceGetTagsByDescriptionResponse {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct UserServiceFindRequest {
+#[serde(rename_all = "kebab-case")]
+pub struct UserServiceFindRequestPath {
     /// UUID of the user to retrieve.
-    pub id: UserId,
+    pub user_id: UserId,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
