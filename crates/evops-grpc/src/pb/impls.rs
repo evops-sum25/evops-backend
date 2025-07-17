@@ -2,12 +2,72 @@ use std::time::SystemTime;
 
 use uuid::Uuid;
 
-use evops_models::ApiError;
+use evops_models::{ApiError, ApiResult};
 
-impl TryFrom<crate::pb::NewEventForm> for evops_models::NewEventForm {
+use crate::pb::{
+    Event, NewEventForm, NewLanguageForm, NewTagForm, NewUserForm, Tag, UpdateEventForm, User,
+};
+
+impl TryFrom<NewLanguageForm> for evops_models::NewLanguageForm {
     type Error = ApiError;
 
-    fn try_from(value: crate::pb::NewEventForm) -> Result<Self, Self::Error> {
+    fn try_from(value: NewLanguageForm) -> Result<Self, Self::Error> {
+        Ok(Self {
+            name: {
+                evops_models::LanguageName::try_new(value.name)
+                    .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+            },
+        })
+    }
+}
+
+impl TryFrom<UpdateEventForm> for evops_models::UpdateEventForm {
+    type Error = ApiError;
+
+    fn try_from(value: UpdateEventForm) -> Result<Self, Self::Error> {
+        Ok(Self {
+            title: match value.title {
+                Some(title) => Some({
+                    evops_models::EventTitle::try_new(title)
+                        .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+                }),
+                None => None,
+            },
+            description: match value.description {
+                Some(description) => Some({
+                    evops_models::EventDescription::try_new(description)
+                        .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+                }),
+                None => None,
+            },
+            tag_ids: match value.tag_ids {
+                Some(tag_ids) => Some(
+                    evops_models::EventTagIds::try_new({
+                        tag_ids
+                            .replace_with
+                            .into_iter()
+                            .map(|tag_id| {
+                                ApiResult::Ok(evops_models::TagId::new({
+                                    tag_id
+                                        .parse::<Uuid>()
+                                        .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+                                }))
+                            })
+                            .collect::<Result<_, _>>()?
+                    })
+                    .map_err(|e| ApiError::InvalidArgument(e.to_string()))?,
+                ),
+                None => None,
+            },
+            track_attendance: value.track_attendance,
+        })
+    }
+}
+
+impl TryFrom<NewEventForm> for evops_models::NewEventForm {
+    type Error = ApiError;
+
+    fn try_from(value: NewEventForm) -> Result<Self, Self::Error> {
         Ok(Self {
             author_id: evops_models::UserId::new({
                 value
@@ -44,7 +104,7 @@ impl TryFrom<crate::pb::NewEventForm> for evops_models::NewEventForm {
     }
 }
 
-impl From<evops_models::Event> for crate::pb::Event {
+impl From<evops_models::Event> for Event {
     fn from(value: evops_models::Event) -> Self {
         Self {
             id: value.id.to_string(),
@@ -74,10 +134,10 @@ impl From<evops_models::Event> for crate::pb::Event {
     }
 }
 
-impl TryFrom<crate::pb::NewTagForm> for evops_models::NewTagForm {
+impl TryFrom<NewTagForm> for evops_models::NewTagForm {
     type Error = ApiError;
 
-    fn try_from(value: crate::pb::NewTagForm) -> Result<Self, Self::Error> {
+    fn try_from(value: NewTagForm) -> Result<Self, Self::Error> {
         Ok(Self {
             name: {
                 evops_models::TagName::try_new(value.name)
@@ -102,7 +162,7 @@ impl TryFrom<crate::pb::NewTagForm> for evops_models::NewTagForm {
     }
 }
 
-impl From<evops_models::Tag> for crate::pb::Tag {
+impl From<evops_models::Tag> for Tag {
     fn from(value: evops_models::Tag) -> Self {
         Self {
             id: value.id.to_string(),
@@ -119,10 +179,10 @@ impl From<evops_models::Tag> for crate::pb::Tag {
     }
 }
 
-impl TryFrom<crate::pb::NewUserForm> for evops_models::NewUserForm {
+impl TryFrom<NewUserForm> for evops_models::NewUserForm {
     type Error = ApiError;
 
-    fn try_from(value: crate::pb::NewUserForm) -> Result<Self, Self::Error> {
+    fn try_from(value: NewUserForm) -> Result<Self, Self::Error> {
         Ok(Self {
             name: {
                 evops_models::UserName::try_new(value.name)
@@ -132,7 +192,7 @@ impl TryFrom<crate::pb::NewUserForm> for evops_models::NewUserForm {
     }
 }
 
-impl From<evops_models::User> for crate::pb::User {
+impl From<evops_models::User> for User {
     fn from(value: evops_models::User) -> Self {
         Self {
             id: value.id.to_string(),

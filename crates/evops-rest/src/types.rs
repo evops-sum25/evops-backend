@@ -6,118 +6,202 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-mod conversions;
+mod impls;
 
 #[derive(Debug, Deserialize, JsonSchema)]
+#[serde(rename_all = "kebab-case")]
+pub struct TagServiceDeleteRequestPath {
+    pub tag_id: TagId,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct EventServiceReorderImagesRequest {
+    pub image_ids: EventImageIds,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+#[serde(rename_all = "kebab-case")]
+pub struct EventServiceDeleteImageRequestPath {
+    pub _image_id: EventImageId,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct EventServiceUpdateRequest {
+    /// Data for updating an event.
+    pub form: UpdateEventForm,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct UpdateEventForm {
+    /// Event title.
+    title: Option<EventTitle>,
+    /// Detailed description.
+    description: Option<EventDescription>,
+    /// UUIDs of associated tags.
+    tag_ids: Option<EventTagIds>,
+    /// Whether to enable attendance tracking.
+    track_attendance: Option<bool>,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+#[serde(rename_all = "kebab-case")]
+pub struct EventServiceUpdateRequestPath {
+    /// UUID of the event to be updated.
+    pub event_id: EventId,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+#[serde(rename_all = "kebab-case")]
+pub struct EventServiceDeleteRequestPath {
+    /// UUID of the event to be deleted.
+    pub event_id: EventId,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct LanguageServiceAddRequest {
+    pub form: NewLanguageForm,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct NewLanguageForm {
+    name: LanguageName,
+}
+
+#[derive(Debug, Serialize, JsonSchema)]
+pub struct LanguageServiceAddResponse {
+    pub language_id: LanguageId,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct LanguageId(Uuid);
+
+#[derive(Debug, Deserialize, JsonSchema)]
+pub struct LanguageName(String);
+
+#[derive(Debug, Deserialize, JsonSchema)]
+#[serde(rename_all = "kebab-case")]
 pub struct EventServicePushImageRequestPath {
     /// UUID of the event to add an image to.
-    pub id: crate::types::EventId,
+    pub event_id: EventId,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct EventServiceFindRequest {
+#[serde(rename_all = "kebab-case")]
+pub struct EventServiceReorderImageRequestPath {
+    /// UUID of the event to reorder images for.
+    pub event_id: EventId,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+#[serde(rename_all = "kebab-case")]
+pub struct EventServiceFindRequestPath {
     /// UUID of the event to retrieve.
-    pub id: crate::types::EventId,
+    pub event_id: EventId,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct EventServiceFindImageRequest {
+#[serde(rename_all = "kebab-case")]
+pub struct EventServiceFindImageRequestPath {
     /// UUID of the event image to retrieve.
-    pub id: crate::types::EventImageId,
+    pub image_id: EventImageId,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
 pub struct EventServiceFindResponse {
     /// Retrieved event object.
-    pub event: crate::types::Event,
+    pub event: Event,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct EventServiceListRequest {
+#[serde(rename_all = "kebab-case")]
+pub struct EventServiceListRequestQuery {
     /// UUID of last listed event.
-    pub last_id: Option<crate::types::EventId>,
+    pub last_id: Option<EventId>,
     /// Size of one batch of events.
-    pub limit: Option<crate::types::PgLimit>,
+    pub limit: Option<PgLimit>,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
 pub struct EventServiceListResponse {
     /// List of all events.
-    pub events: Vec<crate::types::Event>,
+    pub events: Vec<Event>,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct EventServiceCreateRequest {
     /// Data for creating a new event.
-    pub form: crate::types::NewEventForm,
+    pub form: NewEventForm,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
 pub struct EventServiceCreateResponse {
     /// ID of the created event.
-    pub event_id: crate::types::EventId,
+    pub event_id: EventId,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct TagServiceFindRequest {
+#[serde(rename_all = "kebab-case")]
+pub struct TagServiceFindRequestPath {
     /// UUID of the tag to retrieve.
-    pub id: crate::types::TagId,
+    pub tag_id: TagId,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
 pub struct TagServiceFindResponse {
     /// Retrieved tag object.
-    pub tag: crate::types::Tag,
+    pub tag: Tag,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct TagServiceListRequest {
+#[serde(rename_all = "kebab-case")]
+pub struct TagServiceListRequestQuery {
     /// UUID of last listed event.
-    pub last_id: Option<crate::types::TagId>,
+    pub last_id: Option<TagId>,
     /// Size of one batch of events.
-    pub limit: Option<crate::types::PgLimit>,
+    pub limit: Option<PgLimit>,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
 pub struct TagServiceListResponse {
     /// List of all tags.
-    pub tags: Vec<crate::types::Tag>,
+    pub tags: Vec<Tag>,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct TagServiceCreateRequest {
     /// Data for creating a new tag.
-    pub form: crate::types::NewTagForm,
+    pub form: NewTagForm,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
 pub struct TagServiceCreateResponse {
     /// ID of the created tag.
-    pub tag_id: crate::types::TagId,
+    pub tag_id: TagId,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct TagServiceGetTagsByDescriptionRequest {
+pub struct TagServiceSuggestRequest {
     /// Description to predict tags for.
-    pub description: crate::types::EventDescription,
+    pub description: EventDescription,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
-pub struct TagServiceGetTagsByDescriptionResponse {
+pub struct TagServiceSuggestResponse {
     /// A list of predicted tag IDs for a description.
-    pub tag_ids: Vec<crate::types::TagId>,
+    pub tag_ids: Vec<TagId>,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct UserServiceFindRequest {
+#[serde(rename_all = "kebab-case")]
+pub struct UserServiceFindRequestPath {
     /// UUID of the user to retrieve.
-    pub id: crate::types::UserId,
+    pub user_id: UserId,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
 pub struct UserServiceFindResponse {
     /// Retrieved user object.
-    pub user: crate::types::User,
+    pub user: User,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
@@ -126,34 +210,32 @@ pub struct UserServiceListRequest;
 #[derive(Debug, Serialize, JsonSchema)]
 pub struct UserServiceListResponse {
     /// List of all users.
-    pub users: Vec<crate::types::User>,
+    pub users: Vec<User>,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct UserServiceCreateRequest {
     /// Data for creating a new user.
-    pub form: crate::types::NewUserForm,
+    pub form: NewUserForm,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
 pub struct UserServiceCreateResponse {
     /// ID of the created user.
-    pub user_id: crate::types::UserId,
+    pub user_id: UserId,
 }
 
 #[derive(Debug, Default, Deserialize, JsonSchema)]
-pub struct EventTagIds(
-    #[schemars(length(max = evops_models::EVENT_MAX_TAGS))] Vec<crate::types::TagId>,
-);
+pub struct EventTagIds(#[schemars(length(max = evops_models::EVENT_MAX_TAGS))] Vec<TagId>);
 
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct NewEventForm {
     /// UUID of the creating user.
-    author_id: crate::types::UserId,
+    author_id: UserId,
     /// Event title.
-    title: crate::types::EventTitle,
+    title: EventTitle,
     /// Detailed description.
-    description: crate::types::EventDescription,
+    description: EventDescription,
     /// UUIDs of associated tags.
     tag_ids: Option<EventTagIds>,
     /// Whether to enable attendance tracking.
@@ -161,14 +243,14 @@ pub struct NewEventForm {
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
-struct EventTags(#[schemars(length(max = evops_models::EVENT_MAX_TAGS))] Vec<crate::types::Tag>);
+struct EventTags(#[schemars(length(max = evops_models::EVENT_MAX_TAGS))] Vec<Tag>);
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct EventImageId(Uuid);
 
-#[derive(Debug, Serialize, JsonSchema)]
-struct EventImageIds(
-    #[schemars(length(max = evops_models::EVENT_MAX_IMAGES))] Vec<crate::types::EventImageId>,
+#[derive(Debug, Deserialize, Serialize, JsonSchema)]
+pub struct EventImageIds(
+    #[schemars(length(max = evops_models::EVENT_MAX_IMAGES))] Vec<EventImageId>,
 );
 
 #[derive(Debug, TryFromMultipart, JsonSchema)]
@@ -178,23 +260,23 @@ pub struct EventServicePushImageRequestMultipart {
 
 #[derive(Debug, Serialize, JsonSchema)]
 pub struct EventServicePushImageResponse {
-    pub image_id: crate::types::EventImageId,
+    pub image_id: EventImageId,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
 pub struct Event {
     /// Event UUID.
-    id: crate::types::EventId,
+    id: EventId,
     /// User who created the event.
-    author: crate::types::User,
+    author: User,
     /// UUIDs of event images.
-    image_ids: crate::types::EventImageIds,
+    image_ids: EventImageIds,
     /// Event title.
-    title: crate::types::EventTitle,
+    title: EventTitle,
     /// Detailed description.
-    description: crate::types::EventDescription,
+    description: EventDescription,
     /// Associated tags.
-    tags: crate::types::EventTags,
+    tags: EventTags,
     /// Whether attendance tracking is enabled.
     with_attendance: bool,
     /// Creation timestamp.
@@ -204,16 +286,14 @@ pub struct Event {
 }
 
 #[derive(Debug, Default, Serialize, Deserialize, JsonSchema)]
-struct TagAliases(
-    #[schemars(length(max = evops_models::TAG_MAX_ALIASES))] Vec<crate::types::TagAlias>,
-);
+struct TagAliases(#[schemars(length(max = evops_models::TAG_MAX_ALIASES))] Vec<TagAlias>);
 
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct NewTagForm {
     /// Unique name.
-    name: crate::types::TagName,
+    name: TagName,
     /// Alternative names.
-    aliases: Option<crate::types::TagAliases>,
+    aliases: Option<TagAliases>,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
@@ -221,23 +301,23 @@ pub struct Tag {
     /// Tag UUID.
     id: TagId,
     /// Unique name (e.g., `"Music"`, `"Tech"`).
-    name: crate::types::TagName,
+    name: TagName,
     /// Alternative names (e.g., `["Concert", "Gig"]` for `"Music"`).
-    aliases: crate::types::TagAliases,
+    aliases: TagAliases,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct NewUserForm {
     /// Display name.
-    name: crate::types::UserName,
+    name: UserName,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
 pub struct User {
     /// User UUID.
-    id: crate::types::UserId,
+    id: UserId,
     /// Display name.
-    name: crate::types::UserName,
+    name: UserName,
 }
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]

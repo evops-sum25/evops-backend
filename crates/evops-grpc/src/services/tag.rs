@@ -5,9 +5,9 @@ use evops_models::{ApiError, EventDescription};
 
 use crate::pb::tag_service_server::{TagService, TagServiceServer};
 use crate::pb::{
-    TagServiceCreateRequest, TagServiceCreateResponse, TagServiceFindRequest,
-    TagServiceFindResponse, TagServiceGetTagsByDescriptionRequest,
-    TagServiceGetTagsByDescriptionResponse, TagServiceListRequest, TagServiceListResponse,
+    TagServiceCreateRequest, TagServiceCreateResponse, TagServiceDeleteRequest,
+    TagServiceDeleteResponse, TagServiceFindRequest, TagServiceFindResponse, TagServiceListRequest,
+    TagServiceListResponse, TagServiceSuggestRequest, TagServiceSuggestResponse,
 };
 
 pub fn server(state: crate::AppState) -> TagServiceServer<self::Service> {
@@ -20,26 +20,6 @@ pub struct Service {
 
 #[tonic::async_trait]
 impl TagService for self::Service {
-    async fn find(
-        &self,
-        request: Request<TagServiceFindRequest>,
-    ) -> Result<Response<TagServiceFindResponse>, Status> {
-        let request_data = request.into_inner();
-
-        let id = evops_models::TagId::new({
-            request_data
-                .id
-                .parse::<Uuid>()
-                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
-        });
-        let found_tag = self.state.find_tag(id).await?;
-
-        let response_data = TagServiceFindResponse {
-            tag: Some(found_tag.into()),
-        };
-        Ok(Response::new(response_data))
-    }
-
     async fn list(
         &self,
         request: Request<TagServiceListRequest>,
@@ -91,21 +71,60 @@ impl TagService for self::Service {
         Ok(Response::new(response_data))
     }
 
-    async fn get_tags_by_description(
+    async fn find(
         &self,
-        request: Request<TagServiceGetTagsByDescriptionRequest>,
-    ) -> Result<Response<TagServiceGetTagsByDescriptionResponse>, Status> {
+        request: Request<TagServiceFindRequest>,
+    ) -> Result<Response<TagServiceFindResponse>, Status> {
+        let request_data = request.into_inner();
+
+        let id = evops_models::TagId::new({
+            request_data
+                .id
+                .parse::<Uuid>()
+                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+        });
+        let found_tag = self.state.find_tag(id).await?;
+
+        let response_data = TagServiceFindResponse {
+            tag: Some(found_tag.into()),
+        };
+        Ok(Response::new(response_data))
+    }
+
+    async fn delete(
+        &self,
+        request: Request<TagServiceDeleteRequest>,
+    ) -> Result<Response<TagServiceDeleteResponse>, Status> {
+        let request_data = request.into_inner();
+
+        let tag_id = evops_models::TagId::new({
+            request_data
+                .tag_id
+                .parse::<Uuid>()
+                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+        });
+        self.state.delete_tag(tag_id).await?;
+
+        Ok(Response::new(TagServiceDeleteResponse {}))
+    }
+
+    async fn suggest(
+        &self,
+        request: Request<TagServiceSuggestRequest>,
+    ) -> Result<Response<TagServiceSuggestResponse>, Status> {
         let request_data = request.into_inner();
         let description = {
             EventDescription::try_new(request_data.description)
                 .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
         };
         let tag_ids = self.state.get_tags_by_description(description).await?;
-        let response_data = TagServiceGetTagsByDescriptionResponse {
-            tag_ids: tag_ids
-                .into_iter()
-                .map(|tag_id| tag_id.to_string())
-                .collect(),
+        let response_data = TagServiceSuggestResponse {
+            tag_ids: {
+                tag_ids
+                    .into_iter()
+                    .map(|tag_id| tag_id.to_string())
+                    .collect()
+            },
         };
         Ok(Response::new(response_data))
     }

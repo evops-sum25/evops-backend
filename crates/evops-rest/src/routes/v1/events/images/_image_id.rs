@@ -16,13 +16,17 @@ use evops_models::ApiResult;
 
 use crate::AppState;
 use crate::error::AddResponse as _;
-use crate::types::EventServiceFindImageRequest;
+use crate::types::{EventServiceDeleteImageRequestPath, EventServiceFindImageRequestPath};
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::EventService.into())
 }
 pub fn router() -> ApiRouter<AppState> {
-    ApiRouter::new().api_route_with("/", get_with(self::get, self::get_docs), self::route_docs)
+    ApiRouter::new().api_route_with(
+        "/",
+        get_with(self::get, self::get_docs).delete_with(self::delete, self::delete_docs),
+        self::route_docs,
+    )
 }
 
 fn get_docs(o: TransformOperation) -> TransformOperation {
@@ -35,13 +39,26 @@ fn get_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn get(
     State(state): State<AppState>,
-    Path(path): Path<EventServiceFindImageRequest>,
+    Path(path): Path<EventServiceFindImageRequestPath>,
 ) -> ApiResult<PostResponse> {
-    let id = path.id.into();
+    let id = path.image_id.into();
     let image_stream = state.stream_event_image(id).await?;
 
     let response_stream = FileStream::new(image_stream);
     Ok(PostResponse(response_stream))
+}
+
+fn delete_docs(mut o: TransformOperation) -> TransformOperation {
+    o.inner_mut().deprecated = true;
+    o.summary("evops.api.v1.EventService.DeleteImage")
+        .description("Deletes an event image by ID. If there are images to the right, they are shifted one position back.")
+        .response_bad_request()
+        .response_not_found()
+        .response_unprocessable_entity()
+        .response_internal_server_error()
+}
+async fn delete(Path(_path): Path<EventServiceDeleteImageRequestPath>) -> ApiResult<()> {
+    todo!();
 }
 
 const POST_MIME_TYPE: &str = "image/webp";

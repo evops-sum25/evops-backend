@@ -52,4 +52,13 @@ impl crate::Storage {
         };
         Ok(stream)
     }
+
+    pub async fn delete_event_image(&self, id: evops_models::EventImageId) -> ApiResult<()> {
+        self.client
+            .delete_object(Self::BUCKET_EVENT_IMAGES, Self::event_image_filename(id))
+            .send()
+            .await
+            .map_err(|e| ApiError::Storage(e.to_string()))?;
+        Ok(())
+    }
 }

@@ -10,11 +10,11 @@ use evops_models::{ApiError, ApiResult};
 use crate::AppState;
 use crate::error::AddResponse as _;
 use crate::types::{
-    EventServiceCreateRequest, EventServiceCreateResponse, EventServiceListRequest,
+    EventServiceCreateRequest, EventServiceCreateResponse, EventServiceListRequestQuery,
     EventServiceListResponse,
 };
 
-mod _id;
+mod _event_id;
 mod images;
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
@@ -27,7 +27,7 @@ pub fn router() -> ApiRouter<AppState> {
             get_with(self::get, self::get_docs).post_with(self::post, self::post_docs),
             self::route_docs,
         )
-        .nest("/{id}", self::_id::router())
+        .nest("/{event-id}", self::_event_id::router())
         .nest("/images", self::images::router())
 }
 
@@ -37,13 +37,12 @@ fn get_docs(o: TransformOperation) -> TransformOperation {
         .response_bad_request()
         .response_internal_server_error()
 }
-
 async fn get(
     State(state): State<AppState>,
-    Query(request): Query<EventServiceListRequest>,
+    Query(query): Query<EventServiceListRequestQuery>,
 ) -> ApiResult<Json<EventServiceListResponse>> {
-    let last_id = request.last_id.map(Into::into);
-    let limit = match request.limit {
+    let last_id = query.last_id.map(Into::into);
+    let limit = match query.limit {
         Some(lim) => Some({
             lim.try_conv::<evops_models::PgLimit>()
                 .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
@@ -65,7 +64,6 @@ fn post_docs(o: TransformOperation) -> TransformOperation {
         .response_unprocessable_entity()
         .response_internal_server_error()
 }
-
 async fn post(
     State(state): State<AppState>,
     Json(request): Json<EventServiceCreateRequest>,

@@ -1,6 +1,6 @@
 #![allow(clippy::all, clippy::pedantic, clippy::nursery)]
 
-mod conversions;
+mod impls;
 
 tonic::include_proto!("evops.api.v1");
 
