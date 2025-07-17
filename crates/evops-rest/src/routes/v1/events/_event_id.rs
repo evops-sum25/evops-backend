@@ -84,5 +84,6 @@ async fn put(
     Json(request): Json<EventServiceUpdateRequest>,
 ) -> ApiResult<()> {
     let form = request.form.try_into()?;
-    state.update_event(todo!(), form).await
+    let id = path.event_id.into();
+    state.update_event(id, form).await
 }

@@ -46,7 +46,7 @@ impl crate::AppState {
 
     pub async fn update_event(&self, id: EventId, form: UpdateEventForm) -> ApiResult<()> {
         let mut db = self.shared_state.db.lock().await;
-        db.update_event(form).await
+        db.update_event(id, form).await
     }
 
     pub async fn push_event_image(
