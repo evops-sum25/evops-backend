@@ -131,7 +131,17 @@ impl EventService for self::Service {
         &self,
         request: Request<EventServiceDeleteRequest>,
     ) -> Result<Response<EventServiceDeleteResponse>, Status> {
-        todo!();
+        let request_data = request.into_inner();
+
+        let event_id = evops_models::EventId::new({
+            request_data
+                .event_id
+                .parse::<Uuid>()
+                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+        });
+        self.state.delete_event(event_id).await?;
+
+        Ok(Response::new(EventServiceDeleteResponse {}))
     }
 
     async fn reorder_images(
