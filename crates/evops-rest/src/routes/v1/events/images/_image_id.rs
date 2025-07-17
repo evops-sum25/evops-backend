@@ -16,7 +16,7 @@ use evops_models::ApiResult;
 
 use crate::AppState;
 use crate::error::AddResponse as _;
-use crate::types::{EventServiceDeleteImageRequest, EventServiceFindImageRequest};
+use crate::types::{EventServiceDeleteImageRequestPath, EventServiceFindImageRequestPath};
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::EventService.into())
@@ -39,9 +39,9 @@ fn get_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn get(
     State(state): State<AppState>,
-    Path(path): Path<EventServiceFindImageRequest>,
+    Path(path): Path<EventServiceFindImageRequestPath>,
 ) -> ApiResult<PostResponse> {
-    let id = path.id.into();
+    let id = path.image_id.into();
     let image_stream = state.stream_event_image(id).await?;
 
     let response_stream = FileStream::new(image_stream);
@@ -57,7 +57,7 @@ fn delete_docs(mut o: TransformOperation) -> TransformOperation {
         .response_unprocessable_entity()
         .response_internal_server_error()
 }
-async fn delete(Path(_path): Path<EventServiceDeleteImageRequest>) -> ApiResult<()> {
+async fn delete(Path(path): Path<EventServiceDeleteImageRequestPath>) -> ApiResult<()> {
     todo!();
 }
 

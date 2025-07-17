@@ -52,4 +52,8 @@ impl crate::Storage {
         };
         Ok(stream)
     }
+
+    pub async fn delete_event_image(&self, id: evops_models::EventImageId) -> ApiResult<()> {
+        todo!();
+    }
 }

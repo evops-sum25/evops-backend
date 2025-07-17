@@ -4,7 +4,7 @@ use tokio_stream::wrappers::ReceiverStream;
 use tonic::{Request, Response, Status, Streaming};
 use uuid::Uuid;
 
-use evops_models::ApiError;
+use evops_models::{ApiError, ApiResult};
 
 use crate::AppState;
 use crate::pb::event_service_server::{EventService, EventServiceServer};
@@ -103,21 +103,78 @@ impl EventService for self::Service {
         &self,
         request: Request<EventServiceUpdateRequest>,
     ) -> Result<Response<EventServiceUpdateResponse>, Status> {
-        todo!();
+        let request_data = request.into_inner();
+
+        let event_id = evops_models::EventId::new({
+            request_data
+                .event_id
+                .parse::<Uuid>()
+                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+        });
+        let form = {
+            request_data
+                .form
+                .ok_or_else(|| {
+                    ApiError::InvalidArgument({
+                        let err_msg = "EventServiceUpdateRequest.form must not be null.";
+                        err_msg.to_owned()
+                    })
+                })?
+                .try_into()?
+        };
+        self.state.update_event(event_id, form).await?;
+
+        Ok(Response::new(EventServiceUpdateResponse {}))
     }
 
     async fn delete(
         &self,
         request: Request<EventServiceDeleteRequest>,
     ) -> Result<Response<EventServiceDeleteResponse>, Status> {
-        todo!();
+        let request_data = request.into_inner();
+
+        let event_id = evops_models::EventId::new({
+            request_data
+                .event_id
+                .parse::<Uuid>()
+                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+        });
+        self.state.delete_event(event_id).await?;
+
+        Ok(Response::new(EventServiceDeleteResponse {}))
     }
 
     async fn reorder_images(
         &self,
         request: Request<EventServiceReorderImagesRequest>,
     ) -> Result<Response<EventServiceReorderImagesResponse>, Status> {
-        todo!();
+        let request_data = request.into_inner();
+
+        let event_id = evops_models::EventId::new({
+            request_data
+                .event_id
+                .parse::<Uuid>()
+                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+        });
+        let image_order = {
+            evops_models::EventImageIds::try_new({
+                request_data
+                    .image_ids
+                    .into_iter()
+                    .map(|image_id| {
+                        ApiResult::Ok(evops_models::EventImageId::new({
+                            image_id
+                                .parse::<Uuid>()
+                                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+                        }))
+                    })
+                    .collect::<Result<_, _>>()?
+            })
+            .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+        };
+        self.state.reorder_images(event_id, image_order).await?;
+
+        Ok(Response::new(EventServiceReorderImagesResponse {}))
     }
 
     async fn push_image(
@@ -226,6 +283,15 @@ impl EventService for self::Service {
         &self,
         request: Request<EventServiceDeleteImageRequest>,
     ) -> Result<Response<EventServiceDeleteImageResponse>, Status> {
+        let request_data = request.into_inner();
+
+        let image_id = evops_models::EventImageId::new({
+            request_data
+                .image_id
+                .parse::<Uuid>()
+                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+        });
+
         todo!();
     }
 }

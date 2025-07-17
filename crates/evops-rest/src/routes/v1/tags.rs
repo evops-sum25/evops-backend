@@ -10,12 +10,12 @@ use evops_models::{ApiError, ApiResult};
 use crate::AppState;
 use crate::error::AddResponse as _;
 use crate::types::{
-    TagServiceCreateRequest, TagServiceCreateResponse, TagServiceListRequest,
+    TagServiceCreateRequest, TagServiceCreateResponse, TagServiceListRequestQuery,
     TagServiceListResponse,
 };
 
-mod _id;
-mod by_description;
+mod _tag_id;
+mod suggestions;
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::TagService.into())
@@ -27,8 +27,8 @@ pub fn router() -> ApiRouter<AppState> {
             get_with(self::get, self::get_docs).post_with(self::post, self::post_docs),
             self::route_docs,
         )
-        .nest("/{id}", self::_id::router())
-        .nest("/by-description", self::by_description::router())
+        .nest("/{tag-id}", self::_tag_id::router())
+        .nest("/suggestions", self::suggestions::router())
 }
 
 fn get_docs(o: TransformOperation) -> TransformOperation {
@@ -39,26 +39,12 @@ fn get_docs(o: TransformOperation) -> TransformOperation {
         .response_internal_server_error()
 }
 
-#[derive(schemars::JsonSchema, serde::Deserialize)]
-#[serde(rename_all = "kebab-case")]
-enum Order {
-    Name,
-    Time,
-}
-
-#[derive(schemars::JsonSchema, serde::Deserialize)]
-#[serde(rename_all = "kebab-case")]
-struct GetQuery {
-    order: Option<Order>,
-}
-
 async fn get(
     State(state): State<AppState>,
-    Query(request): Query<TagServiceListRequest>,
-    Query(query): Query<GetQuery>,
+    Query(query): Query<TagServiceListRequestQuery>,
 ) -> ApiResult<Json<TagServiceListResponse>> {
-    let last_id = request.last_id.map(Into::into);
-    let limit = match request.limit {
+    let last_id = query.last_id.map(Into::into);
+    let limit = match query.limit {
         Some(lim) => Some({
             lim.try_conv::<evops_models::PgLimit>()
                 .map_err(|e| ApiError::InvalidArgument(e.to_string()))?

@@ -65,7 +65,7 @@ impl crate::AppState {
         Ok(image_id)
     }
 
-    pub async fn reorder_image(
+    pub async fn reorder_images(
         &self,
         event_id: EventId,
         image_order: EventImageIds,
@@ -81,5 +81,9 @@ impl crate::AppState {
         let storage = &self.shared_state.storage;
         let image_stream = storage.stream_event_image(id).await?;
         Ok(image_stream)
+    }
+
+    pub async fn delete_image(&self, id: EventImageId) -> ApiResult<()> {
+        todo!()
     }
 }

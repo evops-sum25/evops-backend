@@ -2,6 +2,7 @@ use aide::axum::ApiRouter;
 use aide::axum::routing::post_with;
 use aide::transform::{TransformOperation, TransformPathItem};
 use axum::Json;
+use axum::extract::State;
 
 use evops_models::ApiResult;
 
@@ -20,8 +21,7 @@ pub fn router() -> ApiRouter<AppState> {
     )
 }
 
-fn post_docs(mut o: TransformOperation) -> TransformOperation {
-    o.inner_mut().deprecated = true;
+fn post_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.LanguageService.Add")
         .description("Adds a new language to the system.")
         .response_bad_request()
@@ -30,7 +30,14 @@ fn post_docs(mut o: TransformOperation) -> TransformOperation {
         .response_internal_server_error()
 }
 async fn post(
-    Json(_request): Json<LanguageServiceAddRequest>,
+    State(state): State<AppState>,
+    Json(request): Json<LanguageServiceAddRequest>,
 ) -> ApiResult<Json<LanguageServiceAddResponse>> {
-    todo!();
+    let form = request.form.try_into()?;
+    let new_language_id = state.add_language(form).await?;
+
+    let response_data = LanguageServiceAddResponse {
+        language_id: new_language_id.into(),
+    };
+    Ok(Json(response_data))
 }

@@ -41,7 +41,7 @@ async fn post(
     Path(path): Path<EventServicePushImageRequestPath>,
     AideMultipart(TypedMultipart(multipart)): AideMultipart<EventServicePushImageRequestMultipart>,
 ) -> ApiResult<Json<EventServicePushImageResponse>> {
-    let event_id = path.id.into();
+    let event_id = path.event_id.into();
     let image = multipart.image.0.contents.try_into()?;
     let image_id = state.push_event_image(event_id, image).await?;
 
@@ -65,7 +65,7 @@ async fn put(
     Path(path): Path<EventServiceReorderImageRequestPath>,
     Json(request): Json<EventServiceReorderImagesRequest>,
 ) -> ApiResult<()> {
-    let event_id = path.id.into();
+    let event_id = path.event_id.into();
     let image_order = request.image_ids.into();
-    state.reorder_image(event_id, image_order).await
+    state.reorder_images(event_id, image_order).await
 }

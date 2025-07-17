@@ -2,7 +2,65 @@ use std::time::SystemTime;
 
 use uuid::Uuid;
 
-use evops_models::ApiError;
+use evops_models::{ApiError, ApiResult};
+
+use crate::pb::{NewLanguageForm, UpdateEventForm};
+
+impl TryFrom<NewLanguageForm> for evops_models::NewLanguageForm {
+    type Error = ApiError;
+
+    fn try_from(value: NewLanguageForm) -> Result<Self, Self::Error> {
+        Ok(Self {
+            name: {
+                evops_models::LanguageName::try_new(value.name)
+                    .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+            },
+        })
+    }
+}
+
+impl TryFrom<UpdateEventForm> for evops_models::UpdateEventForm {
+    type Error = ApiError;
+
+    fn try_from(value: UpdateEventForm) -> Result<Self, Self::Error> {
+        Ok(Self {
+            title: match value.title {
+                Some(title) => Some({
+                    evops_models::EventTitle::try_new(title)
+                        .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+                }),
+                None => None,
+            },
+            description: match value.description {
+                Some(description) => Some({
+                    evops_models::EventDescription::try_new(description)
+                        .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+                }),
+                None => None,
+            },
+            tag_ids: match value.tag_ids {
+                Some(tag_ids) => Some(
+                    evops_models::EventTagIds::try_new({
+                        tag_ids
+                            .replace_with
+                            .into_iter()
+                            .map(|tag_id| {
+                                ApiResult::Ok(evops_models::TagId::new({
+                                    tag_id
+                                        .parse::<Uuid>()
+                                        .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+                                }))
+                            })
+                            .collect::<Result<_, _>>()?
+                    })
+                    .map_err(|e| ApiError::InvalidArgument(e.to_string()))?,
+                ),
+                None => None,
+            },
+            track_attendance: value.track_attendance,
+        })
+    }
+}
 
 impl TryFrom<crate::pb::NewEventForm> for evops_models::NewEventForm {
     type Error = ApiError;

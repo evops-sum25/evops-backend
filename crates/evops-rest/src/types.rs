@@ -10,19 +10,8 @@ mod conversions;
 
 #[derive(Debug, Deserialize, JsonSchema)]
 #[serde(rename_all = "kebab-case")]
-pub struct TagServiceDeleteRequest {
+pub struct TagServiceDeleteRequestPath {
     pub tag_id: TagId,
-}
-
-#[derive(Debug, Deserialize, JsonSchema)]
-pub struct TagServiceUpdateRequest {
-    pub form: UpdateTagForm,
-}
-
-#[derive(Debug, Deserialize, JsonSchema)]
-pub struct UpdateTagForm {
-    name: Option<TagName>,
-    aliases: Option<TagAliases>,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
@@ -31,8 +20,9 @@ pub struct EventServiceReorderImagesRequest {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct EventServiceDeleteImageRequest {
-    pub id: EventImageId,
+#[serde(rename_all = "kebab-case")]
+pub struct EventServiceDeleteImageRequestPath {
+    pub image_id: EventImageId,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
@@ -62,7 +52,7 @@ pub struct EventServiceUpdateRequestPath {
 
 #[derive(Debug, Deserialize, JsonSchema)]
 #[serde(rename_all = "kebab-case")]
-pub struct EventServiceDeleteRequest {
+pub struct EventServiceDeleteRequestPath {
     /// UUID of the event to be deleted.
     pub event_id: EventId,
 }
@@ -89,28 +79,31 @@ pub struct LanguageId(Uuid);
 pub struct LanguageName(String);
 
 #[derive(Debug, Deserialize, JsonSchema)]
+#[serde(rename_all = "kebab-case")]
 pub struct EventServicePushImageRequestPath {
     /// UUID of the event to add an image to.
-    pub id: EventId,
-}
-
-#[derive(Debug, Deserialize, JsonSchema)]
-pub struct EventServiceReorderImageRequestPath {
-    /// UUID of the event to reorder images for.
-    pub id: EventId,
+    pub event_id: EventId,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
 #[serde(rename_all = "kebab-case")]
-pub struct EventServiceFindRequest {
+pub struct EventServiceReorderImageRequestPath {
+    /// UUID of the event to reorder images for.
+    pub event_id: EventId,
+}
+
+#[derive(Debug, Deserialize, JsonSchema)]
+#[serde(rename_all = "kebab-case")]
+pub struct EventServiceFindRequestPath {
     /// UUID of the event to retrieve.
     pub event_id: EventId,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct EventServiceFindImageRequest {
+#[serde(rename_all = "kebab-case")]
+pub struct EventServiceFindImageRequestPath {
     /// UUID of the event image to retrieve.
-    pub id: EventImageId,
+    pub image_id: EventImageId,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
@@ -120,7 +113,8 @@ pub struct EventServiceFindResponse {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct EventServiceListRequest {
+#[serde(rename_all = "kebab-case")]
+pub struct EventServiceListRequestQuery {
     /// UUID of last listed event.
     pub last_id: Option<EventId>,
     /// Size of one batch of events.
@@ -146,9 +140,10 @@ pub struct EventServiceCreateResponse {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct TagServiceFindRequest {
+#[serde(rename_all = "kebab-case")]
+pub struct TagServiceFindRequestPath {
     /// UUID of the tag to retrieve.
-    pub id: TagId,
+    pub tag_id: TagId,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
@@ -158,7 +153,8 @@ pub struct TagServiceFindResponse {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct TagServiceListRequest {
+#[serde(rename_all = "kebab-case")]
+pub struct TagServiceListRequestQuery {
     /// UUID of last listed event.
     pub last_id: Option<TagId>,
     /// Size of one batch of events.
@@ -184,21 +180,22 @@ pub struct TagServiceCreateResponse {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct TagServiceGetTagsByDescriptionRequest {
+pub struct TagServiceSuggestRequest {
     /// Description to predict tags for.
     pub description: EventDescription,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
-pub struct TagServiceGetTagsByDescriptionResponse {
+pub struct TagServiceSuggestResponse {
     /// A list of predicted tag IDs for a description.
     pub tag_ids: Vec<TagId>,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct UserServiceFindRequest {
+#[serde(rename_all = "kebab-case")]
+pub struct UserServiceFindRequestPath {
     /// UUID of the user to retrieve.
-    pub id: UserId,
+    pub user_id: UserId,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]

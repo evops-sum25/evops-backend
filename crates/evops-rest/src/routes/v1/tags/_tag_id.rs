@@ -9,7 +9,7 @@ use evops_models::ApiResult;
 use crate::AppState;
 use crate::error::AddResponse as _;
 use crate::types::{
-    TagServiceDeleteRequest, TagServiceFindRequest, TagServiceFindResponse, TagServiceUpdateRequest,
+    TagServiceDeleteRequestPath, TagServiceFindRequestPath, TagServiceFindResponse,
 };
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
@@ -18,7 +18,7 @@ fn route_docs(r: TransformPathItem) -> TransformPathItem {
 pub fn router() -> ApiRouter<AppState> {
     ApiRouter::new().api_route_with(
         "/",
-        { get_with(self::get, self::get_docs).delete_with(self::delete, self::delete_docs) },
+        get_with(self::get, self::get_docs).delete_with(self::delete, self::delete_docs),
         self::route_docs,
     )
 }
@@ -33,10 +33,10 @@ fn get_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn get(
     State(state): State<AppState>,
-    Path(path): Path<TagServiceFindRequest>,
+    Path(path): Path<TagServiceFindRequestPath>,
 ) -> ApiResult<Json<TagServiceFindResponse>> {
-    let request = path.id.into();
-    let found_tag = state.find_tag(request).await?;
+    let tag_id = path.tag_id.into();
+    let found_tag = state.find_tag(tag_id).await?;
 
     let response_data = TagServiceFindResponse {
         tag: found_tag.into(),
@@ -54,8 +54,8 @@ fn delete_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn delete(
     State(state): State<AppState>,
-    Path(request): Path<TagServiceDeleteRequest>,
+    Path(path): Path<TagServiceDeleteRequestPath>,
 ) -> ApiResult<()> {
-    let id = request.tag_id.into();
+    let id = path.tag_id.into();
     state.delete_tag(id).await
 }
