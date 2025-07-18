@@ -1,5 +1,7 @@
 use chrono::Utc;
-use evops_models::{ApiResult, JwtClaims, NewUserForm, User, UserId};
+use evops_models::{
+    ApiError, ApiResult, JwtClaims, JwtTokenInfo, JwtTokenType, NewUserForm, User, UserId,
+};
 use uuid::Uuid;
 
 impl crate::AppState {
@@ -28,17 +30,26 @@ impl crate::AppState {
         Ok(user)
     }
 
-    pub async fn signup_user(&self, form: NewUserForm) -> ApiResult<()> {
-        let a = jsonwebtoken::encode(
-            &jsonwebtoken::Header::default(),
-            &JwtClaims {
-                sub: UserId::new(Uuid::now_v7()),
-                exp: Utc::now(),
-            },
-            &jsonwebtoken::EncodingKey::from_secret(&self.shared_state.jwt_secret),
-        );
-        form.login;
+    pub async fn signup_user(&self, form: NewUserForm) -> ApiResult<JwtTokenInfo> {
+        let user_id = UserId::new(Uuid::now_v7());
 
-        todo!();
+        let token = {
+            jsonwebtoken::encode(
+                &jsonwebtoken::Header::default(),
+                &JwtClaims {
+                    sub: user_id,
+                    exp: Utc::now(),
+                },
+                &jsonwebtoken::EncodingKey::from_secret(&self.shared_state.jwt_secret),
+            )
+            .map_err(|e| ApiError::Other(e.to_string()))?
+        };
+
+        let token_info = JwtTokenInfo {
+            token,
+            token_type: JwtTokenType::Bearer,
+        };
+
+        Ok(token_info)
     }
 }
