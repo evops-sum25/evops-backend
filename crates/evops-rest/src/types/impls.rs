@@ -38,9 +38,7 @@ impl TryFrom<NewEventForm> for evops_models::NewEventForm {
         Ok(Self {
             title: value.title.try_into()?,
             description: value.description.try_into()?,
-            author_id: value.author_id.into(),
             tag_ids: value.tag_ids.unwrap_or_default().try_into()?,
-            with_attendance: value.with_attendance,
         })
     }
 }
@@ -53,7 +51,6 @@ impl TryFrom<UpdateEventForm> for evops_models::UpdateEventForm {
             title: value.title.map(TryInto::try_into).transpose()?,
             description: value.description.map(TryInto::try_into).transpose()?,
             tag_ids: value.tag_ids.map(TryInto::try_into).transpose()?,
-            track_attendance: value.track_attendance,
         })
     }
 }
@@ -118,7 +115,6 @@ impl From<evops_models::Event> for Event {
             author: value.author.into(),
             image_ids: value.image_ids.into(),
             tags: value.tags.into(),
-            with_attendance: value.with_attendance,
             created_at: value.created_at,
             modified_at: value.modified_at,
         }

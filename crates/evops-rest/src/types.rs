@@ -199,16 +199,12 @@ pub struct EventTagIds(#[schemars(length(max = evops_models::EVENT_MAX_TAGS))] V
 
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct NewEventForm {
-    /// UUID of the creating user.
-    author_id: UserId,
     /// Event title.
     title: EventTitle,
     /// Detailed description.
     description: EventDescription,
     /// UUIDs of associated tags.
     tag_ids: Option<EventTagIds>,
-    /// Whether to enable attendance tracking.
-    with_attendance: bool,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
@@ -246,8 +242,6 @@ pub struct Event {
     description: EventDescription,
     /// Associated tags.
     tags: EventTags,
-    /// Whether attendance tracking is enabled.
-    with_attendance: bool,
     /// Creation timestamp.
     created_at: DateTime<Utc>,
     /// Last modification timestamp.

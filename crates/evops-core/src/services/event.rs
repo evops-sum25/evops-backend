@@ -23,9 +23,11 @@ impl crate::AppState {
     }
 
     pub async fn create_event(&self, form: NewEventForm, auth: JwtClaims) -> ApiResult<EventId> {
+        todo!("jwt auth");
+        let author_id = auth.sub;
         let event_id = {
             let mut db = self.shared_state.db.lock().await;
-            db.create_event(form).await
+            db.create_event(form, author_id).await
         }?;
         Ok(event_id)
     }
