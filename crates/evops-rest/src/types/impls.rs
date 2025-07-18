@@ -171,9 +171,15 @@ impl TryFrom<NewUserForm> for evops_models::NewUserForm {
     type Error = ApiError;
 
     fn try_from(value: NewUserForm) -> Result<Self, Self::Error> {
+        let login: evops_models::UserLogin = value.login.try_into()?;
         Ok(Self {
-            login: value.login.try_into()?,
-            display_name: value.display_name.try_into()?,
+            display_name: match value.display_name {
+                Some(display_name) => display_name.try_into()?,
+                None => unsafe {
+                    evops_models::UserDisplayName::new_unchecked(login.as_ref().to_owned())
+                },
+            },
+            login,
         })
     }
 }

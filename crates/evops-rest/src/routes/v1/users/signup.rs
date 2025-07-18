@@ -9,7 +9,7 @@ use evops_models::ApiResult;
 
 use crate::AppState;
 use crate::error::AddResponse as _;
-use crate::types::UserServiceAuthRequest;
+use crate::types::UserServiceSignUpRequest;
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::UserService.into())
@@ -23,13 +23,13 @@ pub fn router() -> ApiRouter<AppState> {
 }
 
 fn post_docs(o: TransformOperation) -> TransformOperation {
-    o.summary("...")
+    o.summary("evops.api.v1.UserService.SignUp")
         .description("...")
         .response_bad_request()
         .response_internal_server_error()
 }
 async fn post(
-    Json(credentials): Json<UserServiceAuthRequest>,
+    Json(request): Json<UserServiceSignUpRequest>,
 ) -> ApiResult<Json<self::PostResponse>> {
     todo!();
 }

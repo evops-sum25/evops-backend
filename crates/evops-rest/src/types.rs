@@ -213,18 +213,6 @@ pub struct UserServiceListResponse {
     pub users: Vec<User>,
 }
 
-#[derive(Debug, Deserialize, JsonSchema)]
-pub struct UserServiceCreateRequest {
-    /// Data for creating a new user.
-    pub form: NewUserForm,
-}
-
-#[derive(Debug, Serialize, JsonSchema)]
-pub struct UserServiceCreateResponse {
-    /// ID of the created user.
-    pub user_id: UserId,
-}
-
 #[derive(Debug, Default, Deserialize, JsonSchema)]
 pub struct EventTagIds(#[schemars(length(max = evops_models::EVENT_MAX_TAGS))] Vec<TagId>);
 
@@ -306,12 +294,13 @@ pub struct Tag {
     aliases: TagAliases,
 }
 
-#[derive(Debug, Deserialize, JsonSchema)]
+#[derive(Deserialize, JsonSchema)]
 pub struct NewUserForm {
     /// Case-insensitively unique login.
     login: UserLogin,
     /// Display name.
-    display_name: UserDisplayName,
+    display_name: Option<UserDisplayName>,
+    password: UserPassword,
 }
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
@@ -334,8 +323,13 @@ pub struct User {
 }
 
 #[derive(Deserialize, JsonSchema)]
-pub struct UserServiceAuthRequest {
+pub struct UserServiceLogInRequest {
     pub credentials: UserCredentials,
+}
+
+#[derive(Deserialize, JsonSchema)]
+pub struct UserServiceSignUpRequest {
+    pub form: NewUserForm,
 }
 
 #[derive(Deserialize, JsonSchema)]
