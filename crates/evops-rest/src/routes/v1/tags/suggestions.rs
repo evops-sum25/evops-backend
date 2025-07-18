@@ -6,9 +6,9 @@ use axum::extract::State;
 
 use evops_models::ApiResult;
 
-use crate::AppState;
 use crate::error::AddResponse as _;
 use crate::types::{TagServiceSuggestRequest, TagServiceSuggestResponse};
+use crate::{AppState, Auth};
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::TagService.into())
@@ -25,10 +25,12 @@ fn post_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.TagService.Suggest")
         .description("Get relevant tag IDs for an event description.")
         .response_bad_request()
+        .response_unauthorized()
         .response_unprocessable_entity()
         .response_internal_server_error()
 }
 async fn post(
+    _: Auth,
     State(state): State<AppState>,
     Json(request): Json<TagServiceSuggestRequest>,
 ) -> ApiResult<Json<TagServiceSuggestResponse>> {

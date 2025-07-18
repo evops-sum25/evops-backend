@@ -45,7 +45,7 @@ const DEFAULT_SECURITY_REQUIREMENT: &str = "EvOps JWT";
     // input_with = "TypedHeader<Authorization<Bearer>>",
     input,
 )]
-struct Auth(evops_models::JwtClaims);
+struct Auth(evops_models::UserId);
 
 impl FromRequestParts<AppState> for self::Auth {
     type Rejection = ApiError;

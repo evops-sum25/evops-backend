@@ -62,15 +62,15 @@ async fn get(
 fn post_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.TagService.Create")
         .description("Creates a new tag.")
-        .security_requirement(DEFAULT_SECURITY_REQUIREMENT)
         .response_bad_request()
+        .response_unauthorized()
         .response_conflict()
         .response_unprocessable_entity()
         .response_internal_server_error()
 }
 async fn post(
     State(state): State<AppState>,
-    Auth(claims): Auth,
+    Auth(user_id): Auth,
     Json(request): Json<TagServiceCreateRequest>,
 ) -> ApiResult<Json<TagServiceCreateResponse>> {
     let form = request.form.try_into()?;

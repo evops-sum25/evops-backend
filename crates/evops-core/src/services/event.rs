@@ -5,7 +5,7 @@ use futures::Stream;
 
 use evops_models::{
     ApiResult, Event, EventId, EventImage, EventImageId, EventImageIds, JwtClaims, NewEventForm,
-    PgLimit, UpdateEventForm,
+    PgLimit, UpdateEventForm, UserId,
 };
 use uuid::Uuid;
 
@@ -22,9 +22,7 @@ impl crate::AppState {
         Ok(events)
     }
 
-    pub async fn create_event(&self, form: NewEventForm, auth: JwtClaims) -> ApiResult<EventId> {
-        todo!("jwt auth");
-        let author_id = auth.sub;
+    pub async fn create_event(&self, form: NewEventForm, author_id: UserId) -> ApiResult<EventId> {
         let event_id = {
             let mut db = self.shared_state.db.lock().await;
             db.create_event(form, author_id).await
@@ -53,6 +51,7 @@ impl crate::AppState {
 
     pub async fn push_event_image(
         &self,
+        user_id: UserId,
         event_id: EventId,
         image: EventImage,
     ) -> ApiResult<EventImageId> {

@@ -10,7 +10,7 @@ use crate::error::AddResponse as _;
 use crate::types::{
     TagServiceDeleteRequestPath, TagServiceFindRequestPath, TagServiceFindResponse,
 };
-use crate::{AppState, Auth, DEFAULT_SECURITY_REQUIREMENT};
+use crate::{AppState, Auth};
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::TagService.into())
@@ -47,8 +47,9 @@ async fn get(
 fn delete_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.TagService.Delete")
         .description("Deletes a tag by ID.")
-        .security_requirement(DEFAULT_SECURITY_REQUIREMENT)
         .response_bad_request()
+        .response_unauthorized()
+        .response_forbidden()
         .response_not_found()
         .response_unprocessable_entity()
         .response_internal_server_error()

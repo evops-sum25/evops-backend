@@ -233,7 +233,10 @@ impl EventService for self::Service {
             evops_models::EventImage::try_from(buffer)?
         };
 
-        let image_id = self.state.push_event_image(event_id, image).await?;
+        let image_id = self
+            .state
+            .push_event_image(todo!(), event_id, image)
+            .await?;
         let response_data = EventServicePushImageResponse {
             image_id: image_id.to_string(),
         };

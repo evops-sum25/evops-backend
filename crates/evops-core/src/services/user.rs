@@ -54,16 +54,20 @@ impl crate::AppState {
         todo!()
     }
 
-    pub fn decode_jwt(&self, token: &JsonWebToken) -> ApiResult<JwtClaims> {
+    pub fn decode_jwt(&self, token: &JsonWebToken) -> ApiResult<UserId> {
         let token_data = {
             jsonwebtoken::decode::<JwtClaims>(
                 token.as_ref(),
                 &jsonwebtoken::DecodingKey::from_secret(&self.shared_state.jwt_access_secret),
                 &jsonwebtoken::Validation::default(),
             )
-            .map_err(|e| ApiError::Other(e.to_string()))?
+            .map_err(|e| ApiError::Auth(e.to_string()))?
         };
-        Ok(token_data.claims)
+        let claims = token_data.claims;
+        if claims.exp < Utc::now() {
+            return Err(ApiError::Auth("JWT access token expired.".to_owned()));
+        }
+        Ok(claims.sub)
     }
 }
 
@@ -77,7 +81,6 @@ fn generate_jwt(
         &jsonwebtoken::Header::default(),
         &JwtClaims {
             sub: user_id,
-            iat: now,
             exp: now + exp,
         },
         &jsonwebtoken::EncodingKey::from_secret(secret),

@@ -11,7 +11,7 @@ use crate::types::{
     EventServiceDeleteRequestPath, EventServiceFindRequestPath, EventServiceFindResponse,
     EventServiceUpdateRequest, EventServiceUpdateRequestPath,
 };
-use crate::{AppState, Auth, DEFAULT_SECURITY_REQUIREMENT};
+use crate::{AppState, Auth};
 
 mod images;
 
@@ -56,8 +56,9 @@ async fn get(
 fn delete_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.EventService.Delete")
         .description("Deletes an event by ID.")
-        .security_requirement(DEFAULT_SECURITY_REQUIREMENT)
         .response_bad_request()
+        .response_unauthorized()
+        .response_forbidden()
         .response_not_found()
         .response_unprocessable_entity()
         .response_internal_server_error()
@@ -75,8 +76,9 @@ async fn delete(
 fn put_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.EventService.Update")
         .description("Updates an event by ID.")
-        .security_requirement(DEFAULT_SECURITY_REQUIREMENT)
         .response_bad_request()
+        .response_unauthorized()
+        .response_forbidden()
         .response_not_found()
         .response_unprocessable_entity()
         .response_internal_server_error()
