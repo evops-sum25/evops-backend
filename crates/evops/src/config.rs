@@ -3,6 +3,7 @@ use eyre::Context as _;
 use url::Url;
 
 const SERVER_PORT: &str = "SERVER_PORT";
+const JWT_SECRET: &str = "JWT_SECRET";
 const DATABASE_URL: &str = "DATABASE_URL";
 const MINIO_URL: &str = "MINIO_URL";
 const MINIO_ROOT_USER: &str = "MINIO_ROOT_USER";
@@ -11,6 +12,7 @@ const ML_SERVER_URL: &str = "ML_SERVER_URL";
 
 pub struct Config {
     pub port: u16,
+    jwt_secret: String,
     pub database_url: Url,
     pub storage_url: Url,
     pub storage_username: String,
@@ -24,6 +26,7 @@ pub fn from_env() -> eyre::Result<self::Config> {
         raw.parse::<u16>()
             .wrap_err(formatcp!("variable {SERVER_PORT} is malformed"))?
     };
+    let jwt_secret = std::env::var(JWT_SECRET).wrap_err(JWT_SECRET)?;
     let database_url = {
         let raw = std::env::var(DATABASE_URL).wrap_err(DATABASE_URL)?;
         raw.parse::<Url>()
@@ -44,6 +47,7 @@ pub fn from_env() -> eyre::Result<self::Config> {
 
     Ok(self::Config {
         port,
+        jwt_secret,
         database_url,
         storage_url,
         storage_username,
