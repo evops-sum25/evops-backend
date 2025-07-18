@@ -115,7 +115,7 @@ pub struct EventServiceFindResponse {
 #[derive(Debug, Deserialize, JsonSchema)]
 #[serde(rename_all = "kebab-case")]
 pub struct EventServiceListRequestQuery {
-    /// UUID of last listed event.
+    /// UUID of the last listed event.
     pub last_id: Option<EventId>,
     /// Size of one batch of events.
     pub limit: Option<PgLimit>,
@@ -155,7 +155,7 @@ pub struct TagServiceFindResponse {
 #[derive(Debug, Deserialize, JsonSchema)]
 #[serde(rename_all = "kebab-case")]
 pub struct TagServiceListRequestQuery {
-    /// UUID of last listed event.
+    /// UUID of the last listed tag.
     pub last_id: Option<TagId>,
     /// Size of one batch of events.
     pub limit: Option<PgLimit>,
