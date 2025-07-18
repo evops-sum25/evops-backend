@@ -12,7 +12,7 @@ use crate::types::{
     TagServiceCreateRequest, TagServiceCreateResponse, TagServiceListRequestQuery,
     TagServiceListResponse,
 };
-use crate::{AppState, Auth, DEFAULT_SECURITY_REQUIREMENT};
+use crate::{AppState, Auth};
 
 mod _tag_id;
 mod suggestions;
@@ -74,7 +74,7 @@ async fn post(
     Json(request): Json<TagServiceCreateRequest>,
 ) -> ApiResult<Json<TagServiceCreateResponse>> {
     let form = request.form.try_into()?;
-    let tag_id = state.create_tag(form).await?;
+    let tag_id = state.create_tag(form, user_id).await?;
 
     let response_data = TagServiceCreateResponse {
         tag_id: tag_id.into(),

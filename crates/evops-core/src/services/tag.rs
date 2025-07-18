@@ -1,4 +1,4 @@
-use evops_models::{ApiResult, EventDescription, NewTagForm, PgLimit, Tag, TagId};
+use evops_models::{ApiResult, EventDescription, NewTagForm, PgLimit, Tag, TagId, UserId};
 
 impl crate::AppState {
     pub async fn list_tags(
@@ -13,7 +13,7 @@ impl crate::AppState {
         Ok(tags)
     }
 
-    pub async fn create_tag(&self, request: NewTagForm) -> ApiResult<TagId> {
+    pub async fn create_tag(&self, request: NewTagForm, user_id: UserId) -> ApiResult<TagId> {
         let tag_id = {
             let mut db = self.shared_state.db.lock().await;
             db.create_tag(request).await
@@ -40,7 +40,7 @@ impl crate::AppState {
         Ok(tags)
     }
 
-    pub async fn delete_tag(&self, id: TagId) -> ApiResult<()> {
+    pub async fn delete_tag(&self, id: TagId, user_id: UserId) -> ApiResult<()> {
         let mut db = self.shared_state.db.lock().await;
         db.delete_tag(id).await
     }

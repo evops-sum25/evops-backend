@@ -14,7 +14,7 @@ use crate::types::{
     EventServicePushImageResponse, EventServiceReorderImageRequestPath,
     EventServiceReorderImagesRequest,
 };
-use crate::{AppState, Auth, DEFAULT_SECURITY_REQUIREMENT};
+use crate::{AppState, Auth};
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::EventService.into())

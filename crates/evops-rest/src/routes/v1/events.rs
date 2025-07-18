@@ -12,7 +12,7 @@ use crate::types::{
     EventServiceCreateRequest, EventServiceCreateResponse, EventServiceListRequestQuery,
     EventServiceListResponse,
 };
-use crate::{AppState, Auth, DEFAULT_SECURITY_REQUIREMENT};
+use crate::{AppState, Auth};
 
 mod _event_id;
 mod images;

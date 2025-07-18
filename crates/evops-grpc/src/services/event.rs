@@ -122,7 +122,7 @@ impl EventService for self::Service {
                 })?
                 .try_into()?
         };
-        self.state.update_event(event_id, form).await?;
+        self.state.update_event(event_id, todo!(), form).await?;
 
         Ok(Response::new(EventServiceUpdateResponse {}))
     }
@@ -139,7 +139,7 @@ impl EventService for self::Service {
                 .parse::<Uuid>()
                 .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
         });
-        self.state.delete_event(event_id).await?;
+        self.state.delete_event(event_id, todo!()).await?;
 
         Ok(Response::new(EventServiceDeleteResponse {}))
     }

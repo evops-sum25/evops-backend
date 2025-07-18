@@ -65,12 +65,11 @@ fn delete_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn delete(
     State(state): State<AppState>,
-    Auth(claims): Auth,
+    Auth(user_id): Auth,
     Path(path): Path<EventServiceDeleteRequestPath>,
 ) -> ApiResult<()> {
     let request: evops_models::EventId = path.event_id.into();
-    tracing::debug!("delete request received for {}", request);
-    state.delete_event(request).await
+    state.delete_event(request, user_id).await
 }
 
 fn put_docs(o: TransformOperation) -> TransformOperation {
@@ -85,11 +84,11 @@ fn put_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn put(
     State(state): State<AppState>,
-    Auth(claims): Auth,
+    Auth(user_id): Auth,
     Path(path): Path<EventServiceUpdateRequestPath>,
     Json(request): Json<EventServiceUpdateRequest>,
 ) -> ApiResult<()> {
     let form = request.form.try_into()?;
-    let id = path.event_id.into();
-    state.update_event(id, form).await
+    let event_id = path.event_id.into();
+    state.update_event(event_id, user_id, form).await
 }

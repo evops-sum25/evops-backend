@@ -56,9 +56,9 @@ fn delete_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn delete(
     State(state): State<AppState>,
-    Auth(claims): Auth,
+    Auth(user_id): Auth,
     Path(path): Path<TagServiceDeleteRequestPath>,
 ) -> ApiResult<()> {
     let id = path.tag_id.into();
-    state.delete_tag(id).await
+    state.delete_tag(id, user_id).await
 }

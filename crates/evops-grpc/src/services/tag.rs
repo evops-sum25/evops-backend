@@ -63,7 +63,7 @@ impl TagService for self::Service {
                 })?
                 .try_into()?
         };
-        let tag_id = self.state.create_tag(form).await?;
+        let tag_id = self.state.create_tag(form, todo!()).await?;
 
         let response_data = TagServiceCreateResponse {
             tag_id: tag_id.to_string(),
@@ -103,7 +103,7 @@ impl TagService for self::Service {
                 .parse::<Uuid>()
                 .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
         });
-        self.state.delete_tag(tag_id).await?;
+        self.state.delete_tag(tag_id, todo!()).await?;
 
         Ok(Response::new(TagServiceDeleteResponse {}))
     }

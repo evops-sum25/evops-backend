@@ -4,8 +4,8 @@ use bytes::Bytes;
 use futures::Stream;
 
 use evops_models::{
-    ApiResult, Event, EventId, EventImage, EventImageId, EventImageIds, JwtClaims, NewEventForm,
-    PgLimit, UpdateEventForm, UserId,
+    ApiResult, Event, EventId, EventImage, EventImageId, EventImageIds, NewEventForm, PgLimit,
+    UpdateEventForm, UserId,
 };
 use uuid::Uuid;
 
@@ -30,23 +30,28 @@ impl crate::AppState {
         Ok(event_id)
     }
 
-    pub async fn find_event(&self, id: EventId) -> ApiResult<Event> {
+    pub async fn find_event(&self, event_id: EventId) -> ApiResult<Event> {
         let event = {
             let mut db = self.shared_state.db.lock().await;
-            db.find_event(id).await
+            db.find_event(event_id).await
         }?;
         Ok(event)
     }
 
-    pub async fn delete_event(&self, id: EventId) -> ApiResult<()> {
+    pub async fn delete_event(&self, event_id: EventId, user_id: UserId) -> ApiResult<()> {
         // TODO: delete from MINIO
         let mut db = self.shared_state.db.lock().await;
-        db.delete_event(id).await
+        db.delete_event(event_id).await
     }
 
-    pub async fn update_event(&self, id: EventId, form: UpdateEventForm) -> ApiResult<()> {
+    pub async fn update_event(
+        &self,
+        event_id: EventId,
+        user_id: UserId,
+        form: UpdateEventForm,
+    ) -> ApiResult<()> {
         let mut db = self.shared_state.db.lock().await;
-        db.update_event(id, form).await
+        db.update_event(event_id, form).await
     }
 
     pub async fn push_event_image(
