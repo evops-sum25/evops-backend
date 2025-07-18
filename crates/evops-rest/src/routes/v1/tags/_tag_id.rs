@@ -10,7 +10,7 @@ use crate::error::AddResponse as _;
 use crate::types::{
     TagServiceDeleteRequestPath, TagServiceFindRequestPath, TagServiceFindResponse,
 };
-use crate::{AppState, DEFAULT_SECURITY_REQUIREMENT};
+use crate::{AppState, Auth, DEFAULT_SECURITY_REQUIREMENT};
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::TagService.into())
@@ -55,6 +55,7 @@ fn delete_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn delete(
     State(state): State<AppState>,
+    Auth(claims): Auth,
     Path(path): Path<TagServiceDeleteRequestPath>,
 ) -> ApiResult<()> {
     let id = path.tag_id.into();

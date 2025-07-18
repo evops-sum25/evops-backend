@@ -14,7 +14,7 @@ use crate::types::{
     EventServicePushImageResponse, EventServiceReorderImageRequestPath,
     EventServiceReorderImagesRequest,
 };
-use crate::{AppState, DEFAULT_SECURITY_REQUIREMENT};
+use crate::{AppState, Auth, DEFAULT_SECURITY_REQUIREMENT};
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::EventService.into())
@@ -39,6 +39,7 @@ fn post_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn post(
     State(state): State<AppState>,
+    Auth(claims): Auth,
     Path(path): Path<EventServicePushImageRequestPath>,
     AideMultipart(TypedMultipart(multipart)): AideMultipart<EventServicePushImageRequestMultipart>,
 ) -> ApiResult<Json<EventServicePushImageResponse>> {

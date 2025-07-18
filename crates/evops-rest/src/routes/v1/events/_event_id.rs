@@ -11,7 +11,7 @@ use crate::types::{
     EventServiceDeleteRequestPath, EventServiceFindRequestPath, EventServiceFindResponse,
     EventServiceUpdateRequest, EventServiceUpdateRequestPath,
 };
-use crate::{AppState, DEFAULT_SECURITY_REQUIREMENT};
+use crate::{AppState, Auth, DEFAULT_SECURITY_REQUIREMENT};
 
 mod images;
 
@@ -64,6 +64,7 @@ fn delete_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn delete(
     State(state): State<AppState>,
+    Auth(claims): Auth,
     Path(path): Path<EventServiceDeleteRequestPath>,
 ) -> ApiResult<()> {
     let request: evops_models::EventId = path.event_id.into();
@@ -82,6 +83,7 @@ fn put_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn put(
     State(state): State<AppState>,
+    Auth(claims): Auth,
     Path(path): Path<EventServiceUpdateRequestPath>,
     Json(request): Json<EventServiceUpdateRequest>,
 ) -> ApiResult<()> {

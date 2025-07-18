@@ -71,7 +71,7 @@ impl EventService for self::Service {
                 }))?
                 .try_into()?
         };
-        let event_id = self.state.create_event(form).await?;
+        let event_id = self.state.create_event(form, todo!()).await?;
 
         let response_data = EventServiceCreateResponse {
             event_id: event_id.to_string(),

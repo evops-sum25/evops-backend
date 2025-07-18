@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use chrono::{DateTime, Utc};
-use evops_models::{ApiError, ApiResult, JwtClaims, JwtTokenType, NewUserForm, User, UserId};
+use evops_models::{ApiError, ApiResult, JsonWebToken, JwtClaims, NewUserForm, User, UserId};
 use uuid::Uuid;
 
 impl crate::AppState {
@@ -35,64 +35,51 @@ impl crate::AppState {
         let now = Utc::now();
 
         let access_token = {
-            self::generate_jwt_access_token(
+            self::generate_jwt(
                 user_id,
-                now,
                 &self.shared_state.jwt_access_secret,
+                now,
                 self.shared_state.jwt_access_expiration,
             )?
         };
         let refresh_token = {
-            self::generate_jwt_refresh_token(
+            self::generate_jwt(
                 user_id,
-                now,
                 &self.shared_state.jwt_refresh_secret,
+                now,
                 self.shared_state.jwt_refresh_expiration,
             )?
         };
 
         todo!()
     }
+
+    pub fn decode_jwt(&self, token: &JsonWebToken) -> ApiResult<JwtClaims> {
+        let token_data = {
+            jsonwebtoken::decode::<JwtClaims>(
+                token.as_ref(),
+                &jsonwebtoken::DecodingKey::from_secret(&self.shared_state.jwt_access_secret),
+                &jsonwebtoken::Validation::default(),
+            )
+            .map_err(|e| ApiError::Other(e.to_string()))?
+        };
+        Ok(token_data.claims)
+    }
 }
 
-fn generate_jwt_access_token(
+fn generate_jwt(
     user_id: UserId,
-    now: DateTime<Utc>,
     secret: &[u8],
+    now: DateTime<Utc>,
     exp: Duration,
 ) -> ApiResult<String> {
-    self::generate_jwt_token(
-        &JwtClaims {
-            sub: user_id,
-            iat: now,
-            exp: now + exp,
-            token_type: JwtTokenType::Access,
-        },
-        secret,
-    )
-}
-
-fn generate_jwt_refresh_token(
-    user_id: UserId,
-    now: DateTime<Utc>,
-    secret: &[u8],
-    exp: Duration,
-) -> ApiResult<String> {
-    self::generate_jwt_token(
-        &JwtClaims {
-            sub: user_id,
-            iat: now,
-            exp: now + exp,
-            token_type: JwtTokenType::Refresh,
-        },
-        secret,
-    )
-}
-
-fn generate_jwt_token(claims: &JwtClaims, secret: &[u8]) -> ApiResult<String> {
     jsonwebtoken::encode(
         &jsonwebtoken::Header::default(),
-        claims,
+        &JwtClaims {
+            sub: user_id,
+            iat: now,
+            exp: now + exp,
+        },
         &jsonwebtoken::EncodingKey::from_secret(secret),
     )
     .map_err(|e| ApiError::Other(e.to_string()))

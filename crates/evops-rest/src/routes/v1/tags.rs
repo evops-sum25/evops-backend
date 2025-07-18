@@ -12,7 +12,7 @@ use crate::types::{
     TagServiceCreateRequest, TagServiceCreateResponse, TagServiceListRequestQuery,
     TagServiceListResponse,
 };
-use crate::{AppState, DEFAULT_SECURITY_REQUIREMENT};
+use crate::{AppState, Auth, DEFAULT_SECURITY_REQUIREMENT};
 
 mod _tag_id;
 mod suggestions;
@@ -70,6 +70,7 @@ fn post_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn post(
     State(state): State<AppState>,
+    Auth(claims): Auth,
     Json(request): Json<TagServiceCreateRequest>,
 ) -> ApiResult<Json<TagServiceCreateResponse>> {
     let form = request.form.try_into()?;

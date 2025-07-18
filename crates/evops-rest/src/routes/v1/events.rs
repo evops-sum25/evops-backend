@@ -12,7 +12,7 @@ use crate::types::{
     EventServiceCreateRequest, EventServiceCreateResponse, EventServiceListRequestQuery,
     EventServiceListResponse,
 };
-use crate::{AppState, DEFAULT_SECURITY_REQUIREMENT};
+use crate::{AppState, Auth, DEFAULT_SECURITY_REQUIREMENT};
 
 mod _event_id;
 mod images;
@@ -67,10 +67,11 @@ fn post_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn post(
     State(state): State<AppState>,
+    Auth(claims): Auth,
     Json(request): Json<EventServiceCreateRequest>,
 ) -> ApiResult<Json<EventServiceCreateResponse>> {
     let form = request.form.try_into()?;
-    let event_id = state.create_event(form).await?;
+    let event_id = state.create_event(form, claims).await?;
 
     let response_data = EventServiceCreateResponse {
         event_id: event_id.into(),
