@@ -6,11 +6,11 @@ use axum::extract::{Path, State};
 
 use evops_models::ApiResult;
 
-use crate::AppState;
 use crate::error::AddResponse as _;
 use crate::types::{
     TagServiceDeleteRequestPath, TagServiceFindRequestPath, TagServiceFindResponse,
 };
+use crate::{AppState, Auth};
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::TagService.into())
@@ -48,14 +48,17 @@ fn delete_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.TagService.Delete")
         .description("Deletes a tag by ID.")
         .response_bad_request()
+        .response_unauthorized()
+        .response_forbidden()
         .response_not_found()
         .response_unprocessable_entity()
         .response_internal_server_error()
 }
 async fn delete(
     State(state): State<AppState>,
+    Auth(user_id): Auth,
     Path(path): Path<TagServiceDeleteRequestPath>,
 ) -> ApiResult<()> {
     let id = path.tag_id.into();
-    state.delete_tag(id).await
+    state.delete_tag(id, user_id).await
 }

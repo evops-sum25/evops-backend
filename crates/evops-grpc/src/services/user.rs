@@ -1,10 +1,12 @@
 use tonic::{Request, Response, Status};
-use uuid::Uuid;
 
 use evops_models::ApiError;
 
 use crate::pb::user_service_server::{UserService, UserServiceServer};
-use crate::pb::{UserServiceCreateResponse, UserServiceFindResponse, UserServiceListResponse};
+use crate::pb::{
+    UserServiceLogInRequest, UserServiceLogInResponse, UserServiceRefreshRequest,
+    UserServiceRefreshResponse, UserServiceSignUpRequest, UserServiceSignUpResponse,
+};
 
 pub fn server(state: crate::AppState) -> UserServiceServer<self::Service> {
     UserServiceServer::new(self::Service { state })
@@ -16,59 +18,66 @@ pub struct Service {
 
 #[tonic::async_trait]
 impl UserService for self::Service {
-    async fn find(
+    async fn log_in(
         &self,
-        request: Request<crate::pb::UserServiceFindRequest>,
-    ) -> Result<Response<crate::pb::UserServiceFindResponse>, Status> {
+        request: Request<UserServiceLogInRequest>,
+    ) -> Result<Response<UserServiceLogInResponse>, Status> {
         let request_data = request.into_inner();
 
-        let id = {
-            evops_models::UserId::new({
-                request_data
-                    .id
-                    .parse::<Uuid>()
-                    .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
-            })
+        let credentials = request_data.credentials.ok_or(ApiError::InvalidArgument(
+            "UserServiceLogInRequest.form must not be null".to_owned(),
+        ))?;
+        let login = {
+            evops_models::UserLogin::try_new(credentials.login)
+                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
         };
-        let found_user = self.state.find_user(id).await?;
-
-        let response_data = UserServiceFindResponse {
-            user: Some(found_user.into()),
+        let password = {
+            evops_models::UserPassword::try_new(credentials.password)
+                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
         };
-        Ok(Response::new(response_data))
-    }
+        let tokens = self.state.log_in(&login, &password).await?;
 
-    async fn list(
-        &self,
-        _request: Request<crate::pb::UserServiceListRequest>,
-    ) -> Result<Response<crate::pb::UserServiceListResponse>, Status> {
-        let users = self.state.list_users().await?;
-
-        let response_data = UserServiceListResponse {
-            users: users.into_iter().map(Into::into).collect(),
+        let response_data = UserServiceLogInResponse {
+            tokens: Some(tokens.into()),
         };
         Ok(Response::new(response_data))
     }
 
-    async fn create(
+    async fn refresh(
         &self,
-        request: Request<crate::pb::UserServiceCreateRequest>,
-    ) -> Result<Response<crate::pb::UserServiceCreateResponse>, Status> {
+        request: Request<UserServiceRefreshRequest>,
+    ) -> Result<Response<UserServiceRefreshResponse>, Status> {
+        let request_data = request.into_inner();
+
+        let refresh_token = evops_models::JsonWebToken::new(request_data.refresh_token);
+        let tokens = self.state.refresh_jwt_access(&refresh_token).await?;
+
+        let response_data = UserServiceRefreshResponse {
+            tokens: Some(tokens.into()),
+        };
+        Ok(Response::new(response_data))
+    }
+
+    async fn sign_up(
+        &self,
+        request: Request<UserServiceSignUpRequest>,
+    ) -> Result<Response<UserServiceSignUpResponse>, Status> {
         let request_data = request.into_inner();
 
         let form = {
             request_data
                 .form
-                .ok_or({
-                    let err_msg = "UserServiceCreateRequest.form must not be null.";
-                    ApiError::InvalidArgument(err_msg.to_owned())
+                .ok_or_else(|| {
+                    ApiError::InvalidArgument({
+                        "UserServiceSignUpRequest.form must not be null.".to_owned()
+                    })
                 })?
                 .try_into()?
         };
-        let user_id = self.state.create_user(form).await?;
+        let tokens = self.state.sign_up(form).await?;
 
-        let response_data = UserServiceCreateResponse {
-            user_id: user_id.to_string(),
+        let response_data = UserServiceSignUpResponse {
+            tokens: Some(tokens.into()),
         };
         Ok(Response::new(response_data))
     }
