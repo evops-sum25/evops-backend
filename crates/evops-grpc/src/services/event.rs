@@ -61,6 +61,7 @@ impl EventService for self::Service {
         &self,
         request: Request<EventServiceCreateRequest>,
     ) -> Result<Response<EventServiceCreateResponse>, Status> {
+        let user_id = crate::auth(&self.state, &request)?;
         let request_data = request.into_inner();
 
         let form = {
@@ -71,7 +72,7 @@ impl EventService for self::Service {
                 }))?
                 .try_into()?
         };
-        let event_id = self.state.create_event(form, todo!()).await?;
+        let event_id = self.state.create_event(form, user_id).await?;
 
         let response_data = EventServiceCreateResponse {
             event_id: event_id.to_string(),
@@ -103,6 +104,7 @@ impl EventService for self::Service {
         &self,
         request: Request<EventServiceUpdateRequest>,
     ) -> Result<Response<EventServiceUpdateResponse>, Status> {
+        let user_id = crate::auth(&self.state, &request)?;
         let request_data = request.into_inner();
 
         let event_id = evops_models::EventId::new({
@@ -122,7 +124,7 @@ impl EventService for self::Service {
                 })?
                 .try_into()?
         };
-        self.state.update_event(event_id, todo!(), form).await?;
+        self.state.update_event(event_id, user_id, form).await?;
 
         Ok(Response::new(EventServiceUpdateResponse {}))
     }
@@ -131,6 +133,7 @@ impl EventService for self::Service {
         &self,
         request: Request<EventServiceDeleteRequest>,
     ) -> Result<Response<EventServiceDeleteResponse>, Status> {
+        let user_id = crate::auth(&self.state, &request)?;
         let request_data = request.into_inner();
 
         let event_id = evops_models::EventId::new({
@@ -139,7 +142,7 @@ impl EventService for self::Service {
                 .parse::<Uuid>()
                 .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
         });
-        self.state.delete_event(event_id, todo!()).await?;
+        self.state.delete_event(event_id, user_id).await?;
 
         Ok(Response::new(EventServiceDeleteResponse {}))
     }
@@ -183,6 +186,7 @@ impl EventService for self::Service {
     ) -> Result<Response<EventServicePushImageResponse>, Status> {
         use crate::pb::event_service_push_image_request::Message;
 
+        let user_id = crate::auth(&self.state, &request)?;
         let mut request_stream = request.into_inner();
 
         let err_msg_not_null = "EventServicePushImageRequest.message must not be null.";
@@ -235,7 +239,7 @@ impl EventService for self::Service {
 
         let image_id = self
             .state
-            .push_event_image(todo!(), event_id, image)
+            .push_event_image(user_id, event_id, image)
             .await?;
         let response_data = EventServicePushImageResponse {
             image_id: image_id.to_string(),

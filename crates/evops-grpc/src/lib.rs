@@ -5,6 +5,7 @@ use tonic_web::GrpcWebLayer;
 use tower_http::cors::{Any, CorsLayer};
 
 use evops_core::AppState;
+use evops_models::{ApiError, ApiResult};
 
 mod headers;
 pub mod pb;
@@ -38,4 +39,22 @@ fn cors_layer() -> CorsLayer {
         .allow_methods([Method::POST])
         .allow_headers([CONTENT_TYPE, GRPC_TIMEOUT, X_GRPC_WEB, X_USER_AGENT])
         .expose_headers([GRPC_STATUS, GRPC_MESSAGE, GRPC_STATUS_DETAILS_BIN])
+}
+
+fn auth<T>(state: &AppState, request: &tonic::Request<T>) -> ApiResult<evops_models::UserId> {
+    let authorization_header_value = {
+        request
+            .metadata()
+            .get(http::header::AUTHORIZATION.as_str())
+            .ok_or_else(|| ApiError::Auth("No JWT access token provided.".to_owned()))?
+            .to_str()
+            .map_err(|e| ApiError::Auth(e.to_string()))?
+    };
+    let token = evops_models::JsonWebToken::new({
+        authorization_header_value
+            .strip_prefix("Bearer ")
+            .ok_or_else(|| ApiError::Auth("Invalid JWT access token.".to_owned()))?
+    });
+    let user_id = state.decode_jwt(&token)?;
+    Ok(user_id)
 }
