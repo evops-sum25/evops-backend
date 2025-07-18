@@ -1,4 +1,6 @@
-use evops_models::{ApiResult, NewUserForm, User, UserId};
+use chrono::Utc;
+use evops_models::{ApiResult, JwtClaims, NewUserForm, User, UserId};
+use uuid::Uuid;
 
 impl crate::AppState {
     pub async fn list_users(&self) -> ApiResult<Vec<User>> {
@@ -9,6 +11,7 @@ impl crate::AppState {
         Ok(users)
     }
 
+    #[deprecated]
     pub async fn create_user(&self, request: NewUserForm) -> ApiResult<UserId> {
         let user_id = {
             let mut db = self.shared_state.db.lock().await;
@@ -23,5 +26,19 @@ impl crate::AppState {
             db.find_user(id).await
         }?;
         Ok(user)
+    }
+
+    pub async fn signup_user(&self, form: NewUserForm) -> ApiResult<()> {
+        let a = jsonwebtoken::encode(
+            &jsonwebtoken::Header::default(),
+            &JwtClaims {
+                sub: UserId::new(Uuid::now_v7()),
+                exp: Utc::now(),
+            },
+            &jsonwebtoken::EncodingKey::from_secret(b"secret"),
+        );
+        form.login;
+
+        todo!();
     }
 }

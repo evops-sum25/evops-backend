@@ -4,7 +4,7 @@ use crate::types::{
     Event, EventDescription, EventId, EventImageId, EventImageIds, EventTagIds, EventTags,
     EventTitle, LanguageId, LanguageName, NewEventForm, NewLanguageForm, NewTagForm, NewUserForm,
     PgLimit, Tag, TagAlias, TagAliases, TagId, TagName, UpdateEventForm, User, UserDisplayName,
-    UserId, UserLogin,
+    UserId, UserLogin, UserPassword,
 };
 
 impl TryFrom<NewLanguageForm> for evops_models::NewLanguageForm {
@@ -180,7 +180,16 @@ impl TryFrom<NewUserForm> for evops_models::NewUserForm {
                 },
             },
             login,
+            password: value.password.try_into()?,
         })
+    }
+}
+
+impl TryFrom<UserPassword> for evops_models::UserPassword {
+    type Error = ApiError;
+
+    fn try_from(value: UserPassword) -> Result<Self, Self::Error> {
+        Ok(Self::try_new(value.0).map_err(|e| ApiError::InvalidArgument(e.to_string()))?)
     }
 }
 

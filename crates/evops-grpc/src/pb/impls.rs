@@ -192,6 +192,10 @@ impl TryFrom<NewUserForm> for evops_models::NewUserForm {
                 evops_models::UserDisplayName::try_new(value.display_name)
                     .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
             },
+            password: {
+                evops_models::UserPassword::try_new(value.password)
+                    .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+            },
         })
     }
 }
