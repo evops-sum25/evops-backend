@@ -79,7 +79,10 @@ async fn tcp_listener(port: u16) -> io::Result<(SocketAddr, TcpListener)> {
 async fn rest_grpc_app(config: self::config::Config) -> eyre::Result<RestGrpcService> {
     let state = {
         evops_core::AppState::builder()
-            .jwt_secret(config.jwt_secret)
+            .jwt_access_secret(config.jwt_access_secret)
+            .jwt_refresh_secret(config.jwt_refresh_secret)
+            .jwt_access_exp(config.jwt_access_exp)
+            .jwt_refresh_exp(config.jwt_refresh_exp)
             .database_url(&config.database_url)
             .storage_url(&config.storage_url)
             .storage_username(&config.storage_username)

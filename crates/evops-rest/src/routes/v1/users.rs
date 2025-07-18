@@ -11,7 +11,7 @@ use crate::error::AddResponse as _;
 use crate::types::UserServiceListResponse;
 
 mod _user_id;
-mod login;
+mod refresh;
 mod signup;
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
@@ -21,7 +21,7 @@ pub fn router() -> ApiRouter<AppState> {
     ApiRouter::new()
         .api_route_with("/", get_with(self::get, self::get_docs), self::route_docs)
         .nest("/{user-id}", self::_user_id::router())
-        .nest("/login", self::login::router())
+        .nest("/refresh", self::refresh::router())
         .nest("/signup", self::signup::router())
 }
 

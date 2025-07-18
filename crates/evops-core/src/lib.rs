@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 use bon::bon;
 use bytes::Bytes;
@@ -11,7 +11,10 @@ mod services;
 // The reason for its existence is to only wrap the state in an `Arc` once
 // rather than wrapping every field (such as `db`).
 struct State {
-    jwt_secret: Bytes,
+    jwt_access_secret: Bytes,
+    jwt_refresh_secret: Bytes,
+    jwt_access_exp: Duration,
+    jwt_refresh_exp: Duration,
     db: tokio::sync::Mutex<evops_db::Database>,
     storage: evops_storage::Storage,
     ml_client: tokio::sync::Mutex<evops_ml_client::MlClient>,
@@ -27,7 +30,10 @@ pub struct AppState {
 impl AppState {
     #[builder]
     pub async fn new(
-        jwt_secret: Bytes,
+        jwt_access_secret: Bytes,
+        jwt_refresh_secret: Bytes,
+        jwt_access_exp: Duration,
+        jwt_refresh_exp: Duration,
         database_url: &Url,
         storage_url: &Url,
         storage_username: &str,
@@ -56,7 +62,10 @@ impl AppState {
         Ok(Self {
             shared_state: {
                 Arc::new(self::State {
-                    jwt_secret,
+                    jwt_access_secret,
+                    jwt_refresh_secret,
+                    jwt_access_exp,
+                    jwt_refresh_exp,
                     db: tokio::sync::Mutex::new(db),
                     storage,
                     ml_client: tokio::sync::Mutex::new(ml_client),

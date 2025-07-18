@@ -23,7 +23,7 @@ pub fn router() -> ApiRouter<AppState> {
 }
 
 fn post_docs(o: TransformOperation) -> TransformOperation {
-    o.summary("evops.api.v1.UserService.LogIn")
+    o.summary("evops.api.v1.UserService.Refresh")
         .description("...")
         .response_bad_request()
         .response_internal_server_error()
