@@ -1029,6 +1029,7 @@ version = "0.0.0"
 dependencies = [
  "axum",
  "axum_tonic",
+ "bytes",
  "color-eyre",
  "const_format",
  "dotenvy",

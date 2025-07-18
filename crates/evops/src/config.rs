@@ -1,5 +1,6 @@
+use bytes::Bytes;
 use const_format::formatcp;
-use eyre::Context as _;
+use eyre::{Context as _, eyre};
 use url::Url;
 
 const SERVER_PORT: &str = "SERVER_PORT";
@@ -12,7 +13,7 @@ const ML_SERVER_URL: &str = "ML_SERVER_URL";
 
 pub struct Config {
     pub port: u16,
-    jwt_secret: String,
+    pub jwt_secret: Bytes,
     pub database_url: Url,
     pub storage_url: Url,
     pub storage_username: String,
@@ -26,7 +27,12 @@ pub fn from_env() -> eyre::Result<self::Config> {
         raw.parse::<u16>()
             .wrap_err(formatcp!("variable {SERVER_PORT} is malformed"))?
     };
-    let jwt_secret = std::env::var(JWT_SECRET).wrap_err(JWT_SECRET)?;
+    let jwt_secret = {
+        std::env::var_os(JWT_SECRET)
+            .ok_or(eyre!(JWT_SECRET))?
+            .into_encoded_bytes()
+            .into()
+    };
     let database_url = {
         let raw = std::env::var(DATABASE_URL).wrap_err(DATABASE_URL)?;
         raw.parse::<Url>()

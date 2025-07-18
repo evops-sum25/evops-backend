@@ -35,7 +35,7 @@ impl crate::AppState {
                 sub: UserId::new(Uuid::now_v7()),
                 exp: Utc::now(),
             },
-            &jsonwebtoken::EncodingKey::from_secret(b"secret"),
+            &jsonwebtoken::EncodingKey::from_secret(&self.shared_state.jwt_secret),
         );
         form.login;
 
