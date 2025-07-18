@@ -21,9 +21,10 @@ pub fn router() -> ApiRouter<AppState> {
 }
 
 fn post_docs(o: TransformOperation) -> TransformOperation {
-    o.summary("evops.api.v1.UserService.?")
+    o.summary("evops.api.v1.UserService.SignUp")
         .description("...")
         .response_bad_request()
+        .response_unprocessable_entity()
         .response_internal_server_error()
 }
 async fn post(

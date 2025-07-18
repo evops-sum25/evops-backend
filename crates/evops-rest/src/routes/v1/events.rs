@@ -7,12 +7,12 @@ use tap::TryConv as _;
 
 use evops_models::{ApiError, ApiResult};
 
-use crate::AppState;
 use crate::error::AddResponse as _;
 use crate::types::{
     EventServiceCreateRequest, EventServiceCreateResponse, EventServiceListRequestQuery,
     EventServiceListResponse,
 };
+use crate::{AppState, DEFAULT_SECURITY_REQUIREMENT};
 
 mod _event_id;
 mod images;
@@ -60,6 +60,7 @@ async fn get(
 fn post_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.EventService.Create")
         .description("Creates a new event.")
+        .security_requirement(DEFAULT_SECURITY_REQUIREMENT)
         .response_bad_request()
         .response_unprocessable_entity()
         .response_internal_server_error()

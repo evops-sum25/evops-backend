@@ -7,7 +7,7 @@ use evops_models::ApiResult;
 
 use crate::AppState;
 use crate::error::AddResponse as _;
-use crate::types::{UserServiceRefreshRequest, UserServiceRefreshResponse};
+use crate::types::{UserServiceLogInRequest, UserServiceLogInResponse};
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::UserService.into())
@@ -21,14 +21,14 @@ pub fn router() -> ApiRouter<AppState> {
 }
 
 fn post_docs(o: TransformOperation) -> TransformOperation {
-    o.summary("evops.api.v1.UserService.Refresh")
+    o.summary("evops.api.v1.UserService.LogIn")
         .description("...")
         .response_bad_request()
         .response_unprocessable_entity()
         .response_internal_server_error()
 }
 async fn post(
-    Json(request): Json<UserServiceRefreshRequest>,
-) -> ApiResult<Json<UserServiceRefreshResponse>> {
+    Json(request): Json<UserServiceLogInRequest>,
+) -> ApiResult<Json<UserServiceLogInResponse>> {
     todo!();
 }

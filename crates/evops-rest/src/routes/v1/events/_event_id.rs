@@ -6,12 +6,12 @@ use axum::extract::{Path, State};
 
 use evops_models::ApiResult;
 
-use crate::AppState;
 use crate::error::AddResponse as _;
 use crate::types::{
     EventServiceDeleteRequestPath, EventServiceFindRequestPath, EventServiceFindResponse,
     EventServiceUpdateRequest, EventServiceUpdateRequestPath,
 };
+use crate::{AppState, DEFAULT_SECURITY_REQUIREMENT};
 
 mod images;
 
@@ -56,6 +56,7 @@ async fn get(
 fn delete_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.EventService.Delete")
         .description("Deletes an event by ID.")
+        .security_requirement(DEFAULT_SECURITY_REQUIREMENT)
         .response_bad_request()
         .response_not_found()
         .response_unprocessable_entity()
@@ -73,6 +74,7 @@ async fn delete(
 fn put_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.EventService.Update")
         .description("Updates an event by ID.")
+        .security_requirement(DEFAULT_SECURITY_REQUIREMENT)
         .response_bad_request()
         .response_not_found()
         .response_unprocessable_entity()

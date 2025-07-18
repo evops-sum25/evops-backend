@@ -7,12 +7,12 @@ use tap::TryConv as _;
 
 use evops_models::{ApiError, ApiResult};
 
-use crate::AppState;
 use crate::error::AddResponse as _;
 use crate::types::{
     TagServiceCreateRequest, TagServiceCreateResponse, TagServiceListRequestQuery,
     TagServiceListResponse,
 };
+use crate::{AppState, DEFAULT_SECURITY_REQUIREMENT};
 
 mod _tag_id;
 mod suggestions;
@@ -62,6 +62,7 @@ async fn get(
 fn post_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.TagService.Create")
         .description("Creates a new tag.")
+        .security_requirement(DEFAULT_SECURITY_REQUIREMENT)
         .response_bad_request()
         .response_conflict()
         .response_unprocessable_entity()

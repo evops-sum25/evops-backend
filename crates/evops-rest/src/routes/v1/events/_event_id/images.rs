@@ -8,13 +8,13 @@ use axum_typed_multipart::TypedMultipart;
 
 use evops_models::ApiResult;
 
-use crate::AppState;
 use crate::error::AddResponse as _;
 use crate::types::{
     EventServicePushImageRequestMultipart, EventServicePushImageRequestPath,
     EventServicePushImageResponse, EventServiceReorderImageRequestPath,
     EventServiceReorderImagesRequest,
 };
+use crate::{AppState, DEFAULT_SECURITY_REQUIREMENT};
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::EventService.into())
@@ -30,6 +30,7 @@ pub fn router() -> ApiRouter<AppState> {
 fn post_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.EventService.PushImage")
         .description("Adds a new image to the event with the specified ID.")
+        .security_requirement(DEFAULT_SECURITY_REQUIREMENT)
         .response_bad_request()
         .response_not_found()
         .response_conflict()

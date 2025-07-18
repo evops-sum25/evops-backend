@@ -192,26 +192,7 @@ pub struct TagServiceSuggestResponse {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-#[serde(rename_all = "kebab-case")]
-pub struct UserServiceFindRequestPath {
-    /// UUID of the user to retrieve.
-    pub user_id: UserId,
-}
-
-#[derive(Debug, Serialize, JsonSchema)]
-pub struct UserServiceFindResponse {
-    /// Retrieved user object.
-    pub user: User,
-}
-
-#[derive(Debug, Deserialize, JsonSchema)]
 pub struct UserServiceListRequest;
-
-#[derive(Debug, Serialize, JsonSchema)]
-pub struct UserServiceListResponse {
-    /// List of all users.
-    pub users: Vec<User>,
-}
 
 #[derive(Debug, Default, Deserialize, JsonSchema)]
 pub struct EventTagIds(#[schemars(length(max = evops_models::EVENT_MAX_TAGS))] Vec<TagId>);
@@ -322,23 +303,38 @@ pub struct User {
     display_name: UserDisplayName,
 }
 
-#[derive(Deserialize, JsonSchema)]
-pub struct UserServiceLogInRequest {
-    pub credentials: UserCredentials,
-}
-
-#[derive(Serialize, JsonSchema)]
-pub struct Jwt(#[schemars(regex(pattern = r"^[\w-]+\.[\w-]+\.[\w-]+$"))] String);
+#[derive(Serialize, Deserialize, JsonSchema)]
+pub struct JsonWebToken(#[schemars(regex(pattern = r"^[\w-]+\.[\w-]+\.[\w-]+$"))] String);
 
 #[derive(Serialize, JsonSchema)]
 pub struct AuthTokens {
-    access: Jwt,
-    refresh: Jwt,
+    access: JsonWebToken,
+    refresh: JsonWebToken,
 }
 
 #[derive(Serialize, JsonSchema)]
 pub struct UserServiceSignUpResponse {
     pub tokens: AuthTokens,
+}
+
+#[derive(Serialize, JsonSchema)]
+pub struct UserServiceLogInResponse {
+    pub tokens: AuthTokens,
+}
+
+#[derive(Serialize, JsonSchema)]
+pub struct UserServiceRefreshResponse {
+    pub tokens: AuthTokens,
+}
+
+#[derive(Deserialize, JsonSchema)]
+pub struct UserServiceRefreshRequest {
+    pub refresh_token: JsonWebToken,
+}
+
+#[derive(Deserialize, JsonSchema)]
+pub struct UserServiceLogInRequest {
+    pub credentials: UserCredentials,
 }
 
 #[derive(Deserialize, JsonSchema)]

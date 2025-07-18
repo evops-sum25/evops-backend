@@ -32,3 +32,5 @@ pub fn router(state: AppState) -> axum::Router {
 
     api_routes.layer(Extension(Arc::new(api)))
 }
+
+const DEFAULT_SECURITY_REQUIREMENT: &str = "EvOps JWT";
