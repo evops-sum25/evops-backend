@@ -308,17 +308,53 @@ pub struct Tag {
 
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct NewUserForm {
+    /// Case-insensitively unique login.
+    login: UserLogin,
     /// Display name.
-    name: UserName,
+    display_name: UserDisplayName,
 }
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+struct UserLogin(
+    #[schemars(
+        length(min = evops_models::USER_LOGIN_MIN_LEN, max=evops_models::USER_LOGIN_MAX_LEN),
+        regex(pattern = evops_models::USER_LOGIN_REGEX),
+    )]
+    String,
+);
 
 #[derive(Debug, Serialize, JsonSchema)]
 pub struct User {
     /// User UUID.
     id: UserId,
+    /// Case-insensitively unique login.
+    login: UserLogin,
     /// Display name.
-    name: UserName,
+    display_name: UserDisplayName,
 }
+
+#[derive(Deserialize, JsonSchema)]
+pub struct UserServiceAuthRequest {
+    pub credentials: UserCredentials,
+}
+
+#[derive(Deserialize, JsonSchema)]
+pub struct UserCredentials {
+    login: UserLogin,
+    password: UserPassword,
+}
+
+#[derive(Deserialize, JsonSchema)]
+struct UserPassword(
+    #[schemars(
+        length(
+            min = evops_models::USER_PASSWORD_MIN_LEN,
+            max = evops_models::USER_PASSWORD_MAX_LEN,
+        ),
+        regex(pattern = evops_models::USER_PASSWORD_REGEX),
+    )]
+    String,
+);
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct EventId(Uuid);
@@ -343,9 +379,12 @@ pub struct EventDescription(
 );
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
-struct UserName(
-    #[schemars(length(min = evops_models::USER_NAME_MIN_LEN, max = evops_models::USER_NAME_MAX_LEN))]
-     String,
+struct UserDisplayName(
+    #[schemars(length(
+        min = evops_models::USER_DISPLAY_NAME_MIN_LEN,
+        max = evops_models::USER_DISPLAY_NAME_MAX_LEN,
+    ))]
+    String,
 );
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]

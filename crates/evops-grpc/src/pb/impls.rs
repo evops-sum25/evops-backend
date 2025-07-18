@@ -184,8 +184,12 @@ impl TryFrom<NewUserForm> for evops_models::NewUserForm {
 
     fn try_from(value: NewUserForm) -> Result<Self, Self::Error> {
         Ok(Self {
-            name: {
-                evops_models::UserName::try_new(value.name)
+            login: {
+                evops_models::UserLogin::try_new(value.login)
+                    .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+            },
+            display_name: {
+                evops_models::UserDisplayName::try_new(value.display_name)
                     .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
             },
         })
@@ -196,7 +200,8 @@ impl From<evops_models::User> for User {
     fn from(value: evops_models::User) -> Self {
         Self {
             id: value.id.to_string(),
-            name: value.name.into_inner(),
+            login: value.login.into_inner(),
+            display_name: value.display_name.into_inner(),
         }
     }
 }

@@ -11,6 +11,7 @@ use crate::error::AddResponse as _;
 use crate::types::{UserServiceCreateRequest, UserServiceCreateResponse, UserServiceListResponse};
 
 mod _user_id;
+mod auth;
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::UserService.into())
@@ -23,6 +24,7 @@ pub fn router() -> ApiRouter<AppState> {
             self::route_docs,
         )
         .nest("/{user-id}", self::_user_id::router())
+        .nest("/auth", self::auth::router())
 }
 
 fn get_docs(o: TransformOperation) -> TransformOperation {

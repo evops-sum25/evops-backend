@@ -5,7 +5,7 @@ edition = "2024"
 [dependencies]
 aide = { workspace = true, features = ["axum-json", "axum-query", "swagger"] }
 aide-axum-typed-multipart = { workspace = true }
-axum = { workspace = true }
+axum = { workspace = true, features = ["macros"] }
 axum_typed_multipart = { workspace = true }
 axum-extra = { workspace = true, features = ["file-stream"] }
 chrono = { workspace = true, features = ["serde"] }

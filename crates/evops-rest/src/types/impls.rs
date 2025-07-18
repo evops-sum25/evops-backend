@@ -3,7 +3,8 @@ use evops_models::ApiError;
 use crate::types::{
     Event, EventDescription, EventId, EventImageId, EventImageIds, EventTagIds, EventTags,
     EventTitle, LanguageId, LanguageName, NewEventForm, NewLanguageForm, NewTagForm, NewUserForm,
-    PgLimit, Tag, TagAlias, TagAliases, TagId, TagName, UpdateEventForm, User, UserId, UserName,
+    PgLimit, Tag, TagAlias, TagAliases, TagId, TagName, UpdateEventForm, User, UserDisplayName,
+    UserId, UserLogin,
 };
 
 impl TryFrom<NewLanguageForm> for evops_models::NewLanguageForm {
@@ -171,7 +172,8 @@ impl TryFrom<NewUserForm> for evops_models::NewUserForm {
 
     fn try_from(value: NewUserForm) -> Result<Self, Self::Error> {
         Ok(Self {
-            name: value.name.try_into()?,
+            login: value.login.try_into()?,
+            display_name: value.display_name.try_into()?,
         })
     }
 }
@@ -180,8 +182,23 @@ impl From<evops_models::User> for User {
     fn from(value: evops_models::User) -> Self {
         Self {
             id: value.id.into(),
-            name: value.name.into(),
+            login: value.login.into(),
+            display_name: value.display_name.into(),
         }
+    }
+}
+
+impl TryFrom<UserLogin> for evops_models::UserLogin {
+    type Error = ApiError;
+
+    fn try_from(value: UserLogin) -> Result<Self, Self::Error> {
+        Ok(Self::try_new(value.0).map_err(|e| ApiError::InvalidArgument(e.to_string()))?)
+    }
+}
+
+impl From<evops_models::UserLogin> for UserLogin {
+    fn from(value: evops_models::UserLogin) -> Self {
+        Self(value.into_inner())
     }
 }
 
@@ -239,16 +256,16 @@ impl From<evops_models::EventDescription> for EventDescription {
     }
 }
 
-impl TryFrom<UserName> for evops_models::UserName {
+impl TryFrom<UserDisplayName> for evops_models::UserDisplayName {
     type Error = ApiError;
 
-    fn try_from(value: UserName) -> Result<Self, Self::Error> {
+    fn try_from(value: UserDisplayName) -> Result<Self, Self::Error> {
         Self::try_new(value.0).map_err(|e| ApiError::InvalidArgument(e.to_string()))
     }
 }
 
-impl From<evops_models::UserName> for UserName {
-    fn from(value: evops_models::UserName) -> Self {
+impl From<evops_models::UserDisplayName> for UserDisplayName {
+    fn from(value: evops_models::UserDisplayName) -> Self {
         Self(value.into_inner())
     }
 }
