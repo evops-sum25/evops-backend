@@ -327,6 +327,20 @@ pub struct UserServiceLogInRequest {
     pub credentials: UserCredentials,
 }
 
+#[derive(Serialize, JsonSchema)]
+pub struct Jwt(#[schemars(regex(pattern = r"^[\w-]+\.[\w-]+\.[\w-]+$"))] String);
+
+#[derive(Serialize, JsonSchema)]
+pub struct AuthTokens {
+    access: Jwt,
+    refresh: Jwt,
+}
+
+#[derive(Serialize, JsonSchema)]
+pub struct UserServiceSignUpResponse {
+    pub tokens: AuthTokens,
+}
+
 #[derive(Deserialize, JsonSchema)]
 pub struct UserServiceSignUpRequest {
     pub form: NewUserForm,
