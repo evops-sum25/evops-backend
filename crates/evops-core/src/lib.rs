@@ -13,8 +13,8 @@ mod services;
 struct State {
     jwt_access_secret: Bytes,
     jwt_refresh_secret: Bytes,
-    jwt_access_exp: Duration,
-    jwt_refresh_exp: Duration,
+    jwt_access_expiration: Duration,
+    jwt_refresh_expiration: Duration,
     db: tokio::sync::Mutex<evops_db::Database>,
     storage: evops_storage::Storage,
     ml_client: tokio::sync::Mutex<evops_ml_client::MlClient>,
@@ -32,8 +32,8 @@ impl AppState {
     pub async fn new(
         jwt_access_secret: Bytes,
         jwt_refresh_secret: Bytes,
-        jwt_access_exp: Duration,
-        jwt_refresh_exp: Duration,
+        jwt_access_expiration: Duration,
+        jwt_refresh_expiration: Duration,
         database_url: &Url,
         storage_url: &Url,
         storage_username: &str,
@@ -64,8 +64,8 @@ impl AppState {
                 Arc::new(self::State {
                     jwt_access_secret,
                     jwt_refresh_secret,
-                    jwt_access_exp,
-                    jwt_refresh_exp,
+                    jwt_access_expiration,
+                    jwt_refresh_expiration,
                     db: tokio::sync::Mutex::new(db),
                     storage,
                     ml_client: tokio::sync::Mutex::new(ml_client),

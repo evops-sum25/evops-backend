@@ -39,7 +39,7 @@ impl crate::AppState {
                 user_id,
                 now,
                 &self.shared_state.jwt_access_secret,
-                self.shared_state.jwt_access_exp,
+                self.shared_state.jwt_access_expiration,
             )?
         };
         let refresh_token = {
@@ -47,7 +47,7 @@ impl crate::AppState {
                 user_id,
                 now,
                 &self.shared_state.jwt_refresh_secret,
-                self.shared_state.jwt_refresh_exp,
+                self.shared_state.jwt_refresh_expiration,
             )?
         };
 

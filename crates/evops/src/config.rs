@@ -8,8 +8,8 @@ use url::Url;
 const SERVER_PORT: &str = "SERVER_PORT";
 const JWT_ACCESS_SECRET: &str = "JWT_ACCESS_SECRET";
 const JWT_REFRESH_SECRET: &str = "JWT_REFRESH_SECRET";
-const JWT_ACCESS_EXP_SECONDS: &str = "JWT_ACCESS_EXP_SECONDS";
-const JWT_REFRESH_EXP_SECONDS: &str = "JWT_REFRESH_EXP_SECONDS";
+const JWT_ACCESS_EXPIRATION_SECONDS: &str = "JWT_ACCESS_EXPIRATION_SECONDS";
+const JWT_REFRESH_EXPIRATION_SECONDS: &str = "JWT_REFRESH_EXPIRATION_SECONDS";
 const DATABASE_URL: &str = "DATABASE_URL";
 const MINIO_URL: &str = "MINIO_URL";
 const MINIO_ROOT_USER: &str = "MINIO_ROOT_USER";
@@ -20,8 +20,8 @@ pub struct Config {
     pub port: u16,
     pub jwt_access_secret: Bytes,
     pub jwt_refresh_secret: Bytes,
-    pub jwt_access_exp: Duration,
-    pub jwt_refresh_exp: Duration,
+    pub jwt_access_expiration: Duration,
+    pub jwt_refresh_expiration: Duration,
     pub database_url: Url,
     pub storage_url: Url,
     pub storage_username: String,
@@ -47,19 +47,19 @@ pub fn from_env() -> eyre::Result<self::Config> {
             .into_encoded_bytes()
             .into()
     };
-    let jwt_access_exp = {
-        let raw = std::env::var(JWT_ACCESS_EXP_SECONDS).wrap_err(JWT_ACCESS_EXP_SECONDS)?;
-        Duration::from_secs({
-            raw.parse()
-                .wrap_err(formatcp!("variable {JWT_ACCESS_EXP_SECONDS} is malformed"))?
-        })
+    let jwt_access_expiration = {
+        let raw =
+            std::env::var(JWT_ACCESS_EXPIRATION_SECONDS).wrap_err(JWT_ACCESS_EXPIRATION_SECONDS)?;
+        Duration::from_secs(raw.parse().wrap_err(formatcp!(
+            "variable {JWT_ACCESS_EXPIRATION_SECONDS} is malformed",
+        ))?)
     };
-    let jwt_refresh_exp = {
-        let raw = std::env::var(JWT_REFRESH_EXP_SECONDS).wrap_err(JWT_REFRESH_EXP_SECONDS)?;
-        Duration::from_secs({
-            raw.parse()
-                .wrap_err(formatcp!("variable {JWT_REFRESH_EXP_SECONDS} is malformed"))?
-        })
+    let jwt_refresh_expiration = {
+        let raw = std::env::var(JWT_REFRESH_EXPIRATION_SECONDS)
+            .wrap_err(JWT_REFRESH_EXPIRATION_SECONDS)?;
+        Duration::from_secs(raw.parse().wrap_err(formatcp!(
+            "variable {JWT_REFRESH_EXPIRATION_SECONDS} is malformed",
+        ))?)
     };
     let database_url = {
         let raw = std::env::var(DATABASE_URL).wrap_err(DATABASE_URL)?;
@@ -83,8 +83,8 @@ pub fn from_env() -> eyre::Result<self::Config> {
         port,
         jwt_access_secret,
         jwt_refresh_secret,
-        jwt_access_exp,
-        jwt_refresh_exp,
+        jwt_access_expiration,
+        jwt_refresh_expiration,
         database_url,
         storage_url,
         storage_username,
