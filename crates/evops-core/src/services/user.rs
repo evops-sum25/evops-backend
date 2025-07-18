@@ -61,7 +61,7 @@ impl crate::AppState {
                 &jsonwebtoken::DecodingKey::from_secret(&self.shared_state.jwt_access_secret),
                 &jsonwebtoken::Validation::default(),
             )
-            .map_err(|e| ApiError::Auth(e.to_string()))?
+            .map_err(|e| ApiError::Auth(format!("Failed to parse JWT access token: {e}")))?
         };
         let claims = token_data.claims;
         if claims.exp < Utc::now() {
