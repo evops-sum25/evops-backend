@@ -4,8 +4,8 @@ use bytes::Bytes;
 use futures::Stream;
 
 use evops_models::{
-    ApiResult, Event, EventId, EventImage, EventImageId, EventImageIds, NewEventForm, PgLimit,
-    UpdateEventForm,
+    ApiResult, Event, EventId, EventImage, EventImageId, EventImageIds, EventTagIds, NewEventForm,
+    PgLimit, UpdateEventForm,
 };
 use uuid::Uuid;
 
@@ -14,10 +14,11 @@ impl crate::AppState {
         &self,
         last_id: Option<EventId>,
         limit: Option<PgLimit>,
+        tags: Option<EventTagIds>,
     ) -> ApiResult<Vec<Event>> {
         let events = {
             let mut db = self.shared_state.db.lock().await;
-            db.list_events(last_id, limit).await
+            db.list_events(last_id, limit, tags).await
         }?;
         Ok(events)
     }

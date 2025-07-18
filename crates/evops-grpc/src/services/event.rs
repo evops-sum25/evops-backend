@@ -34,7 +34,25 @@ impl EventService for self::Service {
         request: Request<EventServiceListRequest>,
     ) -> Result<Response<EventServiceListResponse>, Status> {
         let request_data = request.into_inner();
-
+        let tags = {
+            let tags_raw: ApiResult<Vec<evops_models::TagId>> = request_data
+                .tags
+                .iter()
+                .map(|e| {
+                    let uuid = e
+                        .parse::<Uuid>()
+                        .map_err(|e| ApiError::InvalidArgument(e.to_string()))?;
+                    Ok(evops_models::TagId::new(uuid))
+                })
+                .collect();
+            let tags_vec = tags_raw?;
+            if tags_vec.is_empty() {
+                None
+            } else {
+                let tags_conv = unsafe { evops_models::EventTagIds::new_unchecked(tags_vec) };
+                Some(tags_conv)
+            }
+        };
         let last_id = match request_data.last_id {
             Some(id) => Some(evops_models::EventId::new({
                 id.parse::<Uuid>()
@@ -49,7 +67,7 @@ impl EventService for self::Service {
             }),
             None => None,
         };
-        let events = self.state.list_events(last_id, limit).await?;
+        let events = self.state.list_events(last_id, limit, tags).await?;
 
         let response_data = EventServiceListResponse {
             events: events.into_iter().map(Into::into).collect(),

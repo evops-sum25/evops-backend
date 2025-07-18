@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use aide_axum_typed_multipart::FieldData;
 use axum::body::Bytes;
 use axum_typed_multipart::TryFromMultipart;
@@ -119,6 +121,33 @@ pub struct EventServiceListRequestQuery {
     pub last_id: Option<EventId>,
     /// Size of one batch of events.
     pub limit: Option<PgLimit>,
+    /// Tag ids of events to be listed (comma separated).
+    #[serde(default, deserialize_with = "deserialize_comma_separated")]
+    #[schemars(with = "Option<String>")]
+    pub tags: Option<EventTagIds>,
+}
+
+fn deserialize_comma_separated<'de, D>(deserializer: D) -> Result<Option<EventTagIds>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let s: Option<String> = Option::deserialize(deserializer)?;
+    match s {
+        Some(s) => {
+            let result = if s.is_empty() {
+                Vec::new()
+            } else {
+                let uuids: Result<Vec<_>, _> = s
+                    .split(',')
+                    .filter(|e| !e.trim().is_empty())
+                    .map(|e| Uuid::parse_str(e).map(|t| TagId(t)))
+                    .collect();
+                uuids.map_err(|e| serde::de::Error::custom(e))?
+            };
+            Ok(Some(EventTagIds(result)))
+        }
+        None => Ok(None),
+    }
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
