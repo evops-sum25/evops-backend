@@ -121,7 +121,8 @@ pub struct EventServiceListRequestQuery {
     pub limit: Option<PgLimit>,
     /// Tag ids of events to be listed.
     #[serde(default)]
-    pub tags: EventTagIds,
+    #[serde(rename = "tag-id")]
+    pub tag_ids: Vec<TagId>,
     /// Search string to match against event titles and descriptions (case-insensitive).
     pub search: Option<String>,
 }
