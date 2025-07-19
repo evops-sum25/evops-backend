@@ -36,7 +36,7 @@ impl EventService for self::Service {
         let request_data = request.into_inner();
         let tags = {
             let tags_raw: ApiResult<Vec<evops_models::TagId>> = request_data
-                .tags
+                .tag_ids
                 .iter()
                 .map(|e| {
                     let uuid = e
