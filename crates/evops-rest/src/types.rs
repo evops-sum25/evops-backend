@@ -119,6 +119,12 @@ pub struct EventServiceListRequestQuery {
     pub last_id: Option<EventId>,
     /// Size of one batch of events.
     pub limit: Option<PgLimit>,
+    /// Tag ids of events to be listed.
+    #[serde(default)]
+    #[serde(rename = "tag-id")]
+    pub tag_ids: Vec<TagId>,
+    /// Search string to match against event titles and descriptions (case-insensitive).
+    pub search: Option<String>,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
@@ -226,7 +232,7 @@ pub struct UserServiceCreateResponse {
 }
 
 #[derive(Debug, Default, Deserialize, JsonSchema)]
-pub struct EventTagIds(#[schemars(length(max = evops_models::EVENT_MAX_TAGS))] Vec<TagId>);
+pub struct EventTagIds(#[schemars(length(max = evops_models::EVENT_MAX_TAGS))] pub Vec<TagId>);
 
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct NewEventForm {

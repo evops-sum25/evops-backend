@@ -5,7 +5,7 @@ use futures::Stream;
 
 use evops_models::{
     ApiResult, Event, EventId, EventImage, EventImageId, EventImageIds, NewEventForm, PgLimit,
-    UpdateEventForm,
+    TagId, UpdateEventForm,
 };
 use uuid::Uuid;
 
@@ -14,10 +14,13 @@ impl crate::AppState {
         &self,
         last_id: Option<EventId>,
         limit: Option<PgLimit>,
+        tags: Vec<TagId>,
+        search: Option<String>,
     ) -> ApiResult<Vec<Event>> {
+        let search = search.map(|s| s.trim().to_lowercase());
         let events = {
             let mut db = self.shared_state.db.lock().await;
-            db.list_events(last_id, limit).await
+            db.list_events(last_id, limit, tags, search).await
         }?;
         Ok(events)
     }

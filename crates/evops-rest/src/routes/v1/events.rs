@@ -2,7 +2,8 @@ use aide::axum::ApiRouter;
 use aide::axum::routing::get_with;
 use aide::transform::{TransformOperation, TransformPathItem};
 use axum::Json;
-use axum::extract::{Query, State};
+use axum::extract::State;
+use axum_extra::extract::Query;
 use tap::TryConv as _;
 
 use evops_models::{ApiError, ApiResult};
@@ -41,7 +42,9 @@ async fn get(
     State(state): State<AppState>,
     Query(query): Query<EventServiceListRequestQuery>,
 ) -> ApiResult<Json<EventServiceListResponse>> {
+    let search = query.search;
     let last_id = query.last_id.map(Into::into);
+    let tags = query.tag_ids.into_iter().map(Into::into).collect();
     let limit = match query.limit {
         Some(lim) => Some({
             lim.try_conv::<evops_models::PgLimit>()
@@ -49,7 +52,7 @@ async fn get(
         }),
         None => None,
     };
-    let events = state.list_events(last_id, limit).await?;
+    let events = state.list_events(last_id, limit, tags, search).await?;
 
     let response_data = EventServiceListResponse {
         events: events.into_iter().map(Into::into).collect(),
