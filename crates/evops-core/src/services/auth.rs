@@ -53,13 +53,32 @@ impl crate::AppState {
         login: &UserLogin,
         password: &UserPassword,
     ) -> ApiResult<AuthTokens> {
-        let password_hash = {
+        let (user_id, password_hash) = {
             let mut db = self.shared_state.db.lock().await;
             db.get_password_hash(&login).await
         }?;
         self::verify_password(password, &password_hash)?;
-
-        todo!();
+        let now = Utc::now();
+        let tokens = AuthTokens {
+            access: self::generate_jwt(
+                user_id,
+                &self.shared_state.jwt_access_secret,
+                now,
+                self.shared_state.jwt_access_expiration,
+            )?,
+            refresh: self::generate_jwt(
+                user_id,
+                &self.shared_state.jwt_refresh_secret,
+                now,
+                self.shared_state.jwt_refresh_expiration,
+            )?,
+        };
+        let token_hash = self::hash_jwt(&tokens.refresh);
+        {
+            let mut db = self.shared_state.db.lock().await;
+            db.reissue_refresh_token(&token_hash, user_id).await?;
+        }
+        Ok(tokens)
     }
 
     pub async fn refresh_jwt_access(&self, refresh_token: &JsonWebToken) -> ApiResult<AuthTokens> {
