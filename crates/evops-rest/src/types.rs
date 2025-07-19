@@ -39,8 +39,6 @@ pub struct UpdateEventForm {
     description: Option<EventDescription>,
     /// UUIDs of associated tags.
     tag_ids: Option<EventTagIds>,
-    /// Whether to enable attendance tracking.
-    track_attendance: Option<bool>,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
