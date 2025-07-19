@@ -20,7 +20,7 @@ impl crate::AppState {
         Ok(users)
     }
 
-    pub async fn sign_up_user(&self, form: NewUserForm) -> ApiResult<AuthTokens> {
+    pub async fn sign_up(&self, form: NewUserForm) -> ApiResult<AuthTokens> {
         let user_id = UserId::new(Uuid::now_v7());
         let now = Utc::now();
 
@@ -43,7 +43,7 @@ impl crate::AppState {
 
         {
             let mut db = self.shared_state.db.lock().await;
-            db.sign_up_user(
+            db.sign_up(
                 user_id,
                 &form.login,
                 &password_hash,

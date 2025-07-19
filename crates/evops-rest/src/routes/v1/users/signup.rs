@@ -33,7 +33,7 @@ async fn post(
     Json(request): Json<UserServiceSignUpRequest>,
 ) -> ApiResult<Json<UserServiceSignUpResponse>> {
     let form = request.form.try_into()?;
-    let tokens = state.sign_up_user(form).await?;
+    let tokens = state.sign_up(form).await?;
 
     let response_data = UserServiceSignUpResponse {
         tokens: tokens.into(),

@@ -50,7 +50,7 @@ impl UserService for self::Service {
                 })?
                 .try_into()?
         };
-        let tokens = self.state.sign_up_user(form).await?;
+        let tokens = self.state.sign_up(form).await?;
 
         let response_data = UserServiceSignUpResponse {
             tokens: Some(tokens.into()),
