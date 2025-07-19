@@ -5,7 +5,8 @@ use uuid::Uuid;
 use evops_models::{ApiError, ApiResult};
 
 use crate::pb::{
-    Event, NewEventForm, NewLanguageForm, NewTagForm, NewUserForm, Tag, UpdateEventForm, User,
+    AuthTokens, Event, NewEventForm, NewLanguageForm, NewTagForm, NewUserForm, Tag,
+    UpdateEventForm, User,
 };
 
 impl TryFrom<NewLanguageForm> for evops_models::NewLanguageForm {
@@ -18,6 +19,15 @@ impl TryFrom<NewLanguageForm> for evops_models::NewLanguageForm {
                     .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
             },
         })
+    }
+}
+
+impl From<evops_models::AuthTokens> for AuthTokens {
+    fn from(value: evops_models::AuthTokens) -> Self {
+        Self {
+            access: value.access.into_inner(),
+            refresh: value.refresh.into_inner(),
+        }
     }
 }
 

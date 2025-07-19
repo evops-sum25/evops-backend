@@ -39,6 +39,22 @@ impl UserService for self::Service {
         request: Request<UserServiceSignUpRequest>,
     ) -> Result<Response<UserServiceSignUpResponse>, Status> {
         let request_data = request.into_inner();
-        todo!();
+
+        let form = {
+            request_data
+                .form
+                .ok_or_else(|| {
+                    ApiError::InvalidArgument({
+                        "UserServiceSignUpRequest.form must not be null.".to_owned()
+                    })
+                })?
+                .try_into()?
+        };
+        let tokens = self.state.sign_up_user(form).await?;
+
+        let response_data = UserServiceSignUpResponse {
+            tokens: Some(tokens.into()),
+        };
+        Ok(Response::new(response_data))
     }
 }
