@@ -5,7 +5,7 @@ use axum::Json;
 use axum::extract::{Query, State};
 use tap::TryConv as _;
 
-use evops_models::{ApiError, ApiResult};
+use evops_models::{ApiError, ApiResult, EventTagIds};
 
 use crate::AppState;
 use crate::error::AddResponse as _;
@@ -41,7 +41,15 @@ async fn get(
     State(state): State<AppState>,
     Query(query): Query<EventServiceListRequestQuery>,
 ) -> ApiResult<Json<EventServiceListResponse>> {
+    let search = query.search;
     let last_id = query.last_id.map(Into::into);
+    let tags: Option<EventTagIds> = match query.tags {
+        Some(tags) => Some({
+            tags.try_conv::<EventTagIds>()
+                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+        }),
+        None => None,
+    };
     let limit = match query.limit {
         Some(lim) => Some({
             lim.try_conv::<evops_models::PgLimit>()
@@ -49,7 +57,7 @@ async fn get(
         }),
         None => None,
     };
-    let events = state.list_events(last_id, limit).await?;
+    let events = state.list_events(last_id, limit, tags, search).await?;
 
     let response_data = EventServiceListResponse {
         events: events.into_iter().map(Into::into).collect(),

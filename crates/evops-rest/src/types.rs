@@ -119,6 +119,35 @@ pub struct EventServiceListRequestQuery {
     pub last_id: Option<EventId>,
     /// Size of one batch of events.
     pub limit: Option<PgLimit>,
+    /// Tag ids of events to be listed (comma separated).
+    #[serde(default, deserialize_with = "deserialize_comma_separated")]
+    #[schemars(with = "Option<String>")]
+    pub tags: Option<EventTagIds>,
+    /// Search string to match against event titles and descriptions (case-insensitive).
+    pub search: Option<String>,
+}
+
+fn deserialize_comma_separated<'de, D>(deserializer: D) -> Result<Option<EventTagIds>, D::Error>
+where
+    D: serde::Deserializer<'de>,
+{
+    let s: Option<String> = Option::deserialize(deserializer)?;
+    match s {
+        Some(s) => {
+            let result = if s.is_empty() {
+                Vec::new()
+            } else {
+                let uuids: Result<Vec<_>, _> = s
+                    .split(',')
+                    .filter(|e| !e.trim().is_empty())
+                    .map(|e| Uuid::parse_str(e).map(TagId))
+                    .collect();
+                uuids.map_err(serde::de::Error::custom)?
+            };
+            Ok(Some(EventTagIds(result)))
+        }
+        None => Ok(None),
+    }
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
