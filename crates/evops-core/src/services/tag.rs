@@ -13,10 +13,10 @@ impl crate::AppState {
         Ok(tags)
     }
 
-    pub async fn create_tag(&self, request: NewTagForm, user_id: UserId) -> ApiResult<TagId> {
+    pub async fn create_tag(&self, request: NewTagForm, owner_id: UserId) -> ApiResult<TagId> {
         let tag_id = {
             let mut db = self.shared_state.db.lock().await;
-            db.create_tag(request).await
+            db.create_tag(request, owner_id).await
         }?;
         Ok(tag_id)
     }
