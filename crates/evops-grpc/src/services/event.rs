@@ -67,7 +67,8 @@ impl EventService for self::Service {
             }),
             None => None,
         };
-        let events = self.state.list_events(last_id, limit, tags).await?;
+        let search = request_data.search;
+        let events = self.state.list_events(last_id, limit, tags, search).await?;
 
         let response_data = EventServiceListResponse {
             events: events.into_iter().map(Into::into).collect(),

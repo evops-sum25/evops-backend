@@ -125,6 +125,8 @@ pub struct EventServiceListRequestQuery {
     #[serde(default, deserialize_with = "deserialize_comma_separated")]
     #[schemars(with = "Option<String>")]
     pub tags: Option<EventTagIds>,
+    /// Search string to match against event titles and descriptions (case-insensitive).
+    pub search: Option<String>,
 }
 
 fn deserialize_comma_separated<'de, D>(deserializer: D) -> Result<Option<EventTagIds>, D::Error>

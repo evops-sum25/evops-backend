@@ -41,6 +41,7 @@ async fn get(
     State(state): State<AppState>,
     Query(query): Query<EventServiceListRequestQuery>,
 ) -> ApiResult<Json<EventServiceListResponse>> {
+    let search = query.search;
     let last_id = query.last_id.map(Into::into);
     let tags: Option<EventTagIds> = match query.tags {
         Some(tags) => Some({
@@ -56,7 +57,7 @@ async fn get(
         }),
         None => None,
     };
-    let events = state.list_events(last_id, limit, tags).await?;
+    let events = state.list_events(last_id, limit, tags, search).await?;
 
     let response_data = EventServiceListResponse {
         events: events.into_iter().map(Into::into).collect(),
