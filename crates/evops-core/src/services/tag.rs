@@ -42,6 +42,6 @@ impl crate::AppState {
 
     pub async fn delete_tag(&self, id: TagId, user_id: UserId) -> ApiResult<()> {
         let mut db = self.shared_state.db.lock().await;
-        db.delete_tag(id).await
+        db.delete_tag(id, user_id).await
     }
 }
