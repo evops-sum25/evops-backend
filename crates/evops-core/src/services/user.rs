@@ -1,9 +1,8 @@
 use std::time::Duration;
 
-use argon2::{
-    Argon2, PasswordVerifier,
-    password_hash::{PasswordHasher as _, SaltString, rand_core::OsRng},
-};
+use argon2::password_hash::rand_core::OsRng;
+use argon2::password_hash::{PasswordHasher as _, SaltString};
+use argon2::{Argon2, PasswordVerifier as _};
 use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
