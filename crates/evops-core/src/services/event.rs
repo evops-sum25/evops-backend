@@ -17,10 +17,7 @@ impl crate::AppState {
         tags: Option<EventTagIds>,
         search: Option<String>,
     ) -> ApiResult<Vec<Event>> {
-        let search = match search {
-            Some(s) => Some(s.trim().to_lowercase()),
-            None => None,
-        };
+        let search = search.map(|s| s.trim().to_lowercase());
         let events = {
             let mut db = self.shared_state.db.lock().await;
             db.list_events(last_id, limit, tags, search).await

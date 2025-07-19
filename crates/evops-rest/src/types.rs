@@ -1,5 +1,3 @@
-use std::str::FromStr;
-
 use aide_axum_typed_multipart::FieldData;
 use axum::body::Bytes;
 use axum_typed_multipart::TryFromMultipart;
@@ -142,9 +140,9 @@ where
                 let uuids: Result<Vec<_>, _> = s
                     .split(',')
                     .filter(|e| !e.trim().is_empty())
-                    .map(|e| Uuid::parse_str(e).map(|t| TagId(t)))
+                    .map(|e| Uuid::parse_str(e).map(TagId))
                     .collect();
-                uuids.map_err(|e| serde::de::Error::custom(e))?
+                uuids.map_err(serde::de::Error::custom)?
             };
             Ok(Some(EventTagIds(result)))
         }
