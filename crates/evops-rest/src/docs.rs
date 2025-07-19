@@ -12,14 +12,14 @@ mod routes;
 #[derive(Display, IntoStaticStr, EnumMessage, VariantArray)]
 #[allow(clippy::enum_variant_names)]
 pub enum Tag {
+    /// Manages login sessions
+    AuthService,
     /// Manages event-related operations
     EventService,
     /// Manages human languages
     LanguageService,
     /// Manages event tags
     TagService,
-    /// Manages user accounts
-    UserService,
 }
 
 pub fn use_openapi3_schemas() {

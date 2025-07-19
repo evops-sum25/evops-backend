@@ -311,32 +311,32 @@ pub struct AuthTokens {
 }
 
 #[derive(Serialize, JsonSchema)]
-pub struct UserServiceSignUpResponse {
+pub struct AuthServiceSignUpResponse {
     pub tokens: AuthTokens,
 }
 
 #[derive(Serialize, JsonSchema)]
-pub struct UserServiceLogInResponse {
+pub struct AuthServiceLogInResponse {
     pub tokens: AuthTokens,
 }
 
 #[derive(Serialize, JsonSchema)]
-pub struct UserServiceRefreshResponse {
+pub struct AuthServiceRefreshSessionResponse {
     pub tokens: AuthTokens,
 }
 
 #[derive(Deserialize, JsonSchema)]
-pub struct UserServiceRefreshRequest {
+pub struct AuthServiceRefreshSessionRequest {
     pub refresh_token: JsonWebToken,
 }
 
 #[derive(Deserialize, JsonSchema)]
-pub struct UserServiceLogInRequest {
+pub struct AuthServiceLogInRequest {
     pub credentials: UserCredentials,
 }
 
 #[derive(Deserialize, JsonSchema)]
-pub struct UserServiceSignUpRequest {
+pub struct AuthServiceSignUpRequest {
     pub form: NewUserForm,
 }
 

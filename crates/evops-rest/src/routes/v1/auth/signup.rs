@@ -8,10 +8,10 @@ use evops_models::ApiResult;
 
 use crate::AppState;
 use crate::error::AddResponse as _;
-use crate::types::{UserServiceLogInRequest, UserServiceLogInResponse};
+use crate::types::{AuthServiceSignUpRequest, AuthServiceSignUpResponse};
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
-    r.tag(crate::docs::Tag::UserService.into())
+    r.tag(crate::docs::Tag::AuthService.into())
 }
 pub fn router() -> ApiRouter<AppState> {
     ApiRouter::new().api_route_with(
@@ -22,7 +22,7 @@ pub fn router() -> ApiRouter<AppState> {
 }
 
 fn post_docs(o: TransformOperation) -> TransformOperation {
-    o.summary("evops.api.v1.UserService.LogIn")
+    o.summary("evops.api.v1.AuthService.SignUp")
         .description("...")
         .response_bad_request()
         .response_unprocessable_entity()
@@ -30,13 +30,12 @@ fn post_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn post(
     State(state): State<AppState>,
-    Json(request): Json<UserServiceLogInRequest>,
-) -> ApiResult<Json<UserServiceLogInResponse>> {
-    let login = request.credentials.login.try_into()?;
-    let password = request.credentials.password.try_into()?;
-    let tokens = state.log_in(&login, &password).await?;
+    Json(request): Json<AuthServiceSignUpRequest>,
+) -> ApiResult<Json<AuthServiceSignUpResponse>> {
+    let form = request.form.try_into()?;
+    let tokens = state.sign_up(form).await?;
 
-    let response_data = UserServiceLogInResponse {
+    let response_data = AuthServiceSignUpResponse {
         tokens: tokens.into(),
     };
     Ok(Json(response_data))
