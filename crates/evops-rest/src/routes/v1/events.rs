@@ -44,14 +44,7 @@ async fn get(
 ) -> ApiResult<Json<EventServiceListResponse>> {
     let search = query.search;
     let last_id = query.last_id.map(Into::into);
-    let tags = if !query.tag_ids.is_empty() {
-        Some({
-            evops_models::EventTagIds::try_new(query.tag_ids.into_iter().map(Into::into).collect())
-                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
-        })
-    } else {
-        None
-    };
+    let tags = query.tag_ids.into_iter().map(Into::into).collect();
     let limit = match query.limit {
         Some(lim) => Some({
             lim.try_conv::<evops_models::PgLimit>()

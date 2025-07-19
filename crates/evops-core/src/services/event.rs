@@ -4,8 +4,8 @@ use bytes::Bytes;
 use futures::Stream;
 
 use evops_models::{
-    ApiResult, Event, EventId, EventImage, EventImageId, EventImageIds, EventTagIds, NewEventForm,
-    PgLimit, UpdateEventForm,
+    ApiResult, Event, EventId, EventImage, EventImageId, EventImageIds, NewEventForm, PgLimit,
+    TagId, UpdateEventForm,
 };
 use uuid::Uuid;
 
@@ -14,7 +14,7 @@ impl crate::AppState {
         &self,
         last_id: Option<EventId>,
         limit: Option<PgLimit>,
-        tags: Option<EventTagIds>,
+        tags: Vec<TagId>,
         search: Option<String>,
     ) -> ApiResult<Vec<Event>> {
         let search = search.map(|s| s.trim().to_lowercase());
