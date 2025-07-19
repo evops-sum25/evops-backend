@@ -2,6 +2,7 @@ use aide::axum::ApiRouter;
 use aide::axum::routing::post_with;
 use aide::transform::{TransformOperation, TransformPathItem};
 use axum::Json;
+use axum::extract::State;
 
 use evops_models::ApiResult;
 
@@ -28,7 +29,14 @@ fn post_docs(o: TransformOperation) -> TransformOperation {
         .response_internal_server_error()
 }
 async fn post(
+    State(state): State<AppState>,
     Json(request): Json<UserServiceSignUpRequest>,
 ) -> ApiResult<Json<UserServiceSignUpResponse>> {
-    todo!();
+    let form = request.form.try_into()?;
+    let tokens = state.sign_up_user(form).await?;
+
+    let response_data = UserServiceSignUpResponse {
+        tokens: tokens.into(),
+    };
+    Ok(Json(response_data))
 }

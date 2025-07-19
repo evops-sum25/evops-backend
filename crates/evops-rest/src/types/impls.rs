@@ -1,10 +1,10 @@
 use evops_models::ApiError;
 
 use crate::types::{
-    Event, EventDescription, EventId, EventImageId, EventImageIds, EventTagIds, EventTags,
-    EventTitle, LanguageId, LanguageName, NewEventForm, NewLanguageForm, NewTagForm, NewUserForm,
-    PgLimit, Tag, TagAlias, TagAliases, TagId, TagName, UpdateEventForm, User, UserDisplayName,
-    UserId, UserLogin, UserPassword,
+    AuthTokens, Event, EventDescription, EventId, EventImageId, EventImageIds, EventTagIds,
+    EventTags, EventTitle, JsonWebToken, LanguageId, LanguageName, NewEventForm, NewLanguageForm,
+    NewTagForm, NewUserForm, PgLimit, Tag, TagAlias, TagAliases, TagId, TagName, UpdateEventForm,
+    User, UserDisplayName, UserId, UserLogin, UserPassword,
 };
 
 impl TryFrom<NewLanguageForm> for evops_models::NewLanguageForm {
@@ -14,6 +14,21 @@ impl TryFrom<NewLanguageForm> for evops_models::NewLanguageForm {
         Ok(Self {
             name: value.name.try_into()?,
         })
+    }
+}
+
+impl From<evops_models::AuthTokens> for AuthTokens {
+    fn from(value: evops_models::AuthTokens) -> Self {
+        Self {
+            access: value.access.into(),
+            refresh: value.refresh.into(),
+        }
+    }
+}
+
+impl From<evops_models::JsonWebToken> for JsonWebToken {
+    fn from(value: evops_models::JsonWebToken) -> Self {
+        Self(value.into_inner())
     }
 }
 
