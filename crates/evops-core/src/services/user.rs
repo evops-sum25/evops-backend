@@ -8,8 +8,8 @@ use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
 use evops_models::{
-    ApiError, ApiResult, JsonWebToken, JwtClaims, NewUserForm, User, UserId, UserPassword,
-    UserPasswordHash,
+    ApiError, ApiResult, AuthTokens, JsonWebToken, JwtClaims, NewUserForm, User, UserId,
+    UserPassword, UserPasswordHash,
 };
 
 impl crate::AppState {
@@ -21,13 +21,39 @@ impl crate::AppState {
         Ok(users)
     }
 
-    #[deprecated]
-    pub async fn create_user(&self, request: NewUserForm) -> ApiResult<UserId> {
-        let user_id = {
+    pub async fn sign_up_user(&self, form: NewUserForm) -> ApiResult<AuthTokens> {
+        let user_id = UserId::new(Uuid::now_v7());
+        let now = Utc::now();
+
+        let tokens = AuthTokens {
+            access: self::generate_jwt(
+                user_id,
+                &self.shared_state.jwt_access_secret,
+                now,
+                self.shared_state.jwt_access_expiration,
+            )?,
+            refresh: self::generate_jwt(
+                user_id,
+                &self.shared_state.jwt_refresh_secret,
+                now,
+                self.shared_state.jwt_refresh_expiration,
+            )?,
+        };
+        let password_hash = self::hash_password(&form.password)?;
+
+        {
             let mut db = self.shared_state.db.lock().await;
-            db.create_user(request).await
+            db.sign_up_user(
+                user_id,
+                &form.login,
+                &password_hash,
+                &form.display_name,
+                &tokens.refresh,
+            )
+            .await
         }?;
-        Ok(user_id)
+
+        Ok(tokens)
     }
 
     pub async fn find_user(&self, id: UserId) -> ApiResult<User> {
@@ -36,31 +62,6 @@ impl crate::AppState {
             db.find_user(id).await
         }?;
         Ok(user)
-    }
-
-    pub async fn signup_user(&self, form: NewUserForm) -> ApiResult<()> {
-        let user_id = UserId::new(Uuid::now_v7());
-        let now = Utc::now();
-
-        let access_token = {
-            self::generate_jwt(
-                user_id,
-                &self.shared_state.jwt_access_secret,
-                now,
-                self.shared_state.jwt_access_expiration,
-            )?
-        };
-        let refresh_token = {
-            self::generate_jwt(
-                user_id,
-                &self.shared_state.jwt_refresh_secret,
-                now,
-                self.shared_state.jwt_refresh_expiration,
-            )?
-        };
-        let password_argon2 = self::hash_password(&form.password)?;
-
-        todo!()
     }
 
     pub fn decode_jwt(&self, token: &JsonWebToken) -> ApiResult<UserId> {
@@ -108,7 +109,7 @@ fn generate_jwt(
     secret: &[u8],
     now: DateTime<Utc>,
     exp: Duration,
-) -> ApiResult<String> {
+) -> ApiResult<JsonWebToken> {
     jsonwebtoken::encode(
         &jsonwebtoken::Header::default(),
         &JwtClaims {
@@ -117,5 +118,6 @@ fn generate_jwt(
         },
         &jsonwebtoken::EncodingKey::from_secret(secret),
     )
+    .map(JsonWebToken::new)
     .map_err(|e| ApiError::Other(e.to_string()))
 }
