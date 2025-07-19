@@ -128,6 +128,5 @@ fn hash_jwt(token: &JsonWebToken) -> JsonWebTokenHash {
         blake3::hash(token.as_ref().as_bytes())
             .as_bytes()
             .to_owned()
-    });
-    todo!()
+    })
 }
