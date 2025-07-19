@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use argon2::{
-    Argon2,
+    Argon2, PasswordVerifier,
     password_hash::{PasswordHasher as _, SaltString, rand_core::OsRng},
 };
 use chrono::{DateTime, Utc};
@@ -39,8 +39,6 @@ impl crate::AppState {
     }
 
     pub async fn signup_user(&self, form: NewUserForm) -> ApiResult<()> {
-        let password_argon2 = self::hash_password(&form.password)?;
-
         let user_id = UserId::new(Uuid::now_v7());
         let now = Utc::now();
 
@@ -60,6 +58,7 @@ impl crate::AppState {
                 self.shared_state.jwt_refresh_expiration,
             )?
         };
+        let password_argon2 = self::hash_password(&form.password)?;
 
         todo!()
     }
@@ -89,6 +88,19 @@ fn hash_password(password: &UserPassword) -> ApiResult<UserPasswordHash> {
         )
         .map(|password_hash| UserPasswordHash::new(password_hash.to_string()))
         .map_err(|e| ApiError::Other(e.to_string()))
+}
+
+fn verify_password(
+    new_password: &UserPassword,
+    true_password_hash: &UserPasswordHash,
+) -> ApiResult<()> {
+    let parsed_hash = {
+        argon2::PasswordHash::new(true_password_hash.as_ref())
+            .map_err(|e| ApiError::Other(e.to_string()))?
+    };
+    Argon2::default()
+        .verify_password(new_password.as_ref().as_bytes(), &parsed_hash)
+        .map_err(|e| ApiError::Forbidden(e.to_string()))
 }
 
 fn generate_jwt(
