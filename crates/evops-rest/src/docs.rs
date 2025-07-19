@@ -43,6 +43,7 @@ pub fn transform_api(mut api: TransformOpenApi) -> TransformOpenApi {
             scheme: "bearer".to_owned(),
             bearer_format: Some("JWT".to_owned()),
             description: None,
+            #[allow(clippy::default_trait_access)]
             extensions: Default::default(),
         },
     )

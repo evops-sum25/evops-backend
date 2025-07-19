@@ -206,7 +206,7 @@ impl TryFrom<UserPassword> for evops_models::UserPassword {
     type Error = ApiError;
 
     fn try_from(value: UserPassword) -> Result<Self, Self::Error> {
-        Ok(Self::try_new(value.0).map_err(|e| ApiError::InvalidArgument(e.to_string()))?)
+        Self::try_new(value.0).map_err(|e| ApiError::InvalidArgument(e.to_string()))
     }
 }
 
@@ -224,7 +224,7 @@ impl TryFrom<UserLogin> for evops_models::UserLogin {
     type Error = ApiError;
 
     fn try_from(value: UserLogin) -> Result<Self, Self::Error> {
-        Ok(Self::try_new(value.0).map_err(|e| ApiError::InvalidArgument(e.to_string()))?)
+        Self::try_new(value.0).map_err(|e| ApiError::InvalidArgument(e.to_string()))
     }
 }
 

@@ -37,13 +37,13 @@ pub fn from_env() -> eyre::Result<self::Config> {
     };
     let jwt_access_secret = {
         std::env::var_os(JWT_ACCESS_SECRET)
-            .ok_or(eyre!(JWT_ACCESS_SECRET))?
+            .ok_or_else(|| eyre!(JWT_ACCESS_SECRET))?
             .into_encoded_bytes()
             .into()
     };
     let jwt_refresh_secret = {
         std::env::var_os(JWT_REFRESH_SECRET)
-            .ok_or(eyre!(JWT_REFRESH_SECRET))?
+            .ok_or_else(|| eyre!(JWT_REFRESH_SECRET))?
             .into_encoded_bytes()
             .into()
     };
