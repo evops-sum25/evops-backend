@@ -1,9 +1,10 @@
 use evops_models::ApiError;
 
 use crate::types::{
-    Event, EventDescription, EventId, EventImageId, EventImageIds, EventTagIds, EventTags,
-    EventTitle, LanguageId, LanguageName, NewEventForm, NewLanguageForm, NewTagForm, NewUserForm,
-    PgLimit, Tag, TagAlias, TagAliases, TagId, TagName, UpdateEventForm, User, UserId, UserName,
+    AuthTokens, Event, EventDescription, EventId, EventImageId, EventImageIds, EventTagIds,
+    EventTags, EventTitle, JsonWebToken, LanguageId, LanguageName, NewEventForm, NewLanguageForm,
+    NewTagForm, NewUserForm, PgLimit, Tag, TagAlias, TagAliases, TagId, TagName, UpdateEventForm,
+    User, UserDisplayName, UserId, UserLogin, UserPassword,
 };
 
 impl TryFrom<NewLanguageForm> for evops_models::NewLanguageForm {
@@ -13,6 +14,27 @@ impl TryFrom<NewLanguageForm> for evops_models::NewLanguageForm {
         Ok(Self {
             name: value.name.try_into()?,
         })
+    }
+}
+
+impl From<JsonWebToken> for evops_models::JsonWebToken {
+    fn from(value: JsonWebToken) -> Self {
+        Self::new(value.0)
+    }
+}
+
+impl From<evops_models::AuthTokens> for AuthTokens {
+    fn from(value: evops_models::AuthTokens) -> Self {
+        Self {
+            access: value.access.into(),
+            refresh: value.refresh.into(),
+        }
+    }
+}
+
+impl From<evops_models::JsonWebToken> for JsonWebToken {
+    fn from(value: evops_models::JsonWebToken) -> Self {
+        Self(value.into_inner())
     }
 }
 
@@ -37,9 +59,7 @@ impl TryFrom<NewEventForm> for evops_models::NewEventForm {
         Ok(Self {
             title: value.title.try_into()?,
             description: value.description.try_into()?,
-            author_id: value.author_id.into(),
             tag_ids: value.tag_ids.unwrap_or_default().try_into()?,
-            with_attendance: value.with_attendance,
         })
     }
 }
@@ -52,7 +72,6 @@ impl TryFrom<UpdateEventForm> for evops_models::UpdateEventForm {
             title: value.title.map(TryInto::try_into).transpose()?,
             description: value.description.map(TryInto::try_into).transpose()?,
             tag_ids: value.tag_ids.map(TryInto::try_into).transpose()?,
-            track_attendance: value.track_attendance,
         })
     }
 }
@@ -117,7 +136,6 @@ impl From<evops_models::Event> for Event {
             author: value.author.into(),
             image_ids: value.image_ids.into(),
             tags: value.tags.into(),
-            with_attendance: value.with_attendance,
             created_at: value.created_at,
             modified_at: value.modified_at,
         }
@@ -170,9 +188,25 @@ impl TryFrom<NewUserForm> for evops_models::NewUserForm {
     type Error = ApiError;
 
     fn try_from(value: NewUserForm) -> Result<Self, Self::Error> {
+        let login: evops_models::UserLogin = value.login.try_into()?;
         Ok(Self {
-            name: value.name.try_into()?,
+            display_name: match value.display_name {
+                Some(display_name) => display_name.try_into()?,
+                None => unsafe {
+                    evops_models::UserDisplayName::new_unchecked(login.as_ref().to_owned())
+                },
+            },
+            login,
+            password: value.password.try_into()?,
         })
+    }
+}
+
+impl TryFrom<UserPassword> for evops_models::UserPassword {
+    type Error = ApiError;
+
+    fn try_from(value: UserPassword) -> Result<Self, Self::Error> {
+        Self::try_new(value.0).map_err(|e| ApiError::InvalidArgument(e.to_string()))
     }
 }
 
@@ -180,8 +214,23 @@ impl From<evops_models::User> for User {
     fn from(value: evops_models::User) -> Self {
         Self {
             id: value.id.into(),
-            name: value.name.into(),
+            login: value.login.into(),
+            display_name: value.display_name.into(),
         }
+    }
+}
+
+impl TryFrom<UserLogin> for evops_models::UserLogin {
+    type Error = ApiError;
+
+    fn try_from(value: UserLogin) -> Result<Self, Self::Error> {
+        Self::try_new(value.0).map_err(|e| ApiError::InvalidArgument(e.to_string()))
+    }
+}
+
+impl From<evops_models::UserLogin> for UserLogin {
+    fn from(value: evops_models::UserLogin) -> Self {
+        Self(value.into_inner())
     }
 }
 
@@ -239,16 +288,16 @@ impl From<evops_models::EventDescription> for EventDescription {
     }
 }
 
-impl TryFrom<UserName> for evops_models::UserName {
+impl TryFrom<UserDisplayName> for evops_models::UserDisplayName {
     type Error = ApiError;
 
-    fn try_from(value: UserName) -> Result<Self, Self::Error> {
+    fn try_from(value: UserDisplayName) -> Result<Self, Self::Error> {
         Self::try_new(value.0).map_err(|e| ApiError::InvalidArgument(e.to_string()))
     }
 }
 
-impl From<evops_models::UserName> for UserName {
-    fn from(value: evops_models::UserName) -> Self {
+impl From<evops_models::UserDisplayName> for UserDisplayName {
+    fn from(value: evops_models::UserDisplayName) -> Self {
         Self(value.into_inner())
     }
 }

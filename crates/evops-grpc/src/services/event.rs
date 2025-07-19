@@ -73,6 +73,7 @@ impl EventService for self::Service {
         &self,
         request: Request<EventServiceCreateRequest>,
     ) -> Result<Response<EventServiceCreateResponse>, Status> {
+        let user_id = crate::auth(&self.state, &request)?;
         let request_data = request.into_inner();
 
         let form = {
@@ -83,7 +84,7 @@ impl EventService for self::Service {
                 }))?
                 .try_into()?
         };
-        let event_id = self.state.create_event(form).await?;
+        let event_id = self.state.create_event(form, user_id).await?;
 
         let response_data = EventServiceCreateResponse {
             event_id: event_id.to_string(),
@@ -115,6 +116,7 @@ impl EventService for self::Service {
         &self,
         request: Request<EventServiceUpdateRequest>,
     ) -> Result<Response<EventServiceUpdateResponse>, Status> {
+        let user_id = crate::auth(&self.state, &request)?;
         let request_data = request.into_inner();
 
         let event_id = evops_models::EventId::new({
@@ -134,7 +136,7 @@ impl EventService for self::Service {
                 })?
                 .try_into()?
         };
-        self.state.update_event(event_id, form).await?;
+        self.state.update_event(event_id, user_id, form).await?;
 
         Ok(Response::new(EventServiceUpdateResponse {}))
     }
@@ -143,6 +145,7 @@ impl EventService for self::Service {
         &self,
         request: Request<EventServiceDeleteRequest>,
     ) -> Result<Response<EventServiceDeleteResponse>, Status> {
+        let user_id = crate::auth(&self.state, &request)?;
         let request_data = request.into_inner();
 
         let event_id = evops_models::EventId::new({
@@ -151,42 +154,44 @@ impl EventService for self::Service {
                 .parse::<Uuid>()
                 .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
         });
-        self.state.delete_event(event_id).await?;
+        self.state.delete_event(event_id, user_id).await?;
 
         Ok(Response::new(EventServiceDeleteResponse {}))
     }
 
     async fn reorder_images(
         &self,
-        request: Request<EventServiceReorderImagesRequest>,
+        _request: Request<EventServiceReorderImagesRequest>,
     ) -> Result<Response<EventServiceReorderImagesResponse>, Status> {
-        let request_data = request.into_inner();
+        // let request_data = request.into_inner();
 
-        let event_id = evops_models::EventId::new({
-            request_data
-                .event_id
-                .parse::<Uuid>()
-                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
-        });
-        let image_order = {
-            evops_models::EventImageIds::try_new({
-                request_data
-                    .image_ids
-                    .into_iter()
-                    .map(|image_id| {
-                        ApiResult::Ok(evops_models::EventImageId::new({
-                            image_id
-                                .parse::<Uuid>()
-                                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
-                        }))
-                    })
-                    .collect::<Result<_, _>>()?
-            })
-            .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
-        };
-        self.state.reorder_images(event_id, image_order).await?;
+        // let event_id = evops_models::EventId::new({
+        //     request_data
+        //         .event_id
+        //         .parse::<Uuid>()
+        //         .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+        // });
+        // let image_order = {
+        //     evops_models::EventImageIds::try_new({
+        //         request_data
+        //             .image_ids
+        //             .into_iter()
+        //             .map(|image_id| {
+        //                 ApiResult::Ok(evops_models::EventImageId::new({
+        //                     image_id
+        //                         .parse::<Uuid>()
+        //                         .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+        //                 }))
+        //             })
+        //             .collect::<Result<_, _>>()?
+        //     })
+        //     .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+        // };
+        // self.state.reorder_images(event_id, image_order).await?;
 
-        Ok(Response::new(EventServiceReorderImagesResponse {}))
+        // Ok(Response::new(EventServiceReorderImagesResponse {}))
+
+        Err(Status::unimplemented(""))
     }
 
     async fn push_image(
@@ -195,6 +200,7 @@ impl EventService for self::Service {
     ) -> Result<Response<EventServicePushImageResponse>, Status> {
         use crate::pb::event_service_push_image_request::Message;
 
+        let user_id = crate::auth(&self.state, &request)?;
         let mut request_stream = request.into_inner();
 
         let err_msg_not_null = "EventServicePushImageRequest.message must not be null.";
@@ -245,7 +251,10 @@ impl EventService for self::Service {
             evops_models::EventImage::try_from(buffer)?
         };
 
-        let image_id = self.state.push_event_image(event_id, image).await?;
+        let image_id = self
+            .state
+            .push_event_image(user_id, event_id, image)
+            .await?;
         let response_data = EventServicePushImageResponse {
             image_id: image_id.to_string(),
         };
@@ -293,18 +302,20 @@ impl EventService for self::Service {
 
     async fn delete_image(
         &self,
-        request: Request<EventServiceDeleteImageRequest>,
+        _request: Request<EventServiceDeleteImageRequest>,
     ) -> Result<Response<EventServiceDeleteImageResponse>, Status> {
-        let request_data = request.into_inner();
+        // let request_data = request.into_inner();
 
-        let image_id = evops_models::EventImageId::new({
-            request_data
-                .image_id
-                .parse::<Uuid>()
-                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
-        });
-        self.state.delete_image(image_id).await?;
+        // let image_id = evops_models::EventImageId::new({
+        //     request_data
+        //         .image_id
+        //         .parse::<Uuid>()
+        //         .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+        // });
+        // self.state.delete_image(image_id).await?;
 
-        Ok(Response::new(EventServiceDeleteImageResponse {}))
+        // Ok(Response::new(EventServiceDeleteImageResponse {}))
+
+        Err(Status::unimplemented(""))
     }
 }

@@ -7,11 +7,11 @@ use axum::extract::State;
 use evops_models::ApiResult;
 
 use crate::AppState;
-use crate::error::AddResponse;
-use crate::types::{LanguageServiceAddRequest, LanguageServiceAddResponse};
+use crate::error::AddResponse as _;
+use crate::types::{AuthServiceSignUpRequest, AuthServiceSignUpResponse};
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
-    r.tag(crate::docs::Tag::LanguageService.into())
+    r.tag(crate::docs::Tag::AuthService.into())
 }
 pub fn router() -> ApiRouter<AppState> {
     ApiRouter::new().api_route_with(
@@ -21,24 +21,22 @@ pub fn router() -> ApiRouter<AppState> {
     )
 }
 
-fn post_docs(mut o: TransformOperation) -> TransformOperation {
-    o.inner_mut().deprecated = true;
-    o.summary("evops.api.v1.LanguageService.Add")
-        .description("Adds a new language to the system.")
+fn post_docs(o: TransformOperation) -> TransformOperation {
+    o.summary("evops.api.v1.AuthService.SignUp")
+        .description("...")
         .response_bad_request()
-        .response_conflict()
         .response_unprocessable_entity()
         .response_internal_server_error()
 }
 async fn post(
     State(state): State<AppState>,
-    Json(request): Json<LanguageServiceAddRequest>,
-) -> ApiResult<Json<LanguageServiceAddResponse>> {
+    Json(request): Json<AuthServiceSignUpRequest>,
+) -> ApiResult<Json<AuthServiceSignUpResponse>> {
     let form = request.form.try_into()?;
-    let new_language_id = state.add_language(form).await?;
+    let tokens = state.sign_up(form).await?;
 
-    let response_data = LanguageServiceAddResponse {
-        language_id: new_language_id.into(),
+    let response_data = AuthServiceSignUpResponse {
+        tokens: tokens.into(),
     };
     Ok(Json(response_data))
 }

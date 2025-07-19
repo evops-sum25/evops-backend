@@ -6,12 +6,12 @@ use axum::extract::State;
 
 use evops_models::ApiResult;
 
+use crate::AppState;
 use crate::error::AddResponse as _;
-use crate::types::{TagServiceSuggestRequest, TagServiceSuggestResponse};
-use crate::{AppState, Auth};
+use crate::types::{AuthServiceRefreshSessionRequest, AuthServiceRefreshSessionResponse};
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
-    r.tag(crate::docs::Tag::TagService.into())
+    r.tag(crate::docs::Tag::AuthService.into())
 }
 pub fn router() -> ApiRouter<AppState> {
     ApiRouter::new().api_route_with(
@@ -22,22 +22,21 @@ pub fn router() -> ApiRouter<AppState> {
 }
 
 fn post_docs(o: TransformOperation) -> TransformOperation {
-    o.summary("evops.api.v1.TagService.Suggest")
-        .description("Get relevant tag IDs for an event description.")
+    o.summary("evops.api.v1.AuthService.RefreshSession")
+        .description("...")
         .response_bad_request()
-        .response_unauthorized()
         .response_unprocessable_entity()
         .response_internal_server_error()
 }
 async fn post(
-    _: Auth,
     State(state): State<AppState>,
-    Json(request): Json<TagServiceSuggestRequest>,
-) -> ApiResult<Json<TagServiceSuggestResponse>> {
-    let description: evops_models::EventDescription = request.description.try_into()?;
-    let tags_ids = state.get_tags_by_description(description).await?;
-    let response_data = TagServiceSuggestResponse {
-        tag_ids: tags_ids.into_iter().map(Into::into).collect(),
+    Json(request): Json<AuthServiceRefreshSessionRequest>,
+) -> ApiResult<Json<AuthServiceRefreshSessionResponse>> {
+    let refresh_token = request.refresh_token.into();
+    let tokens = state.refresh_jwt_access(&refresh_token).await?;
+
+    let response_data = AuthServiceRefreshSessionResponse {
+        tokens: tokens.into(),
     };
     Ok(Json(response_data))
 }

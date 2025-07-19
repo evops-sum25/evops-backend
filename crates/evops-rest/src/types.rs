@@ -39,8 +39,6 @@ pub struct UpdateEventForm {
     description: Option<EventDescription>,
     /// UUIDs of associated tags.
     tag_ids: Option<EventTagIds>,
-    /// Whether to enable attendance tracking.
-    track_attendance: Option<bool>,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
@@ -198,54 +196,19 @@ pub struct TagServiceSuggestResponse {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-#[serde(rename_all = "kebab-case")]
-pub struct UserServiceFindRequestPath {
-    /// UUID of the user to retrieve.
-    pub user_id: UserId,
-}
-
-#[derive(Debug, Serialize, JsonSchema)]
-pub struct UserServiceFindResponse {
-    /// Retrieved user object.
-    pub user: User,
-}
-
-#[derive(Debug, Deserialize, JsonSchema)]
 pub struct UserServiceListRequest;
-
-#[derive(Debug, Serialize, JsonSchema)]
-pub struct UserServiceListResponse {
-    /// List of all users.
-    pub users: Vec<User>,
-}
-
-#[derive(Debug, Deserialize, JsonSchema)]
-pub struct UserServiceCreateRequest {
-    /// Data for creating a new user.
-    pub form: NewUserForm,
-}
-
-#[derive(Debug, Serialize, JsonSchema)]
-pub struct UserServiceCreateResponse {
-    /// ID of the created user.
-    pub user_id: UserId,
-}
 
 #[derive(Debug, Default, Deserialize, JsonSchema)]
 pub struct EventTagIds(#[schemars(length(max = evops_models::EVENT_MAX_TAGS))] pub Vec<TagId>);
 
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct NewEventForm {
-    /// UUID of the creating user.
-    author_id: UserId,
     /// Event title.
     title: EventTitle,
     /// Detailed description.
     description: EventDescription,
     /// UUIDs of associated tags.
     tag_ids: Option<EventTagIds>,
-    /// Whether to enable attendance tracking.
-    with_attendance: bool,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
@@ -283,8 +246,6 @@ pub struct Event {
     description: EventDescription,
     /// Associated tags.
     tags: EventTags,
-    /// Whether attendance tracking is enabled.
-    with_attendance: bool,
     /// Creation timestamp.
     created_at: DateTime<Utc>,
     /// Last modification timestamp.
@@ -312,19 +273,90 @@ pub struct Tag {
     aliases: TagAliases,
 }
 
-#[derive(Debug, Deserialize, JsonSchema)]
+#[derive(Deserialize, JsonSchema)]
 pub struct NewUserForm {
+    /// Case-insensitively unique login.
+    login: UserLogin,
     /// Display name.
-    name: UserName,
+    display_name: Option<UserDisplayName>,
+    password: UserPassword,
 }
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct UserLogin(
+    #[schemars(
+        length(min = evops_models::USER_LOGIN_MIN_LEN, max=evops_models::USER_LOGIN_MAX_LEN),
+        regex(pattern = evops_models::USER_LOGIN_REGEX),
+    )]
+    String,
+);
 
 #[derive(Debug, Serialize, JsonSchema)]
 pub struct User {
     /// User UUID.
     id: UserId,
+    /// Case-insensitively unique login.
+    login: UserLogin,
     /// Display name.
-    name: UserName,
+    display_name: UserDisplayName,
 }
+
+#[derive(Serialize, Deserialize, JsonSchema)]
+pub struct JsonWebToken(#[schemars(regex(pattern = r"^[\w-]+\.[\w-]+\.[\w-]+$"))] String);
+
+#[derive(Serialize, JsonSchema)]
+pub struct AuthTokens {
+    access: JsonWebToken,
+    refresh: JsonWebToken,
+}
+
+#[derive(Serialize, JsonSchema)]
+pub struct AuthServiceSignUpResponse {
+    pub tokens: AuthTokens,
+}
+
+#[derive(Serialize, JsonSchema)]
+pub struct AuthServiceLogInResponse {
+    pub tokens: AuthTokens,
+}
+
+#[derive(Serialize, JsonSchema)]
+pub struct AuthServiceRefreshSessionResponse {
+    pub tokens: AuthTokens,
+}
+
+#[derive(Deserialize, JsonSchema)]
+pub struct AuthServiceRefreshSessionRequest {
+    pub refresh_token: JsonWebToken,
+}
+
+#[derive(Deserialize, JsonSchema)]
+pub struct AuthServiceLogInRequest {
+    pub credentials: UserCredentials,
+}
+
+#[derive(Deserialize, JsonSchema)]
+pub struct AuthServiceSignUpRequest {
+    pub form: NewUserForm,
+}
+
+#[derive(Deserialize, JsonSchema)]
+pub struct UserCredentials {
+    pub login: UserLogin,
+    pub password: UserPassword,
+}
+
+#[derive(Deserialize, JsonSchema)]
+pub struct UserPassword(
+    #[schemars(
+        length(
+            min = evops_models::USER_PASSWORD_MIN_LEN,
+            max = evops_models::USER_PASSWORD_MAX_LEN,
+        ),
+        regex(pattern = evops_models::USER_PASSWORD_REGEX),
+    )]
+    String,
+);
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct EventId(Uuid);
@@ -349,9 +381,12 @@ pub struct EventDescription(
 );
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
-struct UserName(
-    #[schemars(length(min = evops_models::USER_NAME_MIN_LEN, max = evops_models::USER_NAME_MAX_LEN))]
-     String,
+struct UserDisplayName(
+    #[schemars(length(
+        min = evops_models::USER_DISPLAY_NAME_MIN_LEN,
+        max = evops_models::USER_DISPLAY_NAME_MAX_LEN,
+    ))]
+    String,
 );
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]

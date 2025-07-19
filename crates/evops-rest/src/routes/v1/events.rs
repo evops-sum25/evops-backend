@@ -8,12 +8,12 @@ use tap::TryConv as _;
 
 use evops_models::{ApiError, ApiResult};
 
-use crate::AppState;
 use crate::error::AddResponse as _;
 use crate::types::{
     EventServiceCreateRequest, EventServiceCreateResponse, EventServiceListRequestQuery,
     EventServiceListResponse,
 };
+use crate::{AppState, Auth};
 
 mod _event_id;
 mod images;
@@ -64,15 +64,17 @@ fn post_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.EventService.Create")
         .description("Creates a new event.")
         .response_bad_request()
+        .response_unauthorized()
         .response_unprocessable_entity()
         .response_internal_server_error()
 }
 async fn post(
     State(state): State<AppState>,
+    Auth(user_id): Auth,
     Json(request): Json<EventServiceCreateRequest>,
 ) -> ApiResult<Json<EventServiceCreateResponse>> {
     let form = request.form.try_into()?;
-    let event_id = state.create_event(form).await?;
+    let event_id = state.create_event(form, user_id).await?;
 
     let response_data = EventServiceCreateResponse {
         event_id: event_id.into(),

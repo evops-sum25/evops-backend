@@ -7,10 +7,12 @@ default-members = ["crates/evops/"]
 [workspace.dependencies]
 aide = "0.15.0"
 aide-axum-typed-multipart = { version = "0.16.0", package = "aide-axum-typed-multipart-2" }
+argon2 = "0.5.3"
 axum = "0.8.4"
 axum_tonic = "0.4.1"
 axum_typed_multipart = "0.16.3"
 axum-extra = "0.10.1"
+blake3 = "1.8.2"
 bon = "3.6.4"
 bytes = "1.10.1"
 bytesize = "2.0.1"
@@ -30,6 +32,7 @@ futures = "0.3.31"
 http = "1.3.1"
 image = "0.25.6"
 itertools = "0.14.0"
+jsonwebtoken = "9.3.1"
 minio = "0.3.0"
 prost = "0.13.5"  # 0.14.1
 prost-types = "0.13.5"  # 0.14.1

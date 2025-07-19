@@ -6,12 +6,12 @@ use axum::extract::{Path, State};
 
 use evops_models::ApiResult;
 
-use crate::AppState;
 use crate::error::AddResponse as _;
 use crate::types::{
     EventServiceDeleteRequestPath, EventServiceFindRequestPath, EventServiceFindResponse,
     EventServiceUpdateRequest, EventServiceUpdateRequestPath,
 };
+use crate::{AppState, Auth};
 
 mod images;
 
@@ -57,33 +57,38 @@ fn delete_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.EventService.Delete")
         .description("Deletes an event by ID.")
         .response_bad_request()
+        .response_unauthorized()
+        .response_forbidden()
         .response_not_found()
         .response_unprocessable_entity()
         .response_internal_server_error()
 }
 async fn delete(
     State(state): State<AppState>,
+    Auth(user_id): Auth,
     Path(path): Path<EventServiceDeleteRequestPath>,
 ) -> ApiResult<()> {
     let request: evops_models::EventId = path.event_id.into();
-    tracing::debug!("delete request received for {}", request);
-    state.delete_event(request).await
+    state.delete_event(request, user_id).await
 }
 
 fn put_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.EventService.Update")
         .description("Updates an event by ID.")
         .response_bad_request()
+        .response_unauthorized()
+        .response_forbidden()
         .response_not_found()
         .response_unprocessable_entity()
         .response_internal_server_error()
 }
 async fn put(
     State(state): State<AppState>,
+    Auth(user_id): Auth,
     Path(path): Path<EventServiceUpdateRequestPath>,
     Json(request): Json<EventServiceUpdateRequest>,
 ) -> ApiResult<()> {
     let form = request.form.try_into()?;
-    let id = path.event_id.into();
-    state.update_event(id, form).await
+    let event_id = path.event_id.into();
+    state.update_event(event_id, user_id, form).await
 }

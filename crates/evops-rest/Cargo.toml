@@ -4,15 +4,20 @@ edition = "2024"
 
 [dependencies]
 aide = { workspace = true, features = [
-    "axum-extra-query",
-    "axum-json",
-    "axum-query",
-    "swagger",
+  "axum-extra-headers",
+  "axum-extra-query",
+  "axum-json",
+  "axum-query",
+  "swagger",
 ] }
 aide-axum-typed-multipart = { workspace = true }
-axum = { workspace = true }
+axum = { workspace = true, features = ["macros"] }
 axum_typed_multipart = { workspace = true }
-axum-extra = { workspace = true, features = ["file-stream", "query"] }
+axum-extra = { workspace = true, features = [
+  "file-stream",
+  "query",
+  "typed-header",
+] }
 chrono = { workspace = true, features = ["serde"] }
 evops-core = { workspace = true }
 evops-models = { workspace = true, features = ["aide"] }
