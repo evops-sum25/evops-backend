@@ -3,6 +3,8 @@ name = "evops-core"
 edition = "2024"
 
 [dependencies]
+argon2 = { workspace = true }
+blake3 = { workspace = true }
 bon = { workspace = true }
 bytes = { workspace = true }
 chrono = { workspace = true }

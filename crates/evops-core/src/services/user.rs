@@ -1,8 +1,16 @@
 use std::time::Duration;
 
+use argon2::{
+    Argon2,
+    password_hash::{PasswordHasher as _, SaltString, rand_core::OsRng},
+};
 use chrono::{DateTime, Utc};
-use evops_models::{ApiError, ApiResult, JsonWebToken, JwtClaims, NewUserForm, User, UserId};
 use uuid::Uuid;
+
+use evops_models::{
+    ApiError, ApiResult, JsonWebToken, JwtClaims, NewUserForm, User, UserId, UserPassword,
+    UserPasswordHash,
+};
 
 impl crate::AppState {
     pub async fn list_users(&self) -> ApiResult<Vec<User>> {
@@ -31,6 +39,8 @@ impl crate::AppState {
     }
 
     pub async fn signup_user(&self, form: NewUserForm) -> ApiResult<()> {
+        let password_argon2 = self::hash_password(&form.password)?;
+
         let user_id = UserId::new(Uuid::now_v7());
         let now = Utc::now();
 
@@ -69,6 +79,16 @@ impl crate::AppState {
         }
         Ok(claims.sub)
     }
+}
+
+fn hash_password(password: &UserPassword) -> ApiResult<UserPasswordHash> {
+    Argon2::default()
+        .hash_password(
+            password.as_ref().as_bytes(),
+            &SaltString::generate(&mut OsRng),
+        )
+        .map(|password_hash| UserPasswordHash::new(password_hash.to_string()))
+        .map_err(|e| ApiError::Other(e.to_string()))
 }
 
 fn generate_jwt(
