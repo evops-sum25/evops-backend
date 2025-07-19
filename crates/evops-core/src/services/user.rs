@@ -8,8 +8,8 @@ use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
 use evops_models::{
-    ApiError, ApiResult, AuthTokens, JsonWebToken, JwtClaims, NewUserForm, User, UserId,
-    UserPassword, UserPasswordHash,
+    ApiError, ApiResult, AuthTokens, JsonWebToken, JsonWebTokenHash, JwtClaims, NewUserForm, User,
+    UserId, UserPassword, UserPasswordHash,
 };
 
 impl crate::AppState {
@@ -39,6 +39,7 @@ impl crate::AppState {
                 self.shared_state.jwt_refresh_expiration,
             )?,
         };
+        let refresh_token_hash = self::hash_jwt(&tokens.refresh);
         let password_hash = self::hash_password(&form.password)?;
 
         {
@@ -48,7 +49,7 @@ impl crate::AppState {
                 &form.login,
                 &password_hash,
                 &form.display_name,
-                &tokens.refresh,
+                &refresh_token_hash,
             )
             .await
         }?;
@@ -120,4 +121,13 @@ fn generate_jwt(
     )
     .map(JsonWebToken::new)
     .map_err(|e| ApiError::Other(e.to_string()))
+}
+
+fn hash_jwt(token: &JsonWebToken) -> JsonWebTokenHash {
+    JsonWebTokenHash::new({
+        blake3::hash(token.as_ref().as_bytes())
+            .as_bytes()
+            .to_owned()
+    });
+    todo!()
 }
