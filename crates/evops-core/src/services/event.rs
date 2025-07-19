@@ -5,7 +5,7 @@ use futures::Stream;
 
 use evops_models::{
     ApiResult, Event, EventId, EventImage, EventImageId, EventImageIds, NewEventForm, PgLimit,
-    TagId, UpdateEventForm, UpdateEventForm, UserId,
+    TagId, UpdateEventForm, UserId,
 };
 use uuid::Uuid;
 

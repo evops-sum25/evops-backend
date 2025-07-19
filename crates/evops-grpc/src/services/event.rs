@@ -4,7 +4,7 @@ use tokio_stream::wrappers::ReceiverStream;
 use tonic::{Request, Response, Status, Streaming};
 use uuid::Uuid;
 
-use evops_models::ApiError;
+use evops_models::{ApiError, ApiResult};
 
 use crate::AppState;
 use crate::pb::event_service_server::{EventService, EventServiceServer};
