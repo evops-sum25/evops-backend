@@ -52,6 +52,7 @@ impl TagService for self::Service {
         &self,
         request: Request<TagServiceCreateRequest>,
     ) -> Result<Response<TagServiceCreateResponse>, Status> {
+        let user_id = crate::auth(&self.state, &request)?;
         let request_data = request.into_inner();
 
         let form = {
@@ -63,7 +64,7 @@ impl TagService for self::Service {
                 })?
                 .try_into()?
         };
-        let tag_id = self.state.create_tag(form).await?;
+        let tag_id = self.state.create_tag(form, user_id).await?;
 
         let response_data = TagServiceCreateResponse {
             tag_id: tag_id.to_string(),
@@ -95,6 +96,7 @@ impl TagService for self::Service {
         &self,
         request: Request<TagServiceDeleteRequest>,
     ) -> Result<Response<TagServiceDeleteResponse>, Status> {
+        let user_id = crate::auth(&self.state, &request)?;
         let request_data = request.into_inner();
 
         let tag_id = evops_models::TagId::new({
@@ -103,7 +105,7 @@ impl TagService for self::Service {
                 .parse::<Uuid>()
                 .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
         });
-        self.state.delete_tag(tag_id).await?;
+        self.state.delete_tag(tag_id, user_id).await?;
 
         Ok(Response::new(TagServiceDeleteResponse {}))
     }

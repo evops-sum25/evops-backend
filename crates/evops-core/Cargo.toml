@@ -3,14 +3,18 @@ name = "evops-core"
 edition = "2024"
 
 [dependencies]
+argon2 = { workspace = true }
+blake3 = { workspace = true }
 bon = { workspace = true }
 bytes = { workspace = true }
+chrono = { workspace = true }
 evops-db = { workspace = true }
 evops-ml-client = { workspace = true }
 evops-models = { workspace = true }
 evops-storage = { workspace = true }
 eyre = { workspace = true }
 futures = { workspace = true }
+jsonwebtoken = { workspace = true }
 tokio = { workspace = true, features = ["sync"] }
 url = { workspace = true }
 uuid = { workspace = true, features = ["v7"] }

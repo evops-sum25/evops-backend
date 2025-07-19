@@ -3,6 +3,8 @@ use schemars::SchemaGenerator;
 use schemars::generate::SchemaSettings;
 use strum::{Display, EnumMessage, IntoStaticStr, VariantArray};
 
+use crate::DEFAULT_SECURITY_REQUIREMENT;
+
 pub use self::routes::router;
 
 mod routes;
@@ -35,5 +37,13 @@ pub fn transform_api(mut api: TransformOpenApi) -> TransformOpenApi {
         });
     }
 
-    api.title("evops.api")
+    api.title("evops.api").security_scheme(
+        DEFAULT_SECURITY_REQUIREMENT,
+        aide::openapi::SecurityScheme::Http {
+            scheme: "bearer".to_owned(),
+            bearer_format: Some("JWT".to_owned()),
+            description: None,
+            extensions: Default::default(),
+        },
+    )
 }

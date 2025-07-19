@@ -8,13 +8,13 @@ use axum_typed_multipart::TypedMultipart;
 
 use evops_models::ApiResult;
 
-use crate::AppState;
 use crate::error::AddResponse as _;
 use crate::types::{
     EventServicePushImageRequestMultipart, EventServicePushImageRequestPath,
     EventServicePushImageResponse, EventServiceReorderImageRequestPath,
     EventServiceReorderImagesRequest,
 };
+use crate::{AppState, Auth};
 
 fn route_docs(r: TransformPathItem) -> TransformPathItem {
     r.tag(crate::docs::Tag::EventService.into())
@@ -31,6 +31,8 @@ fn post_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.EventService.PushImage")
         .description("Adds a new image to the event with the specified ID.")
         .response_bad_request()
+        .response_unauthorized()
+        .response_forbidden()
         .response_not_found()
         .response_conflict()
         .response_unprocessable_entity()
@@ -38,12 +40,13 @@ fn post_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn post(
     State(state): State<AppState>,
+    Auth(user_id): Auth,
     Path(path): Path<EventServicePushImageRequestPath>,
     AideMultipart(TypedMultipart(multipart)): AideMultipart<EventServicePushImageRequestMultipart>,
 ) -> ApiResult<Json<EventServicePushImageResponse>> {
     let event_id = path.event_id.into();
     let image = multipart.image.0.contents.try_into()?;
-    let image_id = state.push_event_image(event_id, image).await?;
+    let image_id = state.push_event_image(user_id, event_id, image).await?;
 
     let response_data = EventServicePushImageResponse {
         image_id: image_id.into(),

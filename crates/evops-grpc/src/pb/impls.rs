@@ -59,7 +59,6 @@ impl TryFrom<UpdateEventForm> for evops_models::UpdateEventForm {
                 ),
                 None => None,
             },
-            track_attendance: value.track_attendance,
         })
     }
 }
@@ -69,12 +68,6 @@ impl TryFrom<NewEventForm> for evops_models::NewEventForm {
 
     fn try_from(value: NewEventForm) -> Result<Self, Self::Error> {
         Ok(Self {
-            author_id: evops_models::UserId::new({
-                value
-                    .author_id
-                    .parse::<Uuid>()
-                    .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
-            }),
             title: {
                 evops_models::EventTitle::try_new(value.title)
                     .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
@@ -99,7 +92,6 @@ impl TryFrom<NewEventForm> for evops_models::NewEventForm {
                 })
                 .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
             },
-            with_attendance: value.with_attendance,
         })
     }
 }
@@ -127,7 +119,6 @@ impl From<evops_models::Event> for Event {
                     .map(Into::into)
                     .collect()
             },
-            with_attendance: value.with_attendance,
             created_at: Some(SystemTime::from(value.created_at).into()),
             modified_at: Some(SystemTime::from(value.modified_at).into()),
         }
@@ -184,8 +175,16 @@ impl TryFrom<NewUserForm> for evops_models::NewUserForm {
 
     fn try_from(value: NewUserForm) -> Result<Self, Self::Error> {
         Ok(Self {
-            name: {
-                evops_models::UserName::try_new(value.name)
+            login: {
+                evops_models::UserLogin::try_new(value.login)
+                    .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+            },
+            display_name: {
+                evops_models::UserDisplayName::try_new(value.display_name)
+                    .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
+            },
+            password: {
+                evops_models::UserPassword::try_new(value.password)
                     .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
             },
         })
@@ -196,7 +195,8 @@ impl From<evops_models::User> for User {
     fn from(value: evops_models::User) -> Self {
         Self {
             id: value.id.to_string(),
-            name: value.name.into_inner(),
+            login: value.login.into_inner(),
+            display_name: value.display_name.into_inner(),
         }
     }
 }

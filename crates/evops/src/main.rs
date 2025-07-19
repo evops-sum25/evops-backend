@@ -30,7 +30,7 @@ async fn main() -> eyre::Result<()> {
     let config = self::config::from_env()?;
 
     let (addr, listener) = self::tcp_listener(config.port).await?;
-    let app = self::rest_grpc_app(&config).await?;
+    let app = self::rest_grpc_app(config).await?;
 
     info!("listening on {addr}");
     axum::serve(listener, app.into_make_service())
@@ -76,9 +76,13 @@ async fn tcp_listener(port: u16) -> io::Result<(SocketAddr, TcpListener)> {
     Ok((addr, listener))
 }
 
-async fn rest_grpc_app(config: &self::config::Config) -> eyre::Result<RestGrpcService> {
+async fn rest_grpc_app(config: self::config::Config) -> eyre::Result<RestGrpcService> {
     let state = {
         evops_core::AppState::builder()
+            .jwt_access_secret(config.jwt_access_secret)
+            .jwt_refresh_secret(config.jwt_refresh_secret)
+            .jwt_access_expiration(config.jwt_access_expiration)
+            .jwt_refresh_expiration(config.jwt_refresh_expiration)
             .database_url(&config.database_url)
             .storage_url(&config.storage_url)
             .storage_username(&config.storage_username)

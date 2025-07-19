@@ -7,12 +7,12 @@ use tap::TryConv as _;
 
 use evops_models::{ApiError, ApiResult};
 
-use crate::AppState;
 use crate::error::AddResponse as _;
 use crate::types::{
     TagServiceCreateRequest, TagServiceCreateResponse, TagServiceListRequestQuery,
     TagServiceListResponse,
 };
+use crate::{AppState, Auth};
 
 mod _tag_id;
 mod suggestions;
@@ -63,16 +63,18 @@ fn post_docs(o: TransformOperation) -> TransformOperation {
     o.summary("evops.api.v1.TagService.Create")
         .description("Creates a new tag.")
         .response_bad_request()
+        .response_unauthorized()
         .response_conflict()
         .response_unprocessable_entity()
         .response_internal_server_error()
 }
 async fn post(
     State(state): State<AppState>,
+    Auth(user_id): Auth,
     Json(request): Json<TagServiceCreateRequest>,
 ) -> ApiResult<Json<TagServiceCreateResponse>> {
     let form = request.form.try_into()?;
-    let tag_id = state.create_tag(form).await?;
+    let tag_id = state.create_tag(form, user_id).await?;
 
     let response_data = TagServiceCreateResponse {
         tag_id: tag_id.into(),
