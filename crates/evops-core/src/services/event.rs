@@ -70,7 +70,7 @@ impl crate::AppState {
         storage.upload_event_image(image_id, image).await?;
         let db_result = {
             let mut db = self.shared_state.db.lock().await;
-            db.reserve_image(event_id, image_id).await
+            db.reserve_image(event_id, image_id, user_id).await
         };
         db_result?;
         Ok(image_id)
