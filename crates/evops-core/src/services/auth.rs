@@ -76,13 +76,40 @@ impl crate::AppState {
         let token_hash = self::hash_jwt(&tokens.refresh);
         {
             let mut db = self.shared_state.db.lock().await;
-            db.reissue_refresh_token(&token_hash, user_id).await?;
-        }
+            db.insert_refresh_token(&token_hash, user_id).await
+        }?;
         Ok(tokens)
     }
 
     pub async fn refresh_jwt_access(&self, refresh_token: &JsonWebToken) -> ApiResult<AuthTokens> {
-        todo!();
+        let user_id = self.decode_jwt(refresh_token)?;
+        let token_hash = self::hash_jwt(&refresh_token);
+        {
+            let mut db = self.shared_state.db.lock().await;
+            db.check_refresh_token(&token_hash).await
+        }?;
+
+        let now = Utc::now();
+        let tokens = AuthTokens {
+            access: self::generate_jwt(
+                user_id,
+                &self.shared_state.jwt_access_secret,
+                now,
+                self.shared_state.jwt_access_expiration,
+            )?,
+            refresh: self::generate_jwt(
+                user_id,
+                &self.shared_state.jwt_refresh_secret,
+                now,
+                self.shared_state.jwt_refresh_expiration,
+            )?,
+        };
+        let token_hash = self::hash_jwt(&tokens.refresh);
+        {
+            let mut db = self.shared_state.db.lock().await;
+            db.insert_refresh_token(&token_hash, user_id).await?;
+        }
+        Ok(tokens)
     }
 
     pub fn decode_jwt(&self, token: &JsonWebToken) -> ApiResult<UserId> {
@@ -122,7 +149,7 @@ fn verify_password(
     };
     Argon2::default()
         .verify_password(new_password.as_ref().as_bytes(), &parsed_hash)
-        .map_err(|e| ApiError::Forbidden(e.to_string()))
+        .map_err(|_| ApiError::Forbidden("Wrong credentials.".to_owned()))
 }
 
 fn generate_jwt(
