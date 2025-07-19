@@ -12,14 +12,6 @@ use evops_models::{
 };
 
 impl crate::AppState {
-    pub async fn list_users(&self) -> ApiResult<Vec<User>> {
-        let users = {
-            let mut db = self.shared_state.db.lock().await;
-            db.list_users().await
-        }?;
-        Ok(users)
-    }
-
     pub async fn sign_up(&self, form: NewUserForm) -> ApiResult<AuthTokens> {
         let user_id = UserId::new(Uuid::now_v7());
         let now = Utc::now();
@@ -54,14 +46,6 @@ impl crate::AppState {
         }?;
 
         Ok(tokens)
-    }
-
-    pub async fn find_user(&self, id: UserId) -> ApiResult<User> {
-        let user = {
-            let mut db = self.shared_state.db.lock().await;
-            db.find_user(id).await
-        }?;
-        Ok(user)
     }
 
     pub fn decode_jwt(&self, token: &JsonWebToken) -> ApiResult<UserId> {
