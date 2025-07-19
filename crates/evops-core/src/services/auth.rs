@@ -53,6 +53,12 @@ impl crate::AppState {
         login: &UserLogin,
         password: &UserPassword,
     ) -> ApiResult<AuthTokens> {
+        let password_hash = {
+            let mut db = self.shared_state.db.lock().await;
+            db.get_password_hash(&login).await
+        }?;
+        self::verify_password(password, &password_hash)?;
+
         todo!();
     }
 
