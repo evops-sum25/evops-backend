@@ -2,10 +2,10 @@ use aide::axum::ApiRouter;
 use aide::axum::routing::get_with;
 use aide::transform::{TransformOperation, TransformPathItem};
 use axum::Json;
-use axum::extract::{Query, State};
+use axum::extract::State;
 use tap::TryConv as _;
 
-use evops_models::{ApiError, ApiResult, EventTagIds};
+use evops_models::{ApiError, ApiResult};
 
 use crate::AppState;
 use crate::error::AddResponse as _;
@@ -39,16 +39,14 @@ fn get_docs(o: TransformOperation) -> TransformOperation {
 }
 async fn get(
     State(state): State<AppState>,
-    Query(query): Query<EventServiceListRequestQuery>,
+    axum_extra::extract::Query(query): axum_extra::extract::Query<EventServiceListRequestQuery>,
 ) -> ApiResult<Json<EventServiceListResponse>> {
     let search = query.search;
     let last_id = query.last_id.map(Into::into);
-    let tags: Option<EventTagIds> = match query.tags {
-        Some(tags) => Some({
-            tags.try_conv::<EventTagIds>()
-                .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
-        }),
-        None => None,
+    let tags = if !query.tags.0.is_empty() {
+        Some(query.tags.try_into()?)
+    } else {
+        None
     };
     let limit = match query.limit {
         Some(lim) => Some({
