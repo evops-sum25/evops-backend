@@ -1,4 +1,4 @@
-# evops-rest
+# `evops-rest`
 
 ## Overview
 
@@ -16,17 +16,9 @@ Provides REST API endpoints using `axum` crate. Automatically generates OpenAPI 
 
 - `docs.rs`: OpenAPI configuration
     - Defines API tags (e.g., `"TagService"`, `"UserService"`)
-    - Configures OpenAPI 3.0 schema generation
+    - Configures OpenAPI 3 schema generation
 
 - `types.rs`: Request/response data structures
-    - Request/Response types:
-    - Strict validation:
-        ```rust
-        #[schemars(length(min = 2, max = 50))]
-        struct TagName(String);
-        ```
-    - Pagination support:
-        - `last_id`, `limit` `parameters`
 
 - `error.rs`: Error handling
     Standardizes API errors:
