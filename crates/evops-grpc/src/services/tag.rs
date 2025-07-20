@@ -114,6 +114,8 @@ impl TagService for self::Service {
         &self,
         request: Request<TagServiceSuggestRequest>,
     ) -> Result<Response<TagServiceSuggestResponse>, Status> {
+        crate::auth(&self.state, &request)?;
+
         let request_data = request.into_inner();
         let description = {
             EventDescription::try_new(request_data.description)
