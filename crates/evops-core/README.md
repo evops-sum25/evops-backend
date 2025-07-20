@@ -2,49 +2,46 @@
 
 ## Overview
 
-The core service layer containing business logic and integrations. Orchestrates database operations (via `evops_db`), file storage (MinIO via `evops_storage`), and ML services (via `evops_ml_client`). Used by `evops-rest` and `evops-grpc`.
+Acts as the application's source of truth, containing all core business logic and service integrations. This crate is reused by both `evops-rest` and `evops-grpc` to ensure consistent behavior across API boundaries. Orchestrates database operations (via `evops_db`), file storage (MinIO via `evops_storage`), and ML services (via `evops_ml_client`)
+
+### Core Mechanism
+
+1. **State Initialization**
+During `AppState` construction the application is wiring together:
+    - Database connections
+    - Storage clients
+    - ML service integrations
+
+2. **API Layer Integration**
+    - REST: All endpoints inject AppState via axum's State mechanism
+    - gRPC: Service handlers hold shared references to AppState
+
+3. **Business Logic Execution**
+Both REST controllers and gRPC services directly call `AppState` methods like `create_event()`
 
 ### Key Files
 
 - `lib.rs`: 
 Initializes application state and dependencies
-    - Sets up API routes
     - Key components:
+    - Sets up API routes
         - `AppState`: Shared application state (thread-safe via `Arc`)
         - `State`: Internal struct holding:
-            - Database connection (`evops_db::Database`)
-            - File storage client (`evops_storage::Storage`)
-            - ML service client (`evops_ml_client::MlClient`)
-        - Methods:
-            - `new()`: Creates application state with DB/storage/ML connections
-            - `arc_clone()`: Explicitly clones shared state
+            - `evops_db::Database`
+            - `evops_storage::Storage`
+            - `evops_ml_client::MlClient`
+
 - `services.rs`
 Aggregates service modules (event, language, tag, user)
 
 ### Service Modules
 
 - `event.rs`
-Handles event operations and image management.
-Key Methods:
-    - `list_tags()` - Paginated tag listing
-    - `create_tag()` - Creates new tag
-    - `get_tags_by_description()` - Predicts tags using ML service
-    - `delete_tag()` - Deletes tag
+Handles event operations and image management
 
 - `user.rs`
-Manages user accounts.
-Key Methods:
-    - `list_users()` - Gets all users
-    - `create_user()`	- Creates new user
-    - `find_user()` - Gets user by ID
+Manages user accounts
 
 - `language.rs`
 Currently placeholder implementation
 Future use: Manage multilingual content
-
-### Critical Workspace Dependencies
-
-1. `evops-db`: Database operations (PostgreSQL)
-2. `evops-storage`: File storage (MinIO)
-3. `evops-ml-client`: Machine learning service integration
-4. `evops-models`: Domain data structures
