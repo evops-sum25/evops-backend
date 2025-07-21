@@ -29,14 +29,20 @@ impl crate::AppState {
         Ok(tag)
     }
 
-    pub async fn get_tags_by_description(
-        &self,
-        description: EventDescription,
-    ) -> ApiResult<Vec<TagId>> {
-        let tags = {
+    pub async fn suggest_tags(&self, description: EventDescription) -> ApiResult<Vec<Tag>> {
+        let tag_ids = {
             let mut ml_client = self.shared_state.ml_client.lock().await;
-            ml_client.predict_tags(description).await?
-        };
+            ml_client.predict_tags(description).await
+        }?;
+        let mut tags = Vec::with_capacity(tag_ids.len());
+        let tag_ids = tag_ids.into_iter();
+        {
+            let mut db = self.shared_state.db.lock().await;
+            for tag_id in tag_ids {
+                let tag = db.find_tag(tag_id).await?;
+                tags.push(tag);
+            }
+        }
         Ok(tags)
     }
 

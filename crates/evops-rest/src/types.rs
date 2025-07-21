@@ -74,7 +74,13 @@ pub struct LanguageServiceAddResponse {
 pub struct LanguageId(Uuid);
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct LanguageName(String);
+pub struct LanguageName(
+    #[schemars(length(
+        min = evops_models::LanguageName::LEN_CHAR_MIN,
+        max = evops_models::LanguageName::LEN_CHAR_MAX,
+    ))]
+    String,
+);
 
 #[derive(Debug, Deserialize, JsonSchema)]
 #[serde(rename_all = "kebab-case")]
@@ -184,22 +190,25 @@ pub struct TagServiceCreateResponse {
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
-pub struct TagServiceSuggestRequest {
+#[serde(rename_all = "kebab-case")]
+pub struct TagServiceSuggestRequestQuery {
     /// Description to predict tags for.
     pub description: EventDescription,
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
 pub struct TagServiceSuggestResponse {
-    /// A list of predicted tag IDs for a description.
-    pub tag_ids: Vec<TagId>,
+    /// A list of predicted tags for a description.
+    pub tags: Vec<Tag>,
 }
 
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct UserServiceListRequest;
 
 #[derive(Debug, Default, Deserialize, JsonSchema)]
-pub struct EventTagIds(#[schemars(length(max = evops_models::EVENT_MAX_TAGS))] pub Vec<TagId>);
+pub struct EventTagIds(
+    #[schemars(length(max = evops_models::EventTagIds::ITEMS_MAX))] pub Vec<TagId>,
+);
 
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct NewEventForm {
@@ -212,14 +221,14 @@ pub struct NewEventForm {
 }
 
 #[derive(Debug, Serialize, JsonSchema)]
-struct EventTags(#[schemars(length(max = evops_models::EVENT_MAX_TAGS))] Vec<Tag>);
+struct EventTags(#[schemars(length(max = evops_models::EventTags::ITEMS_MAX))] Vec<Tag>);
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct EventImageId(Uuid);
 
 #[derive(Debug, Deserialize, Serialize, JsonSchema)]
 pub struct EventImageIds(
-    #[schemars(length(max = evops_models::EVENT_MAX_IMAGES))] Vec<EventImageId>,
+    #[schemars(length(max = evops_models::EventImageIds::ITEMS_MAX))] Vec<EventImageId>,
 );
 
 #[derive(Debug, TryFromMultipart, JsonSchema)]
@@ -253,7 +262,7 @@ pub struct Event {
 }
 
 #[derive(Debug, Default, Serialize, Deserialize, JsonSchema)]
-struct TagAliases(#[schemars(length(max = evops_models::TAG_MAX_ALIASES))] Vec<TagAlias>);
+struct TagAliases(#[schemars(length(max = evops_models::TagAliases::ITEMS_MAX))] Vec<TagAlias>);
 
 #[derive(Debug, Deserialize, JsonSchema)]
 pub struct NewTagForm {
@@ -285,8 +294,11 @@ pub struct NewUserForm {
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct UserLogin(
     #[schemars(
-        length(min = evops_models::USER_LOGIN_MIN_LEN, max=evops_models::USER_LOGIN_MAX_LEN),
-        regex(pattern = evops_models::USER_LOGIN_REGEX),
+        length(
+            min = evops_models::UserLogin::LEN_CHAR_MIN,
+            max = evops_models::UserLogin::LEN_CHAR_MAX,
+        ),
+        regex(pattern = evops_models::UserLogin::REGEX),
     )]
     String,
 );
@@ -313,6 +325,11 @@ pub struct AuthTokens {
 #[derive(Serialize, JsonSchema)]
 pub struct AuthServiceSignUpResponse {
     pub tokens: AuthTokens,
+}
+
+#[derive(Serialize, JsonSchema)]
+pub struct AuthServiceGetMyInfoResponse {
+    pub user: User,
 }
 
 #[derive(Serialize, JsonSchema)]
@@ -350,10 +367,10 @@ pub struct UserCredentials {
 pub struct UserPassword(
     #[schemars(
         length(
-            min = evops_models::USER_PASSWORD_MIN_LEN,
-            max = evops_models::USER_PASSWORD_MAX_LEN,
+            min = evops_models::UserPassword::LEN_CHAR_MIN,
+            max = evops_models::UserPassword::LEN_CHAR_MAX,
         ),
-        regex(pattern = evops_models::USER_PASSWORD_REGEX),
+        regex(pattern = evops_models::UserPassword::REGEX),
     )]
     String,
 );
@@ -362,29 +379,28 @@ pub struct UserPassword(
 pub struct EventId(Uuid);
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
-struct EventTitle(
-    #[schemars(
-        length(min = evops_models::EVENT_TITLE_MIN_LEN, max = evops_models::EVENT_TITLE_MAX_LEN),
-    )]
+pub struct EventTitle(
+    #[schemars(length(
+        min = evops_models::EventTitle::LEN_CHAR_MIN,
+        max = evops_models::EventTitle::LEN_CHAR_MAX,
+    ))]
     String,
 );
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct EventDescription(
-    #[schemars(
-        length(
-            min = evops_models::EVENT_DESCRIPTION_MIN_LEN,
-            max = evops_models::EVENT_DESCRIPTION_MAX_LEN,
-        ),
-    )]
+    #[schemars(length(
+        min = evops_models::EventDescription::LEN_CHAR_MIN,
+        max = evops_models::EventDescription::LEN_CHAR_MAX,
+    ))]
     String,
 );
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 struct UserDisplayName(
     #[schemars(length(
-        min = evops_models::USER_DISPLAY_NAME_MIN_LEN,
-        max = evops_models::USER_DISPLAY_NAME_MAX_LEN,
+        min = evops_models::UserDisplayName::LEN_CHAR_MIN,
+        max = evops_models::UserDisplayName::LEN_CHAR_MAX,
     ))]
     String,
 );
@@ -398,9 +414,12 @@ pub struct TagId(Uuid);
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 struct TagName(
     #[schemars(
-        length(min = evops_models::TAG_NAME_MIN_LEN, max = evops_models::TAG_NAME_MAX_LEN),
-        regex(pattern = evops_models::TAG_NAME_REGEX),
-        example = &"tag-like-on-github",
+        length(
+            min = evops_models::TagName::LEN_CHAR_MIN,
+            max = evops_models::TagName::LEN_CHAR_MAX,
+        ),
+        regex(pattern = evops_models::TagName::REGEX),
+        example = &"format-like-topics-on-github",
     )]
     String,
 );
@@ -408,7 +427,10 @@ struct TagName(
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 struct TagAlias(
     #[schemars(
-        length(min = evops_models::TAG_ALIAS_MIN_LEN, max = evops_models::TAG_ALIAS_MAX_LEN),
+        length(
+            min = evops_models::TagAlias::LEN_CHAR_MIN,
+            max = evops_models::TagAlias::LEN_CHAR_MAX,
+        ),
         example = &"alias-for-better-search-ux",
     )]
     String,

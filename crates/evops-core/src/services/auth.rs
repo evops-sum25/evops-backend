@@ -7,11 +7,19 @@ use chrono::{DateTime, Utc};
 use uuid::Uuid;
 
 use evops_models::{
-    ApiError, ApiResult, AuthTokens, JsonWebToken, JsonWebTokenHash, JwtClaims, NewUserForm,
+    ApiError, ApiResult, AuthTokens, JsonWebToken, JsonWebTokenHash, JwtClaims, NewUserForm, User,
     UserId, UserLogin, UserPassword, UserPasswordHash,
 };
 
 impl crate::AppState {
+    pub async fn get_user_info(&self, user_id: UserId) -> ApiResult<User> {
+        let user = {
+            let mut db = self.shared_state.db.lock().await;
+            db.find_user(user_id).await
+        }?;
+        Ok(user)
+    }
+
     pub async fn sign_up(&self, form: NewUserForm) -> ApiResult<AuthTokens> {
         let user_id = UserId::new(Uuid::now_v7());
         let now = Utc::now();

@@ -121,14 +121,9 @@ impl TagService for self::Service {
             EventDescription::try_new(request_data.description)
                 .map_err(|e| ApiError::InvalidArgument(e.to_string()))?
         };
-        let tag_ids = self.state.get_tags_by_description(description).await?;
+        let tags = self.state.suggest_tags(description).await?;
         let response_data = TagServiceSuggestResponse {
-            tag_ids: {
-                tag_ids
-                    .into_iter()
-                    .map(|tag_id| tag_id.to_string())
-                    .collect()
-            },
+            tags: tags.into_iter().map(Into::into).collect(),
         };
         Ok(Response::new(response_data))
     }

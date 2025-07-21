@@ -92,7 +92,7 @@ async fn rest_grpc_app(config: self::config::Config) -> eyre::Result<RestGrpcSer
             .await?
     };
 
-    let timeout_layer = TimeoutLayer::new(Duration::from_secs(10));
+    let timeout_layer = TimeoutLayer::new(Duration::from_secs(60));
 
     let grpc_router = evops_grpc::router(&state).layer((TraceLayer::new_for_http(), timeout_layer));
     let rest_router = evops_rest::router(state).layer((TraceLayer::new_for_grpc(), timeout_layer));
